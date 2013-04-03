@@ -9,7 +9,7 @@ entity ab_counter is
 end ab_counter;
 
 architecture rtl of ab_counter is
-    signal count : unsigned(9 downto 0);
+    signal count : unsigned(9 downto 0) := "0000000000";
 begin
     addr <= count;
 

@@ -6,6 +6,7 @@ entity audio_buffer is
     port (clk : in std_logic;
           en  : in std_logic;
           data_debug : out std_logic_vector(15 downto 0);
+          count_debug : out unsigned(10 downto 0);
           sram_req : out std_logic;
           sram_ack : in std_logic;
           sram_readdata : in std_logic_vector(15 downto 0);
@@ -16,7 +17,7 @@ architecture rtl of audio_buffer is
     signal addr : unsigned(9 downto 0);
     signal sram_data : std_logic_vector(15 downto 0);
     signal audio_data : std_logic_vector(15 downto 0);
-    signal count : unsigned(10 downto 0);
+    signal count : unsigned(10 downto 0) := "00000000000";
     signal counter_en : std_logic;
     signal mm_en : std_logic;
     signal codec_en : std_logic;
@@ -59,4 +60,5 @@ begin
 
     audio_data <= sram_data when en = '1' else x"0000";
     data_debug <= audio_data;
+    count_debug <= count;
 end rtl;
