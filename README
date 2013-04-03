@@ -1,0 +1,5 @@
+Hardware description files for the Kanto audio player.
+
+Quartus Project File - kanto.qpf
+Quartus Assignments File - kanto.qsf
+Quartus Top-Level Entity - kanto.vhd
