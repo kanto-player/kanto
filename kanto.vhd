@@ -187,7 +187,7 @@ begin
         sram_addr => addr
     );
 
-    SID : entity work.sram_id_dummy port map (
+    SID : entity work.sram_rom_dummy port map (
         clk => CLOCK_50,
         req => req,
         ack => ack,
