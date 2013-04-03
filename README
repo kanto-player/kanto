@@ -3,3 +3,13 @@ Hardware description files for the Kanto audio player.
 Quartus Project File - kanto.qpf
 Quartus Assignments File - kanto.qsf
 Quartus Top-Level Entity - kanto.vhd
+
+VHDL Style Guide
+============
+ - Use four-space indents
+ - No hard tabs
+ - Name entities under major subsystems with a prefix for that subsystem
+   in order to prevent naming conflicts. (e.g., everything under audio buffer
+   subsystem is prefixed with ab_).
+ - First signal in port declaration on same line as "port (".
+ - Final signal in port declaration on same line as final ");".
