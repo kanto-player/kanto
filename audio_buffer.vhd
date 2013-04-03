@@ -5,6 +5,7 @@ use ieee.numeric_std.all;
 entity audio_buffer is
     port (clk : in std_logic;
           en  : in std_logic;
+          data_debug : out std_logic_vector(15 downto 0);
           sram_req : out std_logic;
           sram_ack : in std_logic;
           sram_readdata : in std_logic_vector(15 downto 0);
@@ -57,4 +58,5 @@ begin
     );
 
     audio_data <= sram_data when en = '1' else x"0000";
+    data_debug <= audio_data;
 end rtl;
