@@ -172,7 +172,16 @@ entity kanto is
 end kanto;
 
 architecture datapath of kanto is
+    signal sram_req : std_logic;
 begin
+
+    AB : entity work.audio_buffer port map (
+        clk => CLOCK_50,
+        en => '1',
+        sram_req => sram_req,
+        sram_ack => sram_req,
+        sram_readdata => x"0000"
+    );
 
     HEX7 <= "0001001"; -- Leftmost
     HEX6 <= "0000110";
