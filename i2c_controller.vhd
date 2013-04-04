@@ -9,36 +9,130 @@ entity i2c_controller is
           data : in std_logic_vector(0 to 15);
           start : in std_logic;
           done : out std_logic;
+          err : out std_logic;
 
-          I2C_SDA : inout std_logic;
-          I2C_SCLK : out std_logic);
+          i2c_sda : inout std_logic;
+          i2c_sclk : out std_logic);
 end i2c_controller;
 
 architecture rtl of i2c_controller is
-    signal long_clk : std_logic;
-    signal last_clk : std_logic;
-    signal long_clk_divider : std_logic_vector(9 downto 0);
-    type state_type is (idle, start, 
-                        a0, a1, a2, a3, a4, a5, a6, rw, ack0
-                        d0, d1, d2, d3, d4, d5, d6, d7, ack1
-                        d8, d9, d10, d11, d12, d13, d14, d15, ack2);
+    signal i2c_clk_divider : std_logic_vector(9 downto 0);
+    signal i2c_clk_midlow : std_logic;
+    signal i2c_clk_midhigh : std_logic;
+    signal active : std_logic := '0';
+    type state_type is (idle, success, fail, 
+                        start0, start1, 
+                        sa0, sa1, rw, ack0,
+                        d0, d1, ack1, ack2);
+    signal i2c_state : state_type := idle;
+    signal bitindex : std_logic_vector(3 downto 0) := x"0";
 begin
     process (clk)
     begin
-        if rising_edge(clk) then
-            long_clk_divider <= long_clk_divider + "1";
+        if rising_edge(clk) and active = '1' then
+            i2c_clk_divider <= i2c_clk_divider + "1";
         end if;
     end process;
 
-    long_clk <= long_clk_divider(9);
+    active <= '0' when state = idle else '1';
+    i2c_sclk <= i2c_clk_divider(9) when active = '1' else 'Z';
+    i2c_clk_midlow <= '1' when i2c_clk_divider = "0000000001" else '0';
+    i2c_clk_midhigh <= '1' when i2c_clk_divider = "1000000001" else '0';
 
     process (clk)
     begin
         if rising_edge(clk) then
-            last_clk <= long_clk;
+            if state = ack0 or state = ack2 then
+                bitindex <= x"0";
+            else
+                bitindex <= bitindex + "1";
+            end if;
         end if;
     end process;
 
     process (clk)
     begin
+        if rising_edge(clk) then
+            case i2c_state is
+                when idle =>
+                    if start = '1' then
+                        i2c_state <= start0;
+                    else
+                        i2c_state <= idle;
+                    end if;
+                when start0 =>
+                    if i2c_clk_midhigh = '1' then
+                        i2c_state <= start1;
+                    else
+                        i2c_state <= start0;
+                    end if;
+                when start1 =>
+                    if i2c_clk_midlow = '1' then
+                        i2c_state <= sa1;
+                    else
+                        i2c_state <= start1;
+                    end if;
+                when sa0 =>
+                    if bitindex = x"6"; then
+                        i2c_state <= rw;
+                    else
+                        i2c_state <= sa1;
+                    end if;
+                when sa1 =>
+                    if i2c_clk_midlow = '1' then
+                        i2c_state <= sa0;
+                    else
+                        i2c_state <= sa1;
+                    end if;
+                when rw =>
+                    if i2c_clk_midlow = '1' then
+                        i2c_state <= ack0;
+                    else
+                        i2c_state <= rw;
+                    end if;
+                when ack0 =>
+                    if i2c_sda = '1' then
+                        i2c_state <= fail;
+                    elsif i2c_clk_midlow = '1' then
+                        i2c_state <= d1;
+                    else
+                        i2c_state <= ack0;
+                    end if;
+                when d0 =>
+                    if bitindex = x"7"; then
+                        i2c_state <= ack1;
+                    elsif bitindex = x"f"; then
+                        i2c_state <= ack2;
+                    else
+                        i2c_state <= d1;
+                    end if;
+                when d1 =>
+                    if i2c_clk_midlow = '1' then
+                        i2c_state <= d0;
+                    else
+                        i2c_state <= d1;
+                    end if;
+                when ack1 =>
+                    if i2c_sda = '1' then
+                        i2c_state <= fail;
+                    elsif i2c_clk_midlow = '1' then
+                        i2c_state <= d1;
+                    else
+                        i2c_state <= ack1;
+                    end if;
+                when ack2 =>
+                    if i2c_sda = '1' then
+                        i2c_state <= fail;
+                    elsif i2c_clk_midlow = '1' then
+                        i2c_state <= success;
+                    else
+                        i2c_state <= ack2;
+                    end if;
+                when success =>
+                    i2c_state <= idle;
+                when fail =>
+                    i2c_state <= idle;
+            end case;
+        end if;
+    end process;
 end rtl;
