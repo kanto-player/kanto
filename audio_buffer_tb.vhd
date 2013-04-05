@@ -10,8 +10,6 @@ architecture sim of audio_buffer_tb is
     signal ack : std_logic;
     signal addr : std_logic_vector(17 downto 0);
     signal readdata : std_logic_vector(15 downto 0);
-    signal data : std_logic_vector(15 downto 0);
-    signal count : unsigned(10 downto 0);
     signal clk : std_logic := '0';
 begin
     AB : entity work.audio_buffer port map (
@@ -21,8 +19,6 @@ begin
         sram_ack => ack,
         sram_readdata => readdata,
         sram_addr => addr,
-        data_debug => data,
-        count_debug => count
     );
 
     SID : entity work.sram_id_dummy port map (
