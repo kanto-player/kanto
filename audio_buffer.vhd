@@ -5,8 +5,16 @@ use ieee.numeric_std.all;
 entity audio_buffer is
     port (clk : in std_logic;
           en  : in std_logic;
+          
           data_debug : out std_logic_vector(15 downto 0);
           count_debug : out unsigned(10 downto 0);
+
+          running : out std_logic;
+          err : out std_logic;
+          
+          i2c_sda : inout std_logic;
+          i2c_sclk : out std_logic;
+          
           sram_req : out std_logic;
           sram_ack : in std_logic;
           sram_readdata : in std_logic_vector(15 downto 0);
@@ -21,11 +29,22 @@ architecture rtl of audio_buffer is
     signal counter_en : std_logic;
     signal mm_en : std_logic;
     signal codec_en : std_logic;
+    signal config_done : std_logic;
+    signal ready : std_logic;
 begin
+
+    I2C_CONF : entity work.ab_i2c_config port map (
+        clk => clk,
+        i2c_sda => i2c_sda,
+        i2c_clk => i2c_clk,
+        config_done => config_done,
+        config_err => err
+    );
+
     process (clk)
     begin
         if rising_edge(clk) then
-            if en = '0' then
+            if ready = '0' then
                 count <= (others => '0');
             else
                 if count = "10001101101" then
@@ -37,9 +56,11 @@ begin
         end if;
     end process;
 
-    counter_en <= '1' when en = '1' and count = "00000000000" else '0';
-    mm_en <= '1' when en = '1' and count = "00000000001" else '0';
-    codec_en <= '1' when en = '1' and count = "00100000000" else '0';
+    ready <= en and config_done;
+    running <= ready;
+    counter_en <= '1' when ready = '1' and count = "00000000000" else '0';
+    mm_en <= '1' when ready = '1' and count = "00000000001" else '0';
+    codec_en <= '1' when ready = '1' and count = "00100000000" else '0';
 
     COUNTER : entity work.ab_counter port map (
         addr => addr,
@@ -58,7 +79,7 @@ begin
         sram_addr => sram_addr
     );
 
-    audio_data <= sram_data when en = '1' else x"0000";
+    audio_data <= sram_data when ready = '1' else x"0000";
     data_debug <= audio_data;
     count_debug <= count;
 end rtl;

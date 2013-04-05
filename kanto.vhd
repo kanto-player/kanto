@@ -28,7 +28,7 @@ entity kanto is
 
         HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7 -- 7-segment displays
              : out std_logic_vector(6 downto 0);
-        LEDG : out std_logic_vector(8 downto 0);       -- Green LEDs
+        LEDG : out std_logic_vector(7 downto 0);       -- Green LEDs
         LEDR : out std_logic_vector(17 downto 0);      -- Red LEDs
 
         -- RS-232 interface
@@ -181,6 +181,13 @@ begin
     AB : entity work.audio_buffer port map (
         clk => CLOCK_50,
         en => '1',
+
+        running => LEDG(0),
+        err => LEDR(0),
+
+        i2c_sdat => i2c_sdat,
+        i2c_sclk => i2c_sclk,
+
         sram_req => req,
         sram_ack => ack,
         sram_readdata => readdata,
@@ -204,8 +211,8 @@ begin
     HEX1 <= (others => '1');
     HEX0 <= (others => '1');-- Rightmost
 
-    LEDG <= (others => '0');
-    LEDR <= (others => '0');
+    LEDG <= (7 downto 1 => '0');
+    LEDR <= (17 downto 1 => '0');
     
     LCD_ON   <= '1';
     LCD_BLON <= '1';
