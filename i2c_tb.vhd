@@ -34,59 +34,59 @@ begin
         variable i : integer range 0 to 16;
     begin
         i2c_sdat <= 'Z';
-        wait for 20 ns;
+        wait for 20 ns; -- 20 ns
         start <= '1';
-        wait for 20 ns;
+        wait for 20 ns; -- 40 ns
         start <= '0';
-        wait for 10240 ns;
+        wait for 100 ns; -- 140 ns
         assert i2c_sdat  = '1';
-        wait for 60 ns;
+        wait for 20 ns;  -- 160 ns
         assert i2c_sdat = '0';
-        wait for 10240 ns;
+        wait for 100 ns;
 
         i := 0;
         while i < 7 loop -- Make sure address sent correctly
             assert i2c_sdat = addr(i);
-            wait for 10240 ns;
+            wait for 80 ns;
             assert i2c_sdat = addr(i);
-            wait for 10240 ns;
+            wait for 80 ns;
             i := i + 1;
         end loop;
 
         i := 0;
 
         assert i2c_sdat = '0'; -- make sure 'W' bit is sent
-        wait for 10240 ns;
+        wait for 80 ns;
         assert i2c_sdat = '0';
-        wait for 10240 ns;
+        wait for 80 ns;
 
         i2c_sdat <= '0'; -- send ACK
-        wait for 20480 ns;
+        wait for 160 ns;
         i2c_sdat <= 'Z';
         
         i := 0;
         while i < 8 loop
             assert i2c_sdat = data(i);
-            wait for 10240 ns;
+            wait for 80 ns;
             assert i2c_sdat = data(i);
-            wait for 10240 ns;
+            wait for 80 ns;
             i := i + 1;
         end loop;
 
         i2c_sdat <= '0';
-        wait for 20480 ns;
+        wait for 160 ns;
         i2c_sdat <= 'Z';
 
         while i < 16 loop
             assert i2c_sdat = data(i);
-            wait for 10240 ns;
+            wait for 80 ns;
             assert i2c_sdat = data(i);
-            wait for 10240 ns;
+            wait for 80 ns;
             i := i + 1;
         end loop;
         
         i2c_sdat <= '0';
-        wait for 20460 ns;
+        wait for 60 ns;
         assert done = '1';
         wait for 20 ns;
         i2c_sdat <= 'Z';

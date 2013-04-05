@@ -15,7 +15,7 @@ entity i2c_controller is
 end i2c_controller;
 
 architecture rtl of i2c_controller is
-    signal i2c_clk_divider : unsigned(9 downto 0) := "0000000000";
+    signal i2c_clk_divider : unsigned(2 downto 0) := "000";
     signal i2c_clk_midlow : std_logic;
     signal i2c_clk_midhigh : std_logic;
     signal active : std_logic := '0';
@@ -34,9 +34,9 @@ begin
     end process;
 
     active <= '0' when i2c_state = idle else '1';
-    i2c_sclk <= i2c_clk_divider(9) when active = '1' else '1';
-    i2c_clk_midlow <= '1' when i2c_clk_divider = "0000000001" else '0';
-    i2c_clk_midhigh <= '1' when i2c_clk_divider = "1000000001" else '0';
+    i2c_sclk <= i2c_clk_divider(2) when active = '1' else '1';
+    i2c_clk_midlow <= '1' when i2c_clk_divider = "001" else '0';
+    i2c_clk_midhigh <= '1' when i2c_clk_divider = "101" else '0';
 
     process (clk)
     begin
