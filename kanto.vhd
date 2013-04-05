@@ -211,8 +211,8 @@ begin
     HEX1 <= (others => '1');
     HEX0 <= (others => '1');-- Rightmost
 
-    LEDG <= (7 downto 1 => '0');
-    LEDR <= (17 downto 1 => '0');
+    LEDG(7 downto 1) <= (others => '0');
+    LEDR(17 downto 1) <= (others => '0');
     
     LCD_ON   <= '1';
     LCD_BLON <= '1';

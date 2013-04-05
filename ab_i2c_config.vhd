@@ -23,7 +23,7 @@ architecture rtl of ab_i2c_config is
         "0000110000000111", -- power down ADC, mic in, and line in
         "0000111000000001", -- 16-bit, left-justified mode
         "0001000000100000", -- normal mode, 44.1 kHz, 256fs
-        "0001001000000001", -- reactivate the codec
+        "0001001000000001"  -- reactivate the codec
     );
     signal i2c_data : std_logic_vector(0 to 15);
     signal i2c_start : std_logic;
@@ -63,6 +63,7 @@ begin
                     state <= err;
                 when done =>
                     state <= done;
+            end case;
         end if;
     end process;
 
@@ -74,8 +75,8 @@ begin
         end if;
     end process;
 
-    i2c_start = '1' when state = changing else '0';
-    config_err = '1' when state = err else '0';
-    config_done = '1' when state = done else '0';
+    i2c_start <= '1' when state = changing else '0';
+    config_err <= '1' when state = err else '0';
+    config_done <= '1' when state = done else '0';
 end rtl;
 

@@ -12,7 +12,7 @@ entity audio_buffer is
           running : out std_logic;
           err : out std_logic;
           
-          i2c_sda : inout std_logic;
+          i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic;
           
           sram_req : out std_logic;
@@ -35,8 +35,8 @@ begin
 
     I2C_CONF : entity work.ab_i2c_config port map (
         clk => clk,
-        i2c_sda => i2c_sda,
-        i2c_clk => i2c_clk,
+        i2c_sdat => i2c_sdat,
+        i2c_sclk => i2c_sclk,
         config_done => config_done,
         config_err => err
     );

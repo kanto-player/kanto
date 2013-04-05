@@ -1,7 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-use IEEE.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
 entity i2c_controller is
     port (clk : in std_logic;
@@ -16,7 +15,7 @@ entity i2c_controller is
 end i2c_controller;
 
 architecture rtl of i2c_controller is
-    signal i2c_clk_divider : std_logic_vector(9 downto 0);
+    signal i2c_clk_divider : unsigned(9 downto 0);
     signal i2c_clk_midlow : std_logic;
     signal i2c_clk_midhigh : std_logic;
     signal active : std_logic := '0';
@@ -25,7 +24,7 @@ architecture rtl of i2c_controller is
                         sa0, sa1, rw, ack0,
                         d0, d1, ack1, ack2);
     signal i2c_state : state_type := idle;
-    signal bitindex : std_logic_vector(3 downto 0) := x"0";
+    signal bitindex : unsigned(3 downto 0) := x"0";
 begin
     process (clk)
     begin
@@ -34,7 +33,7 @@ begin
         end if;
     end process;
 
-    active <= '0' when state = idle else '1';
+    active <= '0' when i2c_state = idle else '1';
     i2c_sclk <= i2c_clk_divider(9) when active = '1' else '1';
     i2c_clk_midlow <= '1' when i2c_clk_divider = "0000000001" else '0';
     i2c_clk_midhigh <= '1' when i2c_clk_divider = "1000000001" else '0';
@@ -42,7 +41,7 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            if state = ack0 or state = ack2 then
+            if i2c_state = ack0 or i2c_state = ack2 then
                 bitindex <= x"0";
             else
                 bitindex <= bitindex + "1";
@@ -50,12 +49,12 @@ begin
         end if;
     end process;
 
-    i2c_sdat <= addr(to_integer(bitindex)) when state = sa0 or state = sa1 else
-               data(to_integer(bitindex)) when state = d0 or state = d1 else
-               '0' when state = rw or state = start1 else
-               '1' when state = start0 else 'Z';
-    done <= '1' when state = success else '0';
-    err <= '1' when state = fail else '0';
+    i2c_sdat <= addr(to_integer(bitindex)) when i2c_state = sa0 or i2c_state = sa1 else
+               data(to_integer(bitindex)) when i2c_state = d0 or i2c_state = d1 else
+               '0' when i2c_state = rw or i2c_state = start1 else
+               '1' when i2c_state = start0 else 'Z';
+    done <= '1' when i2c_state = success else '0';
+    err <= '1' when i2c_state = fail else '0';
 
     process (clk)
     begin
@@ -80,7 +79,7 @@ begin
                         i2c_state <= start1;
                     end if;
                 when sa0 =>
-                    if bitindex = x"6"; then
+                    if bitindex = x"6" then
                         i2c_state <= rw;
                     else
                         i2c_state <= sa1;
@@ -106,9 +105,9 @@ begin
                         i2c_state <= ack0;
                     end if;
                 when d0 =>
-                    if bitindex = x"7"; then
+                    if bitindex = x"7" then
                         i2c_state <= ack1;
-                    elsif bitindex = x"f"; then
+                    elsif bitindex = x"f" then
                         i2c_state <= ack2;
                     else
                         i2c_state <= d1;
