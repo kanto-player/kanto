@@ -35,7 +35,7 @@ begin
 
     active <= '0' when i2c_state = idle else '1';
     i2c_sclk <= i2c_clk_divider(2) when active = '1' else '1';
-    i2c_clk_midlow <= '1' when i2c_clk_divider = "001" else '0';
+    i2c_clk_midlow <= '1' when i2c_clk_divider = "000" else '0';
     i2c_clk_midhigh <= '1' when i2c_clk_divider = "101" else '0';
 
     process (clk)
