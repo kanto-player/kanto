@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity ab_i2c_config is
     port (clk : in std_logic;
-          i2c_sda : inout std_logic;
+          i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic;
           finished : out std_logic;
           err : out std_logic);

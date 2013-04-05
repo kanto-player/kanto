@@ -11,7 +11,7 @@ entity i2c_controller is
           done : out std_logic;
           err : out std_logic;
 
-          i2c_sda : inout std_logic;
+          i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic);
 end i2c_controller;
 
@@ -50,7 +50,7 @@ begin
         end if;
     end process;
 
-    i2c_sda <= addr(to_integer(bitindex)) when state = sa0 or state = sa1 else
+    i2c_sdat <= addr(to_integer(bitindex)) when state = sa0 or state = sa1 else
                data(to_integer(bitindex)) when state = d0 or state = d1 else
                '0' when state = rw or state = start1 else
                '1' when state = start0 else 'Z';
@@ -98,7 +98,7 @@ begin
                         i2c_state <= rw;
                     end if;
                 when ack0 =>
-                    if i2c_sda = '1' then
+                    if i2c_sdat = '1' then
                         i2c_state <= fail;
                     elsif i2c_clk_midlow = '1' then
                         i2c_state <= d1;
@@ -120,7 +120,7 @@ begin
                         i2c_state <= d1;
                     end if;
                 when ack1 =>
-                    if i2c_sda = '1' then
+                    if i2c_sdat = '1' then
                         i2c_state <= fail;
                     elsif i2c_clk_midlow = '1' then
                         i2c_state <= d1;
@@ -128,7 +128,7 @@ begin
                         i2c_state <= ack1;
                     end if;
                 when ack2 =>
-                    if i2c_sda = '1' then
+                    if i2c_sdat = '1' then
                         i2c_state <= fail;
                     elsif i2c_clk_midlow = '1' then
                         i2c_state <= success;
