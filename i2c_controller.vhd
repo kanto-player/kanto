@@ -5,7 +5,7 @@ USE IEEE.std_logic_unsigned.ALL;
 
 entity i2c_controller is
     port (clk : in std_logic;
-          address : in std_logic_vector(0 to 6);
+          addr : in std_logic_vector(0 to 6);
           data : in std_logic_vector(0 to 15);
           start : in std_logic;
           done : out std_logic;
@@ -49,6 +49,13 @@ begin
             end if;
         end if;
     end process;
+
+    i2c_sda <= addr(to_integer(bitindex)) when state = sa0 or state = sa1 else
+               data(to_integer(bitindex)) when state = d0 or state = d1 else
+               '0' when state = rw or state = start1 else
+               '1' when state = start0 else 'Z';
+    done <= '1' when state = success else '0';
+    err <= '1' when state = fail else '0';
 
     process (clk)
     begin
