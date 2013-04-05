@@ -14,7 +14,7 @@ architecture rtl of ab_i2c_config is
     type rom_type is array (0 to 8) of std_logic_vector(0 to 15);
     type state_type is (changing, holding, err, done);
     constant slave_addr : std_logic_vector(0 to 6) := "0011010";
-    constant sda_rom : rom_type := (
+    constant sdat_rom : rom_type := (
         "0001001000000000", -- deactivate the codec
         "0000000110000000", -- mute the ADC
         "0000010101111001", -- set DAC volume to 0 dB
@@ -29,8 +29,8 @@ architecture rtl of ab_i2c_config is
     signal i2c_start : std_logic;
     signal i2c_done : std_logic;
     signal i2c_err : std_logic;
-    signal rom_index : unsigned(3 downto 0);
-    signal state : state_type := CHANGING;
+    signal rom_index : unsigned(2 downto 0) := "111";
+    signal state : state_type := changing;
 begin
     I2C : entity work.i2c_controller port map (
         clk => clk,
@@ -53,7 +53,7 @@ begin
                     if i2c_err = '1' then
                         state <= err;
                     elsif i2c_done = '1' then
-                        if rom_index = x"8" then
+                        if rom_index = x"7" then
                             state <= done;
                         else
                             state <= changing;
@@ -70,11 +70,11 @@ begin
     process (clk)
     begin
         if rising_edge(clk) and state = changing then
-            i2c_data <= sda_rom(to_integer(rom_index));
             rom_index <= rom_index + "1";
         end if;
     end process;
 
+    i2c_data <= sdat_rom(to_integer(rom_index));
     i2c_start <= '1' when state = changing else '0';
     config_err <= '1' when state = err else '0';
     config_done <= '1' when state = done else '0';
