@@ -15,7 +15,7 @@ entity i2c_controller is
 end i2c_controller;
 
 architecture rtl of i2c_controller is
-    signal i2c_clk_divider : unsigned(9 downto 0);
+    signal i2c_clk_divider : unsigned(9 downto 0) := "0000000000";
     signal i2c_clk_midlow : std_logic;
     signal i2c_clk_midhigh : std_logic;
     signal active : std_logic := '0';
@@ -43,16 +43,16 @@ begin
         if rising_edge(clk) then
             if i2c_state = ack0 or i2c_state = ack2 then
                 bitindex <= x"0";
-            else
+            elsif i2c_state = sa0 or i2c_state = d0 then
                 bitindex <= bitindex + "1";
             end if;
         end if;
     end process;
 
-    i2c_sdat <= addr(to_integer(bitindex)) when i2c_state = sa0 or i2c_state = sa1 else
-               data(to_integer(bitindex)) when i2c_state = d0 or i2c_state = d1 else
-               '0' when i2c_state = rw or i2c_state = start1 else
-               '1' when i2c_state = start0 else 'Z';
+    i2c_sdat <= addr(to_integer(bitindex)) when i2c_state = sa1 or i2c_state = sa0 else
+                data(to_integer(bitindex)) when i2c_state = d1 or i2c_state = d0 else
+                '0' when i2c_state = rw or i2c_state = start1 else
+                '1' when i2c_state = start0 else 'Z';
     done <= '1' when i2c_state = success else '0';
     err <= '1' when i2c_state = fail else '0';
 
