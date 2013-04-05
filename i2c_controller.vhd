@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
-USE ieee.std_logic_arith.ALL;
-USE IEEE.std_logic_unsigned.ALL;
+use ieee.std_logic_arith.all;
+use IEEE.std_logic_unsigned.all;
 
 entity i2c_controller is
     port (clk : in std_logic;
