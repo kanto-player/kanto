@@ -86,7 +86,11 @@ begin
         i2c_sdat <= '0';
         wait for 100 ns; -- 4520 ns
         i2c_sdat <= 'Z';
-        wait for 20 ns; -- 4540 ns
+        wait for 80 ns; -- 4600 ns
+        assert i2c_sdat = '0';
+        wait for 40 ns; -- 4640 ns
+        assert i2c_sdat = '1';
+        wait for 60 ns; -- 4700 ns
         assert done = '1';
 
         wait;

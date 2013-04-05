@@ -20,7 +20,7 @@ architecture rtl of i2c_controller is
     signal i2c_clk_midhigh : std_logic;
     signal active : std_logic := '0';
     type state_type is (idle, success, fail, 
-                        start0, start1, 
+                        start0, start1, stop0, stop1,
                         sa0, sa1, rw, ack0,
                         d0, d1, ack1, ack2);
     signal i2c_state : state_type := idle;
@@ -49,10 +49,13 @@ begin
         end if;
     end process;
 
-    i2c_sdat <= addr(to_integer(bitindex)) when i2c_state = sa1 or i2c_state = sa0 else
-                data(to_integer(bitindex)) when i2c_state = d1 or i2c_state = d0 else
-                '0' when i2c_state = rw or i2c_state = start1 else
-                '1' when i2c_state = start0 else 'Z';
+    i2c_sdat <= addr(to_integer(bitindex)) when i2c_state = sa1 
+                        or i2c_state = sa0 else
+                data(to_integer(bitindex)) when i2c_state = d1 
+                        or i2c_state = d0 else
+                '0' when i2c_state = rw or i2c_state = start1 
+                        or i2c_state = stop0 else
+                '1' when i2c_state = start0 or i2c_state = stop1 else 'Z';
     done <= '1' when i2c_state = success else '0';
     err <= '1' when i2c_state = fail else '0';
 
@@ -130,9 +133,21 @@ begin
                     if i2c_sdat = '1' then
                         i2c_state <= fail;
                     elsif i2c_clk_midlow = '1' then
-                        i2c_state <= success;
+                        i2c_state <= stop0;
                     else
                         i2c_state <= ack2;
+                    end if;
+                when stop0 =>
+                    if i2c_clk_midhigh = '1' then
+                        i2c_state <= stop1;
+                    else
+                        i2c_state <= stop0;
+                    end if;
+                when stop1 =>
+                    if i2c_clk_midlow = '1' then
+                        i2c_state <= success;
+                    else
+                        i2c_state <= stop1;
                     end if;
                 when success =>
                     i2c_state <= idle;
