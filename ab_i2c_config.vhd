@@ -6,6 +6,10 @@ entity ab_i2c_config is
     port (clk : in std_logic;
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic;
+
+          stage_debug : out std_logic_vector(2 downto 0);
+          ack_debug : out std_logic_vector(1 downto 0);
+
           config_done : out std_logic;
           config_err : out std_logic);
 end ab_i2c_config;
@@ -39,6 +43,8 @@ begin
         start => i2c_start,
         done => i2c_done,
         err => i2c_err,
+
+        ack_debug => ack_debug,
 
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk
@@ -78,5 +84,7 @@ begin
     i2c_start <= '1' when state = changing else '0';
     config_err <= '1' when state = err else '0';
     config_done <= '1' when state = done else '0';
+
+    stage_debug <= std_logic_vector(rom_index);
 end rtl;
 

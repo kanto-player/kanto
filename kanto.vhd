@@ -188,6 +188,9 @@ begin
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk,
 
+        config_stage_debug => LEDG(3 downto 1),
+        config_ack_debug => LEDR(2 downto 1),
+
         sram_req => req,
         sram_ack => ack,
         sram_readdata => readdata,
@@ -211,8 +214,8 @@ begin
     HEX1 <= (others => '1');
     HEX0 <= (others => '1');-- Rightmost
 
-    LEDG(7 downto 1) <= (others => '0');
-    LEDR(17 downto 1) <= (others => '0');
+    LEDG(7 downto 4) <= (others => '0');
+    LEDR(17 downto 3) <= (others => '0');
     
     LCD_ON   <= '1';
     LCD_BLON <= '1';

@@ -10,6 +10,8 @@ entity i2c_controller is
           done : out std_logic;
           err : out std_logic;
 
+          ack_debug : out std_logic_vector(1 downto 0);
+
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic);
 end i2c_controller;
@@ -25,6 +27,7 @@ architecture rtl of i2c_controller is
                         d0, d1, ack1, ack2);
     signal i2c_state : state_type := idle;
     signal bitindex : unsigned(3 downto 0) := x"0";
+    signal ack_debug_intern : std_logic_vector(1 downto 0);
 begin
     process (clk)
     begin
@@ -49,12 +52,34 @@ begin
         end if;
     end process;
 
-    i2c_sdat <= addr(to_integer(bitindex)) when i2c_state = sa1 or i2c_state = sa0 else
-                data(to_integer(bitindex)) when i2c_state = d1 or i2c_state = d0 else
+    i2c_sdat <= addr(to_integer(bitindex)) when i2c_state = sa1 
+                        or i2c_state = sa0 else
+                data(to_integer(bitindex)) when i2c_state = d1 
+                        or i2c_state = d0 else
                 '0' when i2c_state = rw or i2c_state = start1 else
                 '1' when i2c_state = start0 else 'Z';
     done <= '1' when i2c_state = success else '0';
     err <= '1' when i2c_state = fail else '0';
+
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            case i2c_state is
+                when start0 =>
+                    ack_debug_intern <= "00";
+                when ack0 =>
+                    ack_debug_intern <= "01";
+                when ack1 =>
+                    ack_debug_intern <= "10";
+                when ack2 =>
+                    ack_debug_intern <= "11";
+                when others => 
+                    ack_debug_intern <= ack_debug_intern;
+            end case;
+        end if;
+    end process;
+
+    ack_debug <= ack_debug_intern;
 
     process (clk)
     begin

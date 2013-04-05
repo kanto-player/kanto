@@ -8,6 +8,9 @@ entity audio_buffer is
           
           running : out std_logic;
           err : out std_logic;
+
+          config_stage_debug : out std_logic_vector(2 downto 0);
+          config_ack_debug : out std_logic_vector(1 downto 0);
           
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic;
@@ -34,6 +37,8 @@ begin
         clk => clk,
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk,
+        stage_debug => config_stage_debug,
+        ack_debug => config_ack_debug,
         config_done => config_done,
         config_err => err
     );
