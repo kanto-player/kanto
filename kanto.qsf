@@ -481,6 +481,8 @@ set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id audio_buffer
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "227 us" -section_id audio_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME audio_buffer_tb -section_id audio_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE audio_buffer_tb.vhd -section_id audio_buffer_tb
+set_global_assignment -name VHDL_FILE i2c_controller.vhd
+set_global_assignment -name VHDL_FILE ab_i2c_config.vhd
 set_global_assignment -name VHDL_FILE sram_rom_dummy.vhd
 set_global_assignment -name VHDL_FILE sram_id_dummy.vhd
 set_global_assignment -name VHDL_FILE ab_middleman.vhd
