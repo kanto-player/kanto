@@ -6,9 +6,6 @@ entity audio_buffer is
     port (clk : in std_logic;
           en  : in std_logic;
           
-          data_debug : out std_logic_vector(15 downto 0);
-          count_debug : out unsigned(10 downto 0);
-
           running : out std_logic;
           err : out std_logic;
           
@@ -80,6 +77,4 @@ begin
     );
 
     audio_data <= sram_data when ready = '1' else x"0000";
-    data_debug <= audio_data;
-    count_debug <= count;
 end rtl;
