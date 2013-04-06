@@ -74,6 +74,8 @@ begin
                     ack_debug_intern <= "10";
                 when ack2 =>
                     ack_debug_intern <= "11";
+                when success =>
+                    ack_debug_intern <= "00";
                 when others => 
                     ack_debug_intern <= ack_debug_intern;
             end case;
