@@ -193,12 +193,13 @@ begin
     AB : entity work.audio_buffer port map (
         clk => main_clk,
         aud_clk => aud_clk,
-        en => '1',
+        en => SW(17),
 
         initialized => LEDG(0),
         fault => LEDR(0),
         dacdat_debug => LEDR(1),
-        sram_debug => LEDR(17 downto 2),
+        lrck_debug => LEDR(2),
+        next_samp_debug => LEDR(3),
 
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk,
