@@ -80,10 +80,10 @@ begin
     index_debug <= index;
     data <= audio_rom(to_integer(index));
 
-    process (clk)
+    process (aud_clk)
     begin
-        if rising_edge(clk) and next_samp = '1' then
-            if index = x"a9" then
+        if rising_edge(aud_clk) and next_samp = '1' then
+            if index = x"a8" then
                 index <= x"00";
             else
                 index <= index + x"1";
