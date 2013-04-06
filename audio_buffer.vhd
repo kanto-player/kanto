@@ -5,6 +5,11 @@ use ieee.numeric_std.all;
 entity audio_buffer is
     port (clk : in std_logic;
           en  : in std_logic;
+          aud_clk : in std_logic;
+
+          aud_daclrck : inout std_logic;
+          aud_dacdat : out std_logic;
+          aud_bclk : inout std_logic;
           
           initialized : out std_logic;
           fault : out std_logic;
@@ -21,13 +26,11 @@ end audio_buffer;
 architecture rtl of audio_buffer is
     signal addr : unsigned(9 downto 0);
     signal sram_data : std_logic_vector(15 downto 0);
-    signal audio_data : std_logic_vector(15 downto 0);
-    signal count : unsigned(10 downto 0) := "00000000000";
     signal counter_en : std_logic;
     signal mm_en : std_logic;
-    signal codec_en : std_logic;
     signal config_done : std_logic;
     signal ready : std_logic;
+    signal next_samp : std_logic;
 begin
 
     I2C_CONF : entity work.ab_i2c_config port map (
@@ -38,26 +41,16 @@ begin
         config_fault => fault
     );
 
-    process (clk)
-    begin
-        if rising_edge(clk) then
-            if ready = '0' then
-                count <= (others => '0');
-            else
-                if count = "10001101101" then
-                    count <= (others => '0');
-                else
-                    count <= count + "1";
-                end if;
-            end if;
-        end if;
-    end process;
-
     ready <= en and config_done;
     initialized <= ready;
-    counter_en <= '1' when ready = '1' and count = "00000000000" else '0';
-    mm_en <= '1' when ready = '1' and count = "00000000001" else '0';
-    codec_en <= '1' when ready = '1' and count = "00100000000" else '0';
+    counter_en <= ready and next_samp;
+
+    process (clk) -- assert mm_en one clock behind counter_en
+    begin
+        if rising_edge(clk) then
+            mm_en <= counter_en;
+        end if;
+    end process;
 
     COUNTER : entity work.ab_counter port map (
         addr => addr,
@@ -76,5 +69,15 @@ begin
         sram_addr => sram_addr
     );
 
-    audio_data <= sram_data when ready = '1' else x"0000";
+    CODEC : entity work.ab_codec port map (
+        clk => aud_clk,
+        en => ready,
+
+        aud_daclrck => aud_daclrck,
+        aud_dacdat => aud_dacdat,
+        aud_bclk => aud_bclk,
+
+        data => sram_data,
+        next_samp => next_samp
+    );
 end rtl;
