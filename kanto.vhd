@@ -197,6 +197,8 @@ begin
 
         initialized => LEDG(0),
         fault => LEDR(0),
+        dacdat_debug => LEDR(1),
+        sram_debug => LEDR(17 downto 2),
 
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk,
@@ -229,7 +231,6 @@ begin
     HEX0 <= (others => '1');-- Rightmost
 
     LEDG(7 downto 1) <= (others => '0');
-    LEDR(17 downto 1) <= (others => '0');
     
     LCD_ON   <= '1';
     LCD_BLON <= '1';
