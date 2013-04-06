@@ -6,8 +6,8 @@ entity audio_buffer is
     port (clk : in std_logic;
           en  : in std_logic;
           
-          running : out std_logic;
-          err : out std_logic;
+          initialized : out std_logic;
+          fault : out std_logic;
           
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic;
@@ -35,7 +35,7 @@ begin
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk,
         config_done => config_done,
-        config_err => err
+        config_fault => fault
     );
 
     process (clk)
@@ -54,7 +54,7 @@ begin
     end process;
 
     ready <= en and config_done;
-    running <= ready;
+    initialized <= ready;
     counter_en <= '1' when ready = '1' and count = "00000000000" else '0';
     mm_en <= '1' when ready = '1' and count = "00000000001" else '0';
     codec_en <= '1' when ready = '1' and count = "00100000000" else '0';

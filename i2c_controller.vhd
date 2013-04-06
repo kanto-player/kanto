@@ -8,7 +8,7 @@ entity i2c_controller is
           data : in std_logic_vector(0 to 15);
           start : in std_logic;
           done : out std_logic;
-          err : out std_logic;
+          fault : out std_logic;
 
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic);
@@ -57,7 +57,7 @@ begin
                         or i2c_state = stop0 else
                 '1' when i2c_state = start0 or i2c_state = stop1 else 'Z';
     done <= '1' when i2c_state = success else '0';
-    err <= '1' when i2c_state = fail else '0';
+    fault <= '1' when i2c_state = fail else '0';
 
     process (clk)
     begin

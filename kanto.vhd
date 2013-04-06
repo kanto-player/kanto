@@ -85,8 +85,8 @@ entity kanto is
         OTG_RST_N,                                      -- Reset
         OTG_FSPEED,                                     -- USB Full Speed, 0 = Enable, Z = Disable
         OTG_LSPEED : out std_logic;                     -- USB Low Speed, 0 = Enable, Z = Disable
-        OTG_INT0,                                       -- Interrupt 0
-        OTG_INT1,                                       -- Interrupt 1
+        OTG_INT0,                                       -- Intfaultupt 0
+        OTG_INT1,                                       -- Intfaultupt 1
         OTG_DREQ0,                                      -- DMA Request 0
         OTG_DREQ1 : in std_logic;                       -- DMA Request 1     
         OTG_DACK0_N,                                    -- DMA Acknowledge 0
@@ -145,7 +145,7 @@ entity kanto is
         ENET_RD_N,                                              -- Read
         ENET_RST_N,                                             -- Reset
         ENET_CLK : out std_logic;                               -- Clock 25 MHz
-        ENET_INT : in std_logic;                                -- Interrupt
+        ENET_INT : in std_logic;                                -- Intfaultupt
         
         -- Audio CODEC
         
@@ -182,8 +182,8 @@ begin
         clk => CLOCK_50,
         en => '1',
 
-        running => LEDG(0),
-        err => LEDR(0),
+        initialized => LEDG(0),
+        fault => LEDR(0),
 
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk,

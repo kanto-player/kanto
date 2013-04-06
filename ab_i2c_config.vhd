@@ -7,12 +7,12 @@ entity ab_i2c_config is
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic;
           config_done : out std_logic;
-          config_err : out std_logic);
+          config_fault : out std_logic);
 end ab_i2c_config;
 
 architecture rtl of ab_i2c_config is
     type rom_type is array (0 to 8) of std_logic_vector(0 to 15);
-    type state_type is (changing, holding, err, done);
+    type state_type is (changing, holding, fault, done);
     constant slave_addr : std_logic_vector(0 to 6) := "0011010";
     constant sdat_rom : rom_type := (
         "0001001000000000", -- deactivate the codec
@@ -28,7 +28,7 @@ architecture rtl of ab_i2c_config is
     signal i2c_data : std_logic_vector(0 to 15);
     signal i2c_start : std_logic;
     signal i2c_done : std_logic;
-    signal i2c_err : std_logic;
+    signal i2c_fault : std_logic;
     signal rom_index : unsigned(2 downto 0) := "111";
     signal state : state_type := changing;
 begin
@@ -38,7 +38,7 @@ begin
         data => i2c_data,
         start => i2c_start,
         done => i2c_done,
-        err => i2c_err,
+        fault => i2c_fault,
 
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk
@@ -50,8 +50,8 @@ begin
                 when changing =>
                     state <= holding;
                 when holding =>
-                    if i2c_err = '1' then
-                        state <= err;
+                    if i2c_fault = '1' then
+                        state <= fault;
                     elsif i2c_done = '1' then
                         if rom_index = x"7" then
                             state <= done;
@@ -59,8 +59,8 @@ begin
                             state <= changing;
                         end if;
                     end if;
-                when err =>
-                    state <= err;
+                when fault =>
+                    state <= fault;
                 when done =>
                     state <= done;
             end case;
@@ -76,7 +76,7 @@ begin
 
     i2c_data <= sdat_rom(to_integer(rom_index));
     i2c_start <= '1' when state = changing else '0';
-    config_err <= '1' when state = err else '0';
+    config_fault <= '1' when state = fault else '0';
     config_done <= '1' when state = done else '0';
 end rtl;
 

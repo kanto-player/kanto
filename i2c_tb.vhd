@@ -11,7 +11,7 @@ architecture sim of i2c_tb is
     constant data : std_logic_vector(0 to 15) := "0001001000000000";
     signal start : std_logic;
     signal done : std_logic;
-    signal err : std_logic;
+    signal fault : std_logic;
     
     signal i2c_sdat : std_logic;
     signal i2c_sclk : std_logic;
@@ -24,7 +24,7 @@ begin
         data => data,
         start => start,
         done => done,
-        err => err,
+        fault => fault,
 
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk
