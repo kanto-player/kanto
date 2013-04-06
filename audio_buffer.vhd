@@ -13,8 +13,9 @@ entity audio_buffer is
           
           initialized : out std_logic;
           fault : out std_logic;
-          sram_debug : out std_logic_vector(15 downto 0);
           dacdat_debug : out std_logic;
+          lrck_debug : out std_logic;
+          next_samp_debug : out std_logic;
           
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic;
@@ -34,6 +35,7 @@ architecture rtl of audio_buffer is
     signal ready : std_logic;
     signal next_samp : std_logic;
     signal dacdat : std_logic;
+    signal lrck : std_logic;
 begin
 
     I2C_CONF : entity work.ab_i2c_config port map (
@@ -45,7 +47,7 @@ begin
     );
 
     ready <= en and config_done;
-    initialized <= ready;
+    initialized <= config_done;
     counter_en <= ready and next_samp;
 
     process (clk) -- assert mm_en one clock behind counter_en
@@ -76,7 +78,7 @@ begin
         clk => aud_clk,
         en => ready,
 
-        aud_daclrck => aud_daclrck,
+        aud_daclrck => lrck,
         aud_dacdat => dacdat,
         aud_bclk => aud_bclk,
 
@@ -85,6 +87,9 @@ begin
     );
 
     aud_dacdat <= dacdat;
+    aud_daclrck <= lrck;
+
     dacdat_debug <= dacdat;
-    sram_debug<= sram_data;
+    lrck_debug <= lrck;
+    next_samp_debug <= next_samp;
 end rtl;
