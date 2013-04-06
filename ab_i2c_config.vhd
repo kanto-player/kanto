@@ -15,7 +15,7 @@ architecture rtl of ab_i2c_config is
     type state_type is (changing, holding, fault, done);
     constant slave_addr : std_logic_vector(0 to 6) := "0011010";
     constant sdat_rom : rom_type := (
-        "0001001000000000", -- deactivate the codec
+        "0001111000000000", -- reset the device
         "0000000110000000", -- mute the ADC
         "0000010101111001", -- set DAC volume to 0 dB
         "0000100011010010", -- disable side tone, mute line in, select DAC
@@ -23,7 +23,7 @@ architecture rtl of ab_i2c_config is
         "0000110000000111", -- power down ADC, mic in, and line in
         "0000111000000001", -- 16-bit, left-justified mode
         "0001000000100000", -- normal mode, 44.1 kHz, 256fs
-        "0001001000000001"  -- reactivate the codec
+        "0001001000000001"  -- activate the codec
     );
     signal i2c_data : std_logic_vector(0 to 15);
     signal i2c_start : std_logic;
