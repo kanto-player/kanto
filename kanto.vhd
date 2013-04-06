@@ -176,10 +176,22 @@ architecture datapath of kanto is
     signal ack : std_logic;
     signal addr : std_logic_vector(17 downto 0);
     signal readdata : std_logic_vector(15 downto 0);
+    signal main_clk : std_logic;
+    signal aud_clk : std_logic;
+    signal sdram_clk : std_logic;
 begin
 
+    PLL : entity work.audpll port map (
+        inclk0 => CLOCK_50,
+        c0 => main_clk,
+        c1 => aud_clk,
+        c2 => sdram_clk
+    );
+    
+    AUD_XCK <= aud_clk;
+
     AB : entity work.audio_buffer port map (
-        clk => CLOCK_50,
+        clk => main_clk,
         en => '1',
 
         initialized => LEDG(0),
@@ -195,7 +207,7 @@ begin
     );
 
     SID : entity work.sram_rom_dummy port map (
-        clk => CLOCK_50,
+        clk => main_clk,
         req => req,
         ack => ack,
         addr => addr,
