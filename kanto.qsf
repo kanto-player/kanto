@@ -475,7 +475,7 @@ set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_RO
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
-set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH i2c_tb -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH codec_tb -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_NAME audio_buffer_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id audio_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "227 us" -section_id audio_buffer_tb
@@ -484,8 +484,6 @@ set_global_assignment -name EDA_TEST_BENCH_NAME i2c_tb -section_id eda_simulatio
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id i2c_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME i2c_tb -section_id i2c_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "5 us" -section_id i2c_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE audio_buffer_tb.vhd -section_id audio_buffer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE i2c_tb.vhd -section_id i2c_tb
 set_global_assignment -name VHDL_FILE ab_codec.vhd
 set_global_assignment -name VHDL_FILE i2c_controller.vhd
 set_global_assignment -name VHDL_FILE ab_i2c_config.vhd
@@ -496,4 +494,11 @@ set_global_assignment -name VHDL_FILE ab_counter.vhd
 set_global_assignment -name VHDL_FILE audio_buffer.vhd
 set_global_assignment -name VHDL_FILE kanto.vhd
 set_global_assignment -name QIP_FILE audpll.qip
+set_global_assignment -name EDA_TEST_BENCH_NAME codec_tb -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id codec_tb
+set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "5120 ns" -section_id codec_tb
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME codec_tb -section_id codec_tb
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name EDA_TEST_BENCH_FILE audio_buffer_tb.vhd -section_id audio_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE i2c_tb.vhd -section_id i2c_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE codec_tb.vhd -section_id codec_tb
