@@ -25,6 +25,7 @@ architecture rtl of i2c_controller is
                         d0, d1, ack1, ack2);
     signal i2c_state : state_type := idle;
     signal bitindex : unsigned(3 downto 0) := x"0";
+    signal sclk : std_logic;
 begin
     process (clk)
     begin
@@ -34,7 +35,8 @@ begin
     end process;
 
     active <= '0' when i2c_state = idle else '1';
-    i2c_sclk <= i2c_clk_divider(2) when active = '1' else '1';
+    sclk <= i2c_clk_divider(2);
+    i2c_sclk <= sclk when active = '1' else '1';
     i2c_clk_midlow <= '1' when i2c_clk_divider = "000" else '0';
     i2c_clk_midhigh <= '1' when i2c_clk_divider = "101" else '0';
 
@@ -100,7 +102,7 @@ begin
                         i2c_state <= rw;
                     end if;
                 when ack0 =>
-                    if i2c_sdat = '1' then
+                    if i2c_sdat = '1' and sclk = '1' then
                         i2c_state <= fail;
                     elsif i2c_clk_midlow = '1' then
                         i2c_state <= d1;
@@ -122,7 +124,7 @@ begin
                         i2c_state <= d1;
                     end if;
                 when ack1 =>
-                    if i2c_sdat = '1' then
+                    if i2c_sdat = '1' and sclk = '1' then
                         i2c_state <= fail;
                     elsif i2c_clk_midlow = '1' then
                         i2c_state <= d1;
@@ -130,7 +132,7 @@ begin
                         i2c_state <= ack1;
                     end if;
                 when ack2 =>
-                    if i2c_sdat = '1' then
+                    if i2c_sdat = '1' and sclk = '1' then
                         i2c_state <= fail;
                     elsif i2c_clk_midlow = '1' then
                         i2c_state <= stop0;
