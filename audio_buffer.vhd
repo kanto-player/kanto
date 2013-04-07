@@ -7,15 +7,11 @@ entity audio_buffer is
           en  : in std_logic;
           aud_clk : in std_logic;
 
+          aud_adcdat : in std_logic;
+          aud_adclrck : inout std_logic;
           aud_daclrck : inout std_logic;
           aud_dacdat : out std_logic;
           aud_bclk : inout std_logic;
-          
-          initialized : out std_logic;
-          fault : out std_logic;
-          dacdat_debug : out std_logic;
-          lrck_debug : out std_logic;
-          next_samp_debug : out std_logic;
           
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic;
@@ -27,32 +23,31 @@ entity audio_buffer is
 end audio_buffer;
 
 architecture rtl of audio_buffer is
+    component de2_i2c_av_config is
+        port (iclk : in std_logic;
+              irst_n : in std_logic;
+              i2c_sclk : out std_logic;
+              i2c_sdat : inout std_logic);
+    end component;
+    
     signal addr : unsigned(9 downto 0);
     signal sram_data : std_logic_vector(15 downto 0);
-    signal counter_en : std_logic;
+    signal audio_request : std_logic;
     signal mm_en : std_logic;
-    signal config_done : std_logic;
-    signal ready : std_logic;
-    signal next_samp : std_logic;
-    signal dacdat : std_logic;
-    signal lrck : std_logic;
+    signal counter_en : std_logic;
 begin
 
-    I2C_CONF : entity work.ab_i2c_config port map (
-        clk => clk,
+    I2C_CONF : de2_i2c_av_config port map (
+        iclk => clk,
+        irst_n => '1',
         i2c_sdat => i2c_sdat,
-        i2c_sclk => i2c_sclk,
-        config_done => config_done,
-        config_fault => fault
+        i2c_sclk => i2c_sclk
     );
-
-    ready <= en and config_done;
-    initialized <= config_done;
-    counter_en <= ready and next_samp;
 
     process (clk) -- assert mm_en one clock behind counter_en
     begin
         if rising_edge(clk) then
+            counter_en <= audio_request;
             mm_en <= counter_en;
         end if;
     end process;
@@ -74,22 +69,18 @@ begin
         sram_addr => sram_addr
     );
 
-    CODEC : entity work.ab_codec port map (
+    CODEC : entity work.de2_wm8731_audio port map (
         clk => aud_clk,
-        en => ready,
-
-        aud_daclrck => lrck,
-        aud_dacdat => dacdat,
+        reset_n => en,
+        test_mode => '0',
+        
+        aud_adclrck => aud_adclrck,
+        aud_adcdat => aud_adcdat,
+        aud_daclrck => aud_daclrck,
+        aud_dacdat => aud_dacdat,
         aud_bclk => aud_bclk,
 
         data => sram_data,
-        next_samp => next_samp
+        audio_request => audio_request
     );
-
-    aud_dacdat <= dacdat;
-    aud_daclrck <= lrck;
-
-    dacdat_debug <= dacdat;
-    lrck_debug <= lrck;
-    next_samp_debug <= next_samp;
 end rtl;

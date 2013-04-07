@@ -7,22 +7,26 @@ entity audio_test is
           en  : in std_logic;
           aud_clk : in std_logic;
 
+          aud_adcdat : in std_logic;
+          aud_adclrck : inout std_logic;
           aud_daclrck : inout std_logic;
           aud_dacdat : out std_logic;
           aud_bclk : inout std_logic;
-          
-          initialized : out std_logic;
-          fault : out std_logic;
-
-          index_debug : out unsigned(7 downto 0);
           
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic);
 end audio_test;
 
 architecture rtl of audio_test is
-    signal config_done : std_logic;
-    signal next_samp : std_logic;
+    component de2_i2c_av_config is
+        port (iclk : in std_logic;
+              irst_n : in std_logic;
+              i2c_sclk : out std_logic;
+              i2c_sdat : inout std_logic);
+    end component;
+
+    signal audio_request : std_logic;
+    signal request_data : std_logic;
     signal ready : std_logic;
     signal index : unsigned(7 downto 0) := x"00";
     signal data : std_logic_vector(15 downto 0);
@@ -54,35 +58,34 @@ architecture rtl of audio_test is
         x"dc6a", x"e105", x"e5ab", x"ea5b", x"ef12", x"f3d0", x"f892", 
         x"fd56");
 begin
-    I2C_CONF : entity work.ab_i2c_config port map (
-        clk => clk,
+    I2C_CONF : de2_i2c_av_config port map (
+        iclk => clk,
+        irst_n => '1',
         i2c_sdat => i2c_sdat,
-        i2c_sclk => i2c_sclk,
-        config_done => config_done,
-        config_fault => fault
+        i2c_sclk => i2c_sclk
     );
 
-    initialized <= config_done;
-    ready <= en and config_done;
-
-    CODEC : entity work.ab_codec port map (
+    CODEC : entity work.de2_wm8731_audio port map (
         clk => aud_clk,
-        en => ready,
-
+        reset_n => en,
+        test_mode => '0',
+        
+        aud_adclrck => aud_adclrck,
+        aud_adcdat => aud_adcdat,
         aud_daclrck => aud_daclrck,
         aud_dacdat => aud_dacdat,
         aud_bclk => aud_bclk,
 
         data => data,
-        next_samp => next_samp
+        audio_request => audio_request
     );
 
-    index_debug <= index;
-    data <= audio_rom(to_integer(index));
+    data <= audio_rom(to_integer(index)) when en = '1' else x"0000";
+    request_data <= audio_request and en;
 
     process (aud_clk)
     begin
-        if rising_edge(aud_clk) and next_samp = '1' then
+        if rising_edge(aud_clk) and request_data = '1' then
             if index = x"a8" then
                 index <= x"00";
             else
