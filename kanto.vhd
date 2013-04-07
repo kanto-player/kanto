@@ -195,12 +195,11 @@ begin
         aud_clk => aud_clk,
         en => SW(17),
 
-        initialized => LEDG(0),
-        fault => LEDR(0),
-
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk,
 
+        aud_adclrck => aud_adclrck,
+        aud_adcdat => aud_adcdat,
         aud_daclrck => aud_daclrck,
         aud_dacdat => aud_dacdat,
         aud_bclk => aud_bclk
@@ -220,8 +219,6 @@ begin
     HEX4 <= "1000111";
     HEX3 <= "1000000";
     HEX2 <= (others => '1');
-    HEX1 <= (others => '1');
-    HEX0 <= (others => '1');-- Rightmost
 
     LEDG(7 downto 1) <= (others => '0');
     
