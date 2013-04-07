@@ -32,6 +32,7 @@ architecture rtl of audio_buffer is
     
     signal addr : unsigned(9 downto 0);
     signal sram_data : std_logic_vector(15 downto 0);
+    signal audio_data : std_logic_vector(15 downto 0);
     signal audio_request : std_logic;
     signal mm_en : std_logic;
     signal counter_en : std_logic;
@@ -47,7 +48,15 @@ begin
     process (clk) -- assert mm_en one clock behind counter_en
     begin
         if rising_edge(clk) then
-            counter_en <= audio_request;
+            if counter_en = '1' then
+                counter_en <= '0';
+                audio_data <= sram_data;
+            elsif en = '1' then
+                counter_en <= audio_request;
+            else
+                audio_data <= x"0000";
+                counter_en <= '0';
+            end if;
             mm_en <= counter_en;
         end if;
     end process;
@@ -80,7 +89,7 @@ begin
         aud_dacdat => aud_dacdat,
         aud_bclk => aud_bclk,
 
-        data => sram_data,
+        data => audio_data,
         audio_request => audio_request
     );
 end rtl;
