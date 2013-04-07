@@ -190,7 +190,7 @@ begin
     
     AUD_XCK <= aud_clk;
 
-    AB : entity work.audio_test port map (
+    AB : entity work.audio_buffer port map (
         clk => main_clk,
         aud_clk => aud_clk,
         en => SW(17),
@@ -202,7 +202,12 @@ begin
         aud_adcdat => aud_adcdat,
         aud_daclrck => aud_daclrck,
         aud_dacdat => aud_dacdat,
-        aud_bclk => aud_bclk
+        aud_bclk => aud_bclk,
+        
+        sram_req => req,
+        sram_ack => ack,
+        sram_addr => addr,
+        sram_readdata => readdata
     );
 
     SID : entity work.sram_rom_dummy port map (
