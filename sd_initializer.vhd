@@ -7,9 +7,9 @@ port(
     clk_en      : in std_logic;
     clk         : in std_logic;
     sd_data     : in std_logic_vector(15 downto 0);
-    init_done   : out std_logic
+    init_done   : out std_logic;
     mosi        : out std_logic;
-    cs          : out std_logic;
+    cs          : out std_logic
 );
 end sd_initializer;
 
@@ -28,7 +28,7 @@ begin
 
     process(clk)
 
-        signal counter : integer range 0 to 127 := 0;
+        variable counter : integer range 0 to 127 := 0;
 
     begin
 

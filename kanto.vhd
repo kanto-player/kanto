@@ -229,8 +229,7 @@ begin
 	     mosi => SD_CMD,
 	     miso => SD_DAT,
 	     play => sd_play,
-	     ready => sd_ready,
-	     data_out => sd_data_out
+	     ready => sd_ready
 	 );
 	 
 	 SDC_TEST : entity work.sd_test port map (

@@ -12,5 +12,18 @@ port (
 end sd_test;
 
 architecture rtl of sd_test is
+signal count : integer range 0 to 25000000 := 0;
 begin
+    process(clk)
+	 begin
+	     if rising_edge(clk) then
+  	         play <= '0';
+		  
+		      if count = 25000000 then
+				   count <= 0;
+				else
+     				count <= count + 1;
+				end if;
+		  end if;
+	 end process;
 end rtl;

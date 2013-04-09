@@ -22,7 +22,8 @@ architecture rtl of sd_reader is
     signal cmd_addr : std_logic_vector(0 to 31) := (others => '0');
 
     type state is (idle, send_cmd_begin, send_cmd_addr, send_cmd_end,
-            wait_resp_start);
+            wait_resp_start, wait_resp, wait_data_start, data_recv,
+				data_write, crc_rev);
     signal current_state : state := idle;
 
     signal write_done : std_logic;
@@ -56,7 +57,7 @@ begin
 
         -- sending the first 8 bits of cmd
         when send_cmd_begin =>
-            if clk_en = '1'
+            if clk_en = '1' then
                 if counter /= 7 then
                     counter := counter + 1;
                     mosi <= cmd_begin(counter);
