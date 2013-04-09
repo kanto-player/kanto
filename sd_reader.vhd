@@ -23,7 +23,7 @@ architecture rtl of sd_reader is
 
     type state is (idle, send_cmd_begin, send_cmd_addr, send_cmd_end,
             wait_resp_start, wait_resp, wait_data_start, data_recv,
-				data_write, crc_rev);
+            data_write, crc_rev);
     signal current_state : state := idle;
 
     signal write_done : std_logic;

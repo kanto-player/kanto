@@ -26,7 +26,7 @@ architecture datapath of sd_controller is
 
     signal sd_clk_enable : std_logic := '1';
     signal clk_counter : integer range 0 to 255;
-	 signal init_done_old : std_logic;
+    signal init_done_old : std_logic;
 
 begin
 
@@ -85,15 +85,15 @@ begin
                     or (init_done = '1' and clk_counter = 24) then
                 sd_clk_enable <= '1';
                 clk_counter <= 0;
-				else
-				    sd_clk_enable <= '0';
-					 clk_counter <= clk_counter + 1;
+            else
+                sd_clk_enable <= '0';
+                clk_counter <= clk_counter + 1;
             end if;
 
         end if; -- rising_edge(clk50)
 
-		  init_done_old <= init_done;
-		  
+        init_done_old <= init_done;
+        
     end process;
 
 end datapath;
