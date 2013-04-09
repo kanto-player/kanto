@@ -36,7 +36,7 @@ signal playing : std_logic := '0';
 
 begin
 
-	cs <= '0'
+	cs <= '0';
 
 	process(clk)
 	begin
@@ -48,9 +48,9 @@ begin
 			if clk_en = '1' and playing = '1' then
 
 
-				if ready and sending then
-					elsif cmd_begin_counter /= 8 then
-						mosi <= cmd_begin(command_begin_counter);
+				if ready = '1' and sending = '1' then
+					if cmd_begin_counter /= 8 then
+						mosi <= cmd_begin(cmd_begin_counter);
 						cmd_begin_counter <= cmd_begin_counter + 1;
 
 					elsif cmd_addr_counter /= 32 then
@@ -71,6 +71,7 @@ begin
 							wait_counter <= 0;
 						else
 							wait_counter <= wait_counter + 1;
+						end if;
 
 					elsif resp_counter /= 7 then
 						resp_counter <= resp_counter + 1;
@@ -88,7 +89,7 @@ begin
 
 					end if;
 
-				elsif ready and not sending then
+				elsif ready = '1' and sending = '0' then
 					if fe = '1' then
 						if package_counter = 256 then
 							--package_counter<=0;
@@ -118,7 +119,7 @@ begin
 						end if;
 
 					else
-						if sd_data(7 down to 0)="11111110" then
+						if sd_data(7 downto 0)="11111110" then
 							fe<='1';
 						end if;
 					end if;

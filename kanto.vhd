@@ -179,6 +179,11 @@ architecture datapath of kanto is
     signal main_clk : std_logic;
     signal aud_clk : std_logic;
     signal sdram_clk : std_logic;
+	 
+	 -- inserted for SDC testing
+	 signal sd_play : std_logic;
+	 signal sd_ready : std_logic;
+	 signal sd_data_out : std_logic_vector(15 downto 0);
 begin
 
     PLL : entity work.audpll port map (
@@ -217,8 +222,26 @@ begin
         addr => addr,
         readdata => readdata
     );
+	 
+	 SDC : entity work.sd_controller port map (
+	     clk50 => main_clk,
+	     cs	=> SD_DAT3,
+	     mosi => SD_CMD,
+	     miso => SD_DAT,
+	     play => sd_play,
+	     ready => sd_ready,
+	     data_out => sd_data_out
+	 );
+	 
+	 SDC_TEST : entity work.sd_test port map (
+	     clk => main_clk,
+		  play => sd_play,
+		  ready => sd_ready,
+		  data_out => sd_data_out,
+		  hex => HEX7
+	 );
 
-    HEX7 <= "0001001"; -- Leftmost
+    --HEX7 <= "0001001"; -- Leftmost
     HEX6 <= "0000110";
     HEX5 <= "1000111";
     HEX4 <= "1000111";
@@ -242,9 +265,9 @@ begin
     VGA_G <= (others => '0');
     VGA_B <= (others => '0');
 
-    SD_DAT3 <= '1';    
-    SD_CMD <= '1';
-    SD_CLK <= '1';
+    --SD_DAT3 <= '1';    
+    --SD_CMD <= '1';
+    --SD_CLK <= '1';
 
     UART_TXD <= '0';
     DRAM_ADDR <= (others => '0');

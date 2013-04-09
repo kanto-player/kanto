@@ -10,7 +10,7 @@ port(
 	miso	: in std_logic;
 	play	: in std_logic;
 	ready	: out std_logic;
-);
+	data_out : out std_logic_vector(15 downto 0));
 end sd_controller;
 
 architecture datapath of sd_controller is
@@ -22,11 +22,10 @@ port(
 	sd_data		: in std_logic_vector(15 downto 0);
 	mosi		: out std_logic;
 	cs		: out std_logic;
-	ready	: out std_logic
-);
+	ready	: out std_logic);
 end component;
 
-component sd_reader;
+component sd_reader
 port(
 	clk_en		: in std_logic;
 	clk		: in std_logic;
@@ -34,17 +33,15 @@ port(
 	ready	: in std_logic;
 	mosi	: out std_logic;
 	cs		: out std_logic;
-	play	: in std_logic;
-);
+	play	: in std_logic);
 end component;
 
-component sd_shift_register;
+component sd_shift_register
 port(
 	clk_en		: in std_logic;
 	clk		: in std_logic;
 	data_in		: in std_logic;
-	data_out	: out std_logic_vector(15 downto 0)
-);
+	data_out	: out std_logic_vector(15 downto 0));
 end component;
 
 signal shift_reg_data : std_logic_vector(15 downto 0);
@@ -61,6 +58,8 @@ signal clk_counter : integer range 0 to 250;
 
 begin
 
+	data_out <= shift_reg_data;
+
 	SHIFT_REG : sd_shift_register port map(
 		clk_en => sd_clk_enable,
 		clk => clk50,
@@ -74,8 +73,8 @@ begin
 		sd_data => shift_reg_data,
 		ready => init_done,
 		mosi => reader_mosi,
-		cs => reader_cs
-		play => play;
+		cs => reader_cs,
+		play => play
 	);
 
 	INIT : sd_initializer port map(
@@ -87,20 +86,20 @@ begin
 		ready => init_done
 	);
 
-	mosi <= init_mosi when not init_done
+	mosi <= init_mosi when init_done = '0'
 			else reader_mosi;
-	cs <= init_cs when not init_done
+	cs <= init_cs when init_done = '0'
 			else reader_cs;
 
 	ready <= init_done;
 
 	-- clock divider
-	process(clk)
+	process(clk50)
 	begin
 
-		if rising_edge(clk) then
+		if rising_edge(clk50) then
 
-			if init_done then
+			if init_done = '1' then
 				-- assuming 25MHz sd clock for transfers
 				sd_clk_enable <= not sd_clk_enable;
 			else
