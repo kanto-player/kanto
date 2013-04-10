@@ -246,6 +246,8 @@ begin
     HEX4 <= "1000111";
     HEX3 <= "1000000";
     HEX2 <= (others => '1');
+    HEX1 <= (others => '1');
+    HEX0 <= (others => '1');
 
     LEDG(7 downto 1) <= (others => '0');
     
