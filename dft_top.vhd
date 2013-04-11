@@ -4,14 +4,17 @@ use ieee.numeric_std.all;
 
 entity dft_top is
     port (tdom_data : in signed(15 downto 0);
-          tdom_addr : out unsigned(3 downto 0);
+          tdom_addr : out unsigned(7 downto 0);
+          tdom_base : in unsigned(3 downto 0);
           clk : in std_logic;
           reset : in std_logic;
           rom_data : in signed(35 downto 0);
           rom_addr : out unsigned(7 downto 0);
           fdom_data : out signed(35 downto 0);
-          fdom_addr : out unsigned(3 downto 0);
-          fdom_write : out std_logic);
+          fdom_addr : out unsigned(7 downto 0);
+          fdom_base : in unsigned(3 downto 0);
+          fdom_write : out std_logic;
+          done : out std_logic);
 end dft_top;
 
 architecture rtl of dft_top is
@@ -25,6 +28,7 @@ begin
     S1 : entity work.dft_stage1 port map (
         tdom_data => tdom_data,
         tdom_addr => tdom_addr,
+        tdom_base => tdom_base,
 
         clk => clk,
         reset => reset,

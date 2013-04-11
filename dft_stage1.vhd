@@ -4,7 +4,8 @@ use ieee.numeric_std.all;
 
 entity dft_stage1 is
     port (tdom_data : in signed(15 downto 0);
-          tdom_addr : out unsigned(3 downto 0);
+          tdom_addr : out unsigned(7 downto 0);
+          tdom_base : in unsigned(3 downto 0);
           
           clk : in std_logic;
           reset : in std_logic;
@@ -26,7 +27,7 @@ architecture rtl of dft_stage1 is
     signal done_intern : std_logic := '0';
 begin
     rom_addr <= k & n;
-    tdom_addr <= n;
+    tdom_addr <= tdom_base & n;
     done <= done_intern;
 
     process (clk)
