@@ -9,7 +9,7 @@ entity fft_fdom_ram is
     port (writedata : in complex_signed_array;
           readdata : out complex_signed_array;
           addr : in byte_array;
-          write_en : in std_logic_vector(15 downto 0);
+          write_en : in std_logic_vector(0 to 15);
           clk : std_logic);
 end fft_fdom_ram;
 
