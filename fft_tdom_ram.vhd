@@ -15,17 +15,17 @@ entity fft_tdom_ram is
 end fft_tdom_ram;
 
 architecture rtl of fft_tdom_ram is
-    type ram_type is array(0 to 255) of signed(17 downto 0);
+    type ram_type is array(0 to 255) of signed(15 downto 0);
     signal ram_data : ram_type;
 begin
     LUMAP : for i in 0 to 15 generate
-        readdata <= ram(to_integer(readaddr(i)));
+        readdata(i) <= ram_data(to_integer(readaddr(i)));
     end generate LUMAP;
 
     process (clk)
     begin
         if rising_edge(clk) and write_en = '1' then
-            ram(to_integer(writeaddr)) <= writedata;
+            ram_data(to_integer(writeaddr)) <= writedata;
         end if;
     end process;
 end rtl;

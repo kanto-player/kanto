@@ -79,7 +79,7 @@ begin
         indone => s2_done,
         outdone => done,
         inwrite => s2_write,
-        outwrite => write,
+        outwrite => fdom_write,
         k => s2_k,
         
         fdom_addr => fdom_addr,

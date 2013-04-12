@@ -18,7 +18,7 @@ entity fft_controller is
 end fft_controller;
 
 architecture rtl of fft_controller is
-    type control_state_type is (idle, loading, dft, 
+    type control_state_type is (idle, loading, dftcomp, 
                                 recomb1, recomb2, recomb3, recomb4, 
                                 writing);
     signal control_state : control_state_type;
@@ -66,7 +66,7 @@ begin
     );
 
     DFT_GEN : for i in 0 to 15 generate
-        DFT : entity work.dft_top port amp (
+        DFT : entity work.dft_top port map (
             tdom_data => tdom_readdata(to_integer(fft_reorder(i))),
             tdom_addr => tdom_readaddr(to_integer(fft_reorder(i))),
             tdom_offset => fft_reorder(i),
@@ -79,19 +79,20 @@ begin
 
             fdom_data => dft_out_data(i),
             fdom_addr => dft_out_addr(i),
-            fdom_base => to_integer(i, 4),
+            fdom_base => to_unsigned(i, 4),
             fdom_write => dft_out_write(i),
             done => dft_done(i)
         );
+        
 
         with control_state select fdom_writedata(i) <=
-            dft_out_data(i) when dft,
+            dft_out_data(i) when dftcomp,
             (others => '0') when others;
         with control_state select fdom_addr(i) <=
-            dft_out_addr(i) when dft,
+            dft_out_addr(i) when dftcomp,
             (others => '0') when others;
         with control_state select fdom_write_en(i) <=
-            dft_out_write(i) when dft,
+            dft_out_write(i) when dftcomp,
             '0' when others;
     end generate DFT_GEN;
 
@@ -103,7 +104,7 @@ begin
                     if start = '1' then
                         control_state <= loading;
                     end if;
-                when dft =>
+                when dftcomp =>
                     if dft_done = x"ffff" then
                         control_state <= recomb1;
                     end if;

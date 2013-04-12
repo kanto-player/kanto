@@ -13,8 +13,8 @@ entity dft_stage2 is
           res_real : out signed(31 downto 0);
           res_imag : out signed(31 downto 0);
 
-          ink : in signed(3 downto 0);
-          outk : in signed(3 downto 0);
+          ink : in unsigned(3 downto 0);
+          outk : out unsigned(3 downto 0);
 
           inwrite : in std_logic;
           outwrite : out std_logic;
@@ -38,15 +38,15 @@ begin
     tdom_extended <= (1 downto 0 => input_copy_bit) & tdom_real;
 
     REALM : entity work.mult port map (
-        dataa => rom_real,
-        datab => tdom_extended,
-        result => mult_real
+        dataa => std_logic_vector(rom_real),
+        datab => std_logic_vector(tdom_extended),
+        signed(result) => mult_real
     );
 
     IMAGM : entity work.mult port map (
-        dataa => rom_imag,
-        datab => tdom_extended,
-        result => mult_imag
+        dataa => std_logic_vector(rom_imag),
+        datab => std_logic_vector(tdom_extended),
+        signed(result) => mult_imag
     );
 
     process (clk)

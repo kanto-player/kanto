@@ -11,7 +11,7 @@ entity dft_stage3 is
 
           indone : in std_logic;
           inwrite : in std_logic;
-          k : in signed(3 downto 0);
+          k : in unsigned(3 downto 0);
           
           outdone : out std_logic;
           outwrite : out std_logic;
@@ -37,7 +37,7 @@ begin
                 outwrite <= '0';
                 fdom_data <= (others => '0');
                 fdom_addr <= (others => '0');
-            if inwrite = '1' then
+            elsif inwrite = '1' then
                 fdom_addr <= fdom_base & k;
                 fdom_data <= sum_real(31 downto 14) & sum_imag(31 downto 14);
                 sum_real <= mult_real;

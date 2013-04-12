@@ -63,5 +63,6 @@ begin
                 n <= n + x"1";
                 write <= '0';
             end if;
+        end if;
     end process;
 end rtl;

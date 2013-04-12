@@ -172,13 +172,23 @@ entity kanto is
 end kanto;
 
 architecture datapath of kanto is
-    signal req : std_logic;
-    signal ack : std_logic;
-    signal addr : std_logic_vector(17 downto 0);
-    signal readdata : std_logic_vector(15 downto 0);
+    signal ab_req : std_logic;
+    signal ab_ack : std_logic;
+    signal ab_addr : std_logic_vector(17 downto 0);
+    signal ab_readdata : std_logic_vector(15 downto 0);
+    
+    signal fft_req : std_logic;
+    signal fft_ack : std_logic;
+    signal fft_addr : std_logic_vector(17 downto 0);
+    signal fft_readdata : std_logic_vector(15 downto 0);
+    signal fft_writedata : std_logic_vector(15 downto 0);
+    signal fft_write : std_logic;
+    signal fft_start : std_logic;
+    
     signal main_clk : std_logic;
     signal aud_clk : std_logic;
     signal sdram_clk : std_logic;
+    signal start : std_logic;
      
      -- inserted for SDC testing
      signal sd_play : std_logic;
@@ -209,18 +219,18 @@ begin
         aud_dacdat => aud_dacdat,
         aud_bclk => aud_bclk,
         
-        sram_req => req,
-        sram_ack => ack,
-        sram_addr => addr,
-        sram_readdata => readdata
+        sram_req => ab_req,
+        sram_ack => ab_ack,
+        sram_addr => ab_addr,
+        sram_readdata => ab_readdata
     );
 
-    SID : entity work.sram_rom_dummy port map (
+    SRD : entity work.sram_rom_dummy port map (
         clk => main_clk,
-        req => req,
-        ack => ack,
-        addr => addr,
-        readdata => readdata
+        req => ab_req,
+        ack => ab_ack,
+        addr => ab_addr,
+        readdata => ab_readdata
     );
      
     SDC : entity work.sd_controller port map (
@@ -239,7 +249,16 @@ begin
         data_out => sd_data_out,
         hex => HEX7
     );
-
+    
+    FFT : entity work.fft_controller port map (
+        clk => main_clk,
+        start => fft_start,
+        sram_readdata => fft_readdata,
+        sram_writedata => fft_writedata,
+        sram_addr => fft_addr,
+        sram_req => fft_req,
+        sram_ack => fft_ack
+    );
 
     --HEX7 <= "0001001"; -- Leftmost
     HEX6 <= "0000110";

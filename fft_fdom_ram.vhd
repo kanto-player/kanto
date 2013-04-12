@@ -18,7 +18,7 @@ architecture rtl of fft_fdom_ram is
     signal ram_data : ram_type;
 begin
     LUMAP : for i in 0 to 15 generate
-        readdata <= ram(to_integer(addr(i)));
+        readdata(i) <= ram_data(to_integer(addr(i)));
         process (clk)
         begin
             if rising_edge(clk) and write_en(i) = '1' then
