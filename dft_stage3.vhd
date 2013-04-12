@@ -16,7 +16,7 @@ entity dft_stage3 is
           outdone : out std_logic;
           outwrite : out std_logic;
 
-          fdom_data : out signed(35 downto 0);
+          fdom_data : out signed(31 downto 0);
           fdom_addr : out unsigned(3 downto 0));
 end dft_stage3;
 
@@ -38,7 +38,7 @@ begin
                 fdom_addr <= (others => '0');
             elsif inwrite = '1' then
                 fdom_addr <= k;
-                fdom_data <= sum_real(31 downto 14) & sum_imag(31 downto 14);
+                fdom_data <= sum_real(31 downto 16) & sum_imag(31 downto 16);
                 sum_real <= mult_real;
                 sum_imag <= sum_imag;
             else

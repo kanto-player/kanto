@@ -14,7 +14,7 @@ entity fft_fdom_ram is
 end fft_fdom_ram;
 
 architecture rtl of fft_fdom_ram is
-    type ram_type is array(0 to 15, 0 to 15) of signed(35 downto 0);
+    type ram_type is array(0 to 15, 0 to 15) of signed(31 downto 0);
     signal ram_data : ram_type;
 begin
     LUMAP : for i in 0 to 15 generate

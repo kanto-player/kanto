@@ -8,17 +8,17 @@ entity dft_top is
           tdom_offset : in unsigned(3 downto 0);
           clk : in std_logic;
           reset : in std_logic;
-          rom_data : in signed(35 downto 0);
+          rom_data : in signed(31 downto 0);
           rom_addr : out unsigned(7 downto 0);
-          fdom_data : out signed(35 downto 0);
+          fdom_data : out signed(31 downto 0);
           fdom_addr : out unsigned(3 downto 0);
           fdom_write : out std_logic;
           done : out std_logic);
 end dft_top;
 
 architecture rtl of dft_top is
-    signal s1_rom_real : signed(17 downto 0);
-    signal s1_rom_imag : signed(17 downto 0);
+    signal s1_rom_real : signed(15 downto 0);
+    signal s1_rom_imag : signed(15 downto 0);
     signal s1_tdom_real : signed(15 downto 0);
     signal s1_k : unsigned(3 downto 0);
     signal s1_write : std_logic;

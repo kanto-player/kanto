@@ -24,30 +24,23 @@ entity dft_stage2 is
 end dft_stage2;
 
 architecture rtl of dft_stage2 is
-    signal mult_real : signed(35 downto 0);
-    signal mult_imag : signed(35 downto 0);
-    signal tdom_extended : signed(17 downto 0);
-    signal rom_real_extended : signed(17 downto 0);
-    signal rom_imag_extended : signed(17 downto 0);
-    signal tdom_copy_bit : std_logic;
-    signal mult_real_copy_bit : std_logic;
-    signal mult_imag_copy_bit : std_logic;
+    signal mult_real : signed(31 downto 0);
+    signal mult_imag : signed(31 downto 0);
+    signal real_copy_bit : std_logic;
+    signal imag_copy_bit : std_logic;
 begin
-    input_copy_bit <= tdom_real(15);
-    real_copy_bit <= mult_real(33);
-    imag_copy_bit <= mult_imag(33);
-
-    tdom_extended <= (1 downto 0 => input_copy_bit) & tdom_real;
-
+    real_copy_bit <= mult_real(31);
+    imag_copy_bit <= mult_imag(31);
+    
     REALM : entity work.mult port map (
         dataa => std_logic_vector(rom_real),
-        datab => std_logic_vector(tdom_extended),
+        datab => std_logic_vector(tdom_real),
         signed(result) => mult_real
     );
 
     IMAGM : entity work.mult port map (
         dataa => std_logic_vector(rom_imag),
-        datab => std_logic_vector(tdom_extended),
+        datab => std_logic_vector(tdom_real),
         signed(result) => mult_imag
     );
 
@@ -62,8 +55,8 @@ begin
                 outwrite <= inwrite;
                 outdone <= indone;
                 outk <= ink;
-                res_real <= (3 downto 0 => real_copy_bit) & mult_real(33 downto 6);
-                res_imag <= (3 downto 0 => imag_copy_bit) & mult_imag(33 downto 6);
+                res_real <= (3 downto 0 => real_copy_bit) & mult_real(31 downto 4);
+                res_imag <= (3 downto 0 => imag_copy_bit) & mult_imag(31 downto 4);
             end if;
         end if;
     end process;
