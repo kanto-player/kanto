@@ -10,11 +10,11 @@ entity dft_stage1 is
           clk : in std_logic;
           reset : in std_logic;
           
-          rom_data : in signed(35 downto 0);
+          rom_data : in signed(31 downto 0);
           rom_addr : out unsigned(7 downto 0);
           
-          rom_real : out signed(17 downto 0);
-          rom_imag : out signed(17 downto 0);
+          rom_real : out signed(15 downto 0);
+          rom_imag : out signed(15 downto 0);
           tdom_real : out signed(15 downto 0);
           outk : out unsigned(3 downto 0);
           write : out std_logic;
@@ -33,8 +33,8 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            rom_real <= rom_data(35 downto 18);
-            rom_imag <= rom_data(17 downto 0);
+            rom_real <= rom_data(31 downto 16);
+            rom_imag <= rom_data(15 downto 0);
             tdom_real <= tdom_data;
             outk <= k;
         end if;

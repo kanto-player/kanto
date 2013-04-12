@@ -3,8 +3,8 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity dft_stage2 is
-    port (rom_real : in signed(17 downto 0);
-          rom_imag : in signed(17 downto 0);
+    port (rom_real : in signed(15 downto 0);
+          rom_imag : in signed(15 downto 0);
           tdom_real : in signed(15 downto 0);
 
           clk : std_logic;
@@ -27,9 +27,11 @@ architecture rtl of dft_stage2 is
     signal mult_real : signed(35 downto 0);
     signal mult_imag : signed(35 downto 0);
     signal tdom_extended : signed(17 downto 0);
-    signal input_copy_bit : std_logic;
-    signal real_copy_bit : std_logic;
-    signal imag_copy_bit : std_logic;
+    signal rom_real_extended : signed(17 downto 0);
+    signal rom_imag_extended : signed(17 downto 0);
+    signal tdom_copy_bit : std_logic;
+    signal mult_real_copy_bit : std_logic;
+    signal mult_imag_copy_bit : std_logic;
 begin
     input_copy_bit <= tdom_real(15);
     real_copy_bit <= mult_real(33);
