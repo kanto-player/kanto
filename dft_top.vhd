@@ -56,6 +56,7 @@ begin
         tdom_real => s1_tdom_real,
 
         clk => clk,
+        reset => reset,
 
         res_real => s2_res_real,
         res_imag => s2_res_imag,

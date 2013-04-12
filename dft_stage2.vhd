@@ -8,6 +8,7 @@ entity dft_stage2 is
           tdom_real : in signed(15 downto 0);
 
           clk : std_logic;
+          reset : std_logic;
 
           res_real : out signed(31 downto 0);
           res_imag : out signed(31 downto 0);
@@ -51,11 +52,17 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            outwrite <= inwrite;
-            outdone <= indone;
-            outk <= ink;
-            res_real <= (3 downto 0 => real_copy_bit) & mult_real(33 downto 6);
-            res_imag <= (3 downto 0 => imag_copy_bit) & mult_imag(33 downto 6);
+            if reset = '1' then
+                outwrite <= '0';
+                outdone <= '0';
+                outk <= x"0";
+            else
+                outwrite <= inwrite;
+                outdone <= indone;
+                outk <= ink;
+                res_real <= (3 downto 0 => real_copy_bit) & mult_real(33 downto 6);
+                res_imag <= (3 downto 0 => imag_copy_bit) & mult_imag(33 downto 6);
+            end if;
         end if;
     end process;
 end rtl;
