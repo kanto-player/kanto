@@ -85,11 +85,14 @@ begin
         );
 
         with control_state select fdom_writedata(i) <=
-            dft_out_data(i) when dft;
+            dft_out_data(i) when dft,
+            (others => '0') when others;
         with control_state select fdom_addr(i) <=
-            dft_out_addr(i) when dft;
+            dft_out_addr(i) when dft,
+            (others => '0') when others;
         with control_state select fdom_write_en(i) <=
-            dft_out_write(i) when dft;
+            dft_out_write(i) when dft,
+            '0' when others;
     end generate DFT_GEN;
 
     process (clk)
@@ -98,12 +101,14 @@ begin
             case control_state is
                 when idle =>
                     if start = '1' then
-                        control_state <= dft;
+                        control_state <= loading;
                     end if;
                 when dft =>
                     if dft_done = x"ffff" then
                         control_state <= recomb1;
                     end if;
+                when others =>
+                    control_state <= idle;
             end case;
         end if;
     end process;
