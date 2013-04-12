@@ -25,16 +25,16 @@ begin
                 when INACTIVE =>
                     if req = '1' then
                         state <= RESPONDING;
-                        readdata <= rom(to_integer(intern_addr));
                     end if;
                 when RESPONDING =>
                     if req = '0' then
                         state <= INACTIVE;
-                        readdata <= (others => '0');
                     end if;
             end case;
         end if;
     end process;
-
+    
+    readdata <= rom(to_integer(intern_addr)) 
+                    when state = responding else x"0000";
     ack <= '1' when state = RESPONDING else '0';
 end rtl;
