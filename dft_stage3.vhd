@@ -17,8 +17,7 @@ entity dft_stage3 is
           outwrite : out std_logic;
 
           fdom_data : out signed(35 downto 0);
-          fdom_base : in unsigned(3 downto 0);
-          fdom_addr : out unsigned(7 downto 0));
+          fdom_addr : out unsigned(3 downto 0));
 end dft_stage3;
 
 architecture rtl of dft_stage3 is
@@ -38,7 +37,7 @@ begin
                 fdom_data <= (others => '0');
                 fdom_addr <= (others => '0');
             elsif inwrite = '1' then
-                fdom_addr <= fdom_base & k;
+                fdom_addr <= k;
                 fdom_data <= sum_real(31 downto 14) & sum_imag(31 downto 14);
                 sum_real <= mult_real;
                 sum_imag <= sum_imag;

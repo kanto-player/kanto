@@ -29,12 +29,12 @@ architecture rtl of fft_controller is
     signal tdom_readaddr : byte_array;
     signal fdom_writedata : complex_signed_array;
     signal fdom_readdata : complex_signed_array;
-    signal fdom_addr : byte_array;
+    signal fdom_addr : nibble_array;
     signal fdom_write_en : std_logic_vector(0 to 15);
     signal dft_rom_data : complex_signed_array;
     signal dft_rom_addr : byte_array;
     signal dft_out_data : complex_signed_array;
-    signal dft_out_addr : byte_array;
+    signal dft_out_addr : nibble_array;
     signal dft_out_write : std_logic_vector(0 to 15);
     signal dft_done : std_logic_vector(0 to 15);
     type reorder_type is array(0 to 15) of unsigned(3 downto 0); 
@@ -79,7 +79,6 @@ begin
 
             fdom_data => dft_out_data(i),
             fdom_addr => dft_out_addr(i),
-            fdom_base => to_unsigned(i, 4),
             fdom_write => dft_out_write(i),
             done => dft_done(i)
         );

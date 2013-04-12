@@ -11,8 +11,7 @@ entity dft_top is
           rom_data : in signed(35 downto 0);
           rom_addr : out unsigned(7 downto 0);
           fdom_data : out signed(35 downto 0);
-          fdom_addr : out unsigned(7 downto 0);
-          fdom_base : in unsigned(3 downto 0);
+          fdom_addr : out unsigned(3 downto 0);
           fdom_write : out std_logic;
           done : out std_logic);
 end dft_top;
@@ -83,7 +82,6 @@ begin
         k => s2_k,
         
         fdom_addr => fdom_addr,
-        fdom_base => fdom_base,
         fdom_data => fdom_data
     );
 end rtl;
