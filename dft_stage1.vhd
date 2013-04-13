@@ -46,7 +46,7 @@ begin
             if reset = '1' then
                 k <= x"0";
                 n <= x"0";
-                write <= '0';
+                write <= '1';
                 done_intern <= '0';
             elsif done_intern = '1' then
                 write <= '0';
