@@ -68,7 +68,7 @@ entity dft_test_setup is
           reset : in std_logic;
           done : out std_logic;
           read_addr : in unsigned(3 downto 0);
-          read_data : out signed(15 downto 0));
+          read_data : out signed(31 downto 0));
 end dft_test_setup;
 
 architecture rtl of dft_test_setup is
