@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 entity dft_tb is
 end dft_tb;
 
-architecture dft_tb is
+architecture sim of dft_tb is
     signal clk : std_logic := '1';
     signal reset : std_logic;
     signal done : std_logic;
@@ -45,4 +45,4 @@ begin
             wait for 10 ns;
         end loop;
     end process;
-end dft_tb;
+end rtl;
