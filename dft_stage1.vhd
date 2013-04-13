@@ -24,11 +24,12 @@ end dft_stage1;
 architecture rtl of dft_stage1 is
     signal n : unsigned(3 downto 0) := x"0";
     signal k : unsigned(3 downto 0) := x"0";
+    signal prevk : unsigned(3 downto 0) := x"0";
     signal done_intern : std_logic := '0';
+    signal write_intern : std_logic := '0';
 begin
     rom_addr <= k & n;
     tdom_addr <= n & tdom_offset;
-    done <= done_intern;
 
     process (clk)
     begin
@@ -36,7 +37,10 @@ begin
             rom_real <= rom_data(31 downto 16);
             rom_imag <= rom_data(15 downto 0);
             tdom_real <= tdom_data;
-            outk <= k;
+            done <= done_intern;
+            write <= write_intern;
+            outk <= prevk;
+            prevk <= k;
         end if;
     end process;
 
@@ -46,22 +50,22 @@ begin
             if reset = '1' then
                 k <= x"0";
                 n <= x"0";
-                write <= '1';
+                write_intern <= '1';
                 done_intern <= '0';
             elsif done_intern = '1' then
-                write <= '0';
+                write_intern <= '0';
                 k <= x"0";
                 n <= x"0";
             elsif k = x"f" and n = x"f" then
-                write <= '1';
+                write_intern <= '1';
                 done_intern <= '1';
             elsif n = x"f" then
                 k <= k + x"1";
                 n <= x"0";
-                write <= '1';
+                write_intern <= '1';
             else
                 n <= n + x"1";
-                write <= '0';
+                write_intern <= '0';
             end if;
         end if;
     end process;
