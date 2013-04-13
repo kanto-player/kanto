@@ -51,6 +51,8 @@ begin
                 outwrite <= '0';
                 outdone <= '0';
                 outk <= x"0";
+                res_real <= (others => '0');
+                res_imag <= (others => '0');
             else
                 outwrite <= inwrite;
                 outdone <= indone;
