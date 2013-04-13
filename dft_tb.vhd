@@ -18,6 +18,9 @@ architecture sim of dft_tb is
     signal fdom_write_debug : std_logic;
     signal sum_debug : signed(63 downto 0);
     signal mult_debug : signed(63 downto 0);
+    signal rom_data_debug : signed(31 downto 0);
+    signal rom_addr_debug : unsigned(7 downto 0);
+    signal tdom_data_debug : signed(15 downto 0);
 
     type expected_type is array(0 to 15) of signed(31 downto 0);
     constant expected : expected_type := 
@@ -37,6 +40,9 @@ begin
         s1_write_debug => s1_write_debug,
         s2_write_debug => s2_write_debug,
         fdom_write_debug => fdom_write_debug,
+        rom_data_debug => rom_data_debug,
+        rom_addr_debug => rom_addr_debug,
+        tdom_data_debug => tdom_data_debug,
         sum_debug => sum_debug,
         mult_debug => mult_debug
     );

@@ -69,6 +69,9 @@ entity dft_test_setup is
           done : out std_logic;
           tdom_addr_debug : out unsigned(7 downto 0);
           fdom_addr_debug : out unsigned(3 downto 0);
+          rom_addr_debug : out unsigned(7 downto 0);
+          tdom_data_debug : out signed(15 downto 0);
+          rom_data_debug : out signed(31 downto 0);
           s1_write_debug : out std_logic;
           s2_write_debug : out std_logic;
           fdom_write_debug : out std_logic;
@@ -90,6 +93,9 @@ begin
     tdom_addr_debug <= tdom_addr;
     fdom_addr_debug <= fdom_addr;
     fdom_write_debug <= fdom_write;
+    rom_addr_debug <= rom_addr;
+    rom_data_debug <= rom_data;
+    tdom_data_debug <= tdom_data;
 
     DFT : entity work.dft_top port map (
         tdom_data => tdom_data,
