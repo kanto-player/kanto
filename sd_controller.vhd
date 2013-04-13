@@ -31,7 +31,7 @@ architecture datapath of sd_controller is
 begin
 
     -- shift register which gets the data coming from the sd card
-    SHIFT_REG : work.sd_shift_register port map (
+    SHIFT_REG : entity work.sd_shift_register port map (
         clk_en => sd_clk_enable,
         clk => clk50,
         data_in => miso,
@@ -40,7 +40,7 @@ begin
 
     -- responsible for sending read commands to sd card and writing
     -- response to sram
-    READER : work.sd_reader port map (
+    READER : entity work.sd_reader port map (
         clk_en => sd_clk_enable,
         clk => clk50,
         sd_data => shift_reg_data,
@@ -52,7 +52,7 @@ begin
 
     -- initializes the sd card in spi mode. asserts done to high when
     -- initialization is complete
-    INIT : work.sd_initializer port map (
+    INIT : entity work.sd_initializer port map (
         clk_en => sd_clk_enable,
         clk => clk50,
         sd_data => shift_reg_data,
