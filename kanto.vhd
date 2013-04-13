@@ -189,6 +189,10 @@ architecture datapath of kanto is
     signal aud_clk : std_logic;
     signal sdram_clk : std_logic;
     signal start : std_logic;
+    
+    signal dft_test_reset : std_logic;
+    signal dft_test_addr : unsigned(3 downto 0);
+    signal dft_test_data : signed(15 downto 0);
      
      -- inserted for SDC testing
      signal sd_play : std_logic;
@@ -258,6 +262,13 @@ begin
         sram_addr => fft_addr,
         sram_req => fft_req,
         sram_ack => fft_ack
+    );
+    
+    DFT_TEST : entity work.dft_test_setup port map (
+        clk => main_clk,
+        reset => dft_test_reset,
+        read_data => dft_test_data,
+        read_addr => dft_test_addr
     );
 
     --HEX7 <= "0001001"; -- Leftmost
