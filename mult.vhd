@@ -42,16 +42,16 @@ USE lpm.all;
 ENTITY mult IS
 	PORT
 	(
-		dataa		: IN STD_LOGIC_VECTOR (17 DOWNTO 0);
-		datab		: IN STD_LOGIC_VECTOR (17 DOWNTO 0);
-		result		: OUT STD_LOGIC_VECTOR (35 DOWNTO 0)
+		dataa		: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+		datab		: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+		result		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
 	);
 END mult;
 
 
 ARCHITECTURE SYN OF mult IS
 
-	SIGNAL sub_wire0	: STD_LOGIC_VECTOR (35 DOWNTO 0);
+	SIGNAL sub_wire0	: STD_LOGIC_VECTOR (31 DOWNTO 0);
 
 
 
@@ -65,23 +65,23 @@ ARCHITECTURE SYN OF mult IS
 		lpm_widthp		: NATURAL
 	);
 	PORT (
-			dataa	: IN STD_LOGIC_VECTOR (17 DOWNTO 0);
-			datab	: IN STD_LOGIC_VECTOR (17 DOWNTO 0);
-			result	: OUT STD_LOGIC_VECTOR (35 DOWNTO 0)
+			dataa	: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+			datab	: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+			result	: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
 	);
 	END COMPONENT;
 
 BEGIN
-	result    <= sub_wire0(35 DOWNTO 0);
+	result    <= sub_wire0(31 DOWNTO 0);
 
 	lpm_mult_component : lpm_mult
 	GENERIC MAP (
 		lpm_hint => "DEDICATED_MULTIPLIER_CIRCUITRY=YES,MAXIMIZE_SPEED=5",
 		lpm_representation => "SIGNED",
 		lpm_type => "LPM_MULT",
-		lpm_widtha => 18,
-		lpm_widthb => 18,
-		lpm_widthp => 36
+		lpm_widtha => 16,
+		lpm_widthb => 16,
+		lpm_widthp => 32
 	)
 	PORT MAP (
 		dataa => dataa,
@@ -106,9 +106,9 @@ END SYN;
 -- Retrieval info: PRIVATE: SignedMult NUMERIC "1"
 -- Retrieval info: PRIVATE: USE_MULT NUMERIC "1"
 -- Retrieval info: PRIVATE: ValidConstant NUMERIC "0"
--- Retrieval info: PRIVATE: WidthA NUMERIC "18"
--- Retrieval info: PRIVATE: WidthB NUMERIC "18"
--- Retrieval info: PRIVATE: WidthP NUMERIC "36"
+-- Retrieval info: PRIVATE: WidthA NUMERIC "16"
+-- Retrieval info: PRIVATE: WidthB NUMERIC "16"
+-- Retrieval info: PRIVATE: WidthP NUMERIC "32"
 -- Retrieval info: PRIVATE: aclr NUMERIC "0"
 -- Retrieval info: PRIVATE: clken NUMERIC "0"
 -- Retrieval info: PRIVATE: new_diagram STRING "1"
@@ -117,15 +117,15 @@ END SYN;
 -- Retrieval info: CONSTANT: LPM_HINT STRING "DEDICATED_MULTIPLIER_CIRCUITRY=YES,MAXIMIZE_SPEED=5"
 -- Retrieval info: CONSTANT: LPM_REPRESENTATION STRING "SIGNED"
 -- Retrieval info: CONSTANT: LPM_TYPE STRING "LPM_MULT"
--- Retrieval info: CONSTANT: LPM_WIDTHA NUMERIC "18"
--- Retrieval info: CONSTANT: LPM_WIDTHB NUMERIC "18"
--- Retrieval info: CONSTANT: LPM_WIDTHP NUMERIC "36"
--- Retrieval info: USED_PORT: dataa 0 0 18 0 INPUT NODEFVAL "dataa[17..0]"
--- Retrieval info: USED_PORT: datab 0 0 18 0 INPUT NODEFVAL "datab[17..0]"
--- Retrieval info: USED_PORT: result 0 0 36 0 OUTPUT NODEFVAL "result[35..0]"
--- Retrieval info: CONNECT: @dataa 0 0 18 0 dataa 0 0 18 0
--- Retrieval info: CONNECT: @datab 0 0 18 0 datab 0 0 18 0
--- Retrieval info: CONNECT: result 0 0 36 0 @result 0 0 36 0
+-- Retrieval info: CONSTANT: LPM_WIDTHA NUMERIC "16"
+-- Retrieval info: CONSTANT: LPM_WIDTHB NUMERIC "16"
+-- Retrieval info: CONSTANT: LPM_WIDTHP NUMERIC "32"
+-- Retrieval info: USED_PORT: dataa 0 0 16 0 INPUT NODEFVAL "dataa[15..0]"
+-- Retrieval info: USED_PORT: datab 0 0 16 0 INPUT NODEFVAL "datab[15..0]"
+-- Retrieval info: USED_PORT: result 0 0 32 0 OUTPUT NODEFVAL "result[31..0]"
+-- Retrieval info: CONNECT: @dataa 0 0 16 0 dataa 0 0 16 0
+-- Retrieval info: CONNECT: @datab 0 0 16 0 datab 0 0 16 0
+-- Retrieval info: CONNECT: result 0 0 32 0 @result 0 0 32 0
 -- Retrieval info: GEN_FILE: TYPE_NORMAL mult.vhd TRUE
 -- Retrieval info: GEN_FILE: TYPE_NORMAL mult.inc FALSE
 -- Retrieval info: GEN_FILE: TYPE_NORMAL mult.cmp TRUE
