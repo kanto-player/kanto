@@ -16,6 +16,8 @@ entity dft_stage3 is
           outdone : out std_logic;
           outwrite : out std_logic;
 
+          sum_debug : out signed(63 downto 0);
+
           fdom_data : out signed(31 downto 0);
           fdom_addr : out unsigned(3 downto 0));
 end dft_stage3;
@@ -24,6 +26,7 @@ architecture rtl of dft_stage3 is
     signal sum_real : signed(31 downto 0);
     signal sum_imag : signed(31 downto 0);
 begin
+    sum_debug <= sum_real & sum_imag;
     process (clk)
     begin
         if rising_edge(clk) then

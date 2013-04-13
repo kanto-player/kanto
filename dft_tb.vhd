@@ -10,7 +10,14 @@ architecture sim of dft_tb is
     signal reset : std_logic;
     signal done : std_logic;
     signal read_addr : unsigned(3 downto 0);
-    signal read_data : out signed(31 downto 0);
+    signal read_data : signed(31 downto 0);
+    signal tdom_addr_debug : unsigned(7 downto 0);
+    signal fdom_addr_debug : unsigned(3 downto 0);
+    signal s1_write_debug : std_logic;
+    signal s2_write_debug : std_logic;
+    signal fdom_write_debug : std_logic;
+    signal sum_debug : signed(63 downto 0);
+    signal mult_debug : signed(63 downto 0);
 
     type expected_type is array(0 to 15) of signed(31 downto 0);
     constant expected : expected_type := 
@@ -24,7 +31,14 @@ begin
         reset => reset,
         done => done,
         read_addr => read_addr,
-        read_data => read_data
+        read_data => read_data,
+        tdom_addr_debug => tdom_addr_debug,
+        fdom_addr_debug => fdom_addr_debug,
+        s1_write_debug => s1_write_debug,
+        s2_write_debug => s2_write_debug,
+        fdom_write_debug => fdom_write_debug,
+        sum_debug => sum_debug,
+        mult_debug => mult_debug
     );
 
     clk <= not clk after 10 ns;

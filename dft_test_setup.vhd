@@ -67,6 +67,13 @@ entity dft_test_setup is
     port (clk : in std_logic;
           reset : in std_logic;
           done : out std_logic;
+          tdom_addr_debug : out unsigned(7 downto 0);
+          fdom_addr_debug : out unsigned(3 downto 0);
+          s1_write_debug : out std_logic;
+          s2_write_debug : out std_logic;
+          fdom_write_debug : out std_logic;
+          sum_debug : out signed(63 downto 0);
+          mult_debug : out signed(63 downto 0);
           read_addr : in unsigned(3 downto 0);
           read_data : out signed(31 downto 0));
 end dft_test_setup;
@@ -80,6 +87,10 @@ architecture rtl of dft_test_setup is
     signal fdom_addr : unsigned(3 downto 0);
     signal fdom_write : std_logic;
 begin
+    tdom_addr_debug <= tdom_addr;
+    fdom_addr_debug <= fdom_addr;
+    fdom_write_debug <= fdom_write;
+
     DFT : entity work.dft_top port map (
         tdom_data => tdom_data,
         tdom_addr => tdom_addr,
@@ -88,6 +99,10 @@ begin
         clk => clk,
         reset => reset,
         done => done,
+        s1_write_debug => s1_write_debug,
+        s2_write_debug => s2_write_debug,
+        sum_debug => sum_debug,
+        mult_debug => mult_debug,
 
         rom_data => rom_data,
         rom_addr => rom_addr,

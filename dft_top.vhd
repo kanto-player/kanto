@@ -8,6 +8,10 @@ entity dft_top is
           tdom_offset : in unsigned(3 downto 0);
           clk : in std_logic;
           reset : in std_logic;
+          s1_write_debug : out std_logic;
+          s2_write_debug : out std_logic;
+          sum_debug : out signed(63 downto 0);
+          mult_debug : out signed(63 downto 0);
           rom_data : in signed(31 downto 0);
           rom_addr : out unsigned(7 downto 0);
           fdom_data : out signed(31 downto 0);
@@ -30,6 +34,10 @@ architecture rtl of dft_top is
     signal s2_res_real : signed(31 downto 0);
     signal s2_res_imag : signed(31 downto 0);
 begin
+    s1_write_debug <= s1_write;
+    s2_write_debug <= s2_write;
+    mult_debug <= s2_res_real & s2_res_imag;
+
     S1 : entity work.dft_stage1 port map (
         tdom_data => tdom_data,
         tdom_addr => tdom_addr,
@@ -80,6 +88,8 @@ begin
         inwrite => s2_write,
         outwrite => fdom_write,
         k => s2_k,
+
+        sum_debug => sum_debug,
         
         fdom_addr => fdom_addr,
         fdom_data => fdom_data
