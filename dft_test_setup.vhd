@@ -25,7 +25,10 @@ end dft_test_tdom_rom;
 
 architecture rtl of dft_test_tdom_rom is
     type rom_type is array(0 to 15) of signed(15 downto 0);
-    constant rom_data : rom_type;
+    constant rom_data : rom_type := (x"7fff", x"12a0", x"856d", x"c9b4", 
+                                     x"6ac5", x"555f", x"ae14", x"92c9", 
+                                     x"3223", x"7bcf", x"f1e6", x"8016", 
+                                     x"e8e1", x"792f", x"3a64", x"97d0");
 begin
     data <= rom_data(to_integer(addr(15 downto 8)));
 end rtl;
