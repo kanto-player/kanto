@@ -60,7 +60,7 @@ begin
         clk => clk
     );
 
-    DFTR : entity work.dft_rom port map (
+    COEFF_ROM : entity work.dft_coeff_rom port map (
         data => dft_rom_data,
         addr => dft_rom_addr
     );
