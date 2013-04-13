@@ -192,7 +192,7 @@ architecture datapath of kanto is
     
     signal dft_test_reset : std_logic;
     signal dft_test_addr : unsigned(3 downto 0);
-    signal dft_test_data : signed(15 downto 0);
+    signal dft_test_data : signed(31 downto 0);
      
      -- inserted for SDC testing
      signal sd_play : std_logic;

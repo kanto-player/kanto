@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity dft_test_coeff_rom is
-    port (data : out signed(15 downto 0);
+    port (data : out signed(31 downto 0);
           addr : in unsigned(7 downto 0));
 end dft_test_coeff_rom;
 
@@ -30,7 +30,7 @@ architecture rtl of dft_test_tdom_rom is
                                      x"3223", x"7bcf", x"f1e6", x"8016", 
                                      x"e8e1", x"792f", x"3a64", x"97d0");
 begin
-    data <= rom_data(to_integer(addr(15 downto 8)));
+    data <= rom_data(to_integer(addr(7 downto 4)));
 end rtl;
 
 library ieee;
@@ -47,7 +47,7 @@ entity dft_test_fdom_ram is
 end dft_test_fdom_ram;
 
 architecture rtl of dft_test_fdom_ram is
-    type ram_type is array(0 to 15) of signed(15 downto 0);
+    type ram_type is array(0 to 15) of signed(31 downto 0);
     signal ram_data : ram_type;
 begin
     process (clk)
