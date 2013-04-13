@@ -36,7 +36,7 @@ begin
         wait for 20 ns;
         reset <= '0';
         read_addr <= x"0";
-        wait for 5180 ns; -- 5200 ns
+        wait for 5200 ns; -- 5220 ns
         assert done = '1';
         
         i := 0;
