@@ -40,11 +40,10 @@ begin
                 fdom_addr <= k;
                 fdom_data <= sum_real(31 downto 16) & sum_imag(31 downto 16);
                 sum_real <= mult_real;
-                sum_imag <= sum_imag;
+                sum_imag <= mult_imag;
             else
                 sum_real <= sum_real + mult_real;
                 sum_imag <= sum_imag + mult_imag;
-                outwrite <= '1';
             end if;
         end if;
     end process;
