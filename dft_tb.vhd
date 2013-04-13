@@ -14,10 +14,10 @@ architecture sim of dft_tb is
 
     type expected_type is array(0 to 15) of signed(31 downto 0);
     constant expected : expected_type := 
-        (x"01b70000", x"fffffe55", x"fffffbbc", x"fffff2cf", 
+        (x"01b70000", x"018dfe55", x"00d8fbbc", x"fd5ff2cf", 
          x"0d2f1744", x"061605ec", x"050e02ce", x"04b80136", 
-         x"04a10000", x"fffffec9", x"fffffd31", x"fffffa13", 
-         x"ffffe8bb", x"fd5f0d30", x"00d80443", x"018d01aa");
+         x"04a10000", x"04b8fec9", x"050efd31", x"0616fa13", 
+         x"0d2fe8bb", x"fd5f0d30", x"00d80443", x"018d01aa");
 begin
     DFT_TEST : entity work.dft_test_setup port map (
         clk => clk,
