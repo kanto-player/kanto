@@ -45,11 +45,24 @@ architecture rtl of fft_controller is
     signal mm_done : std_logic;
     signal start_write : std_logic;
     signal start_recomb : std_logic;
-    type reorder_type is array(0 to 15) of unsigned(3 downto 0); 
-    constant fft_reorder : reorder_type := (x"0", x"8", x"4", x"c", 
-                                            x"2", x"a", x"6", x"e", 
-                                            x"1", x"9", x"5", x"d",
-                                            x"3", x"b", x"7", x"f");
+    type fft_reorder_type is array(0 to 15) of unsigned(3 downto 0); 
+    constant fft_reorder : fft_reorder_type := (x"0", x"8", x"4", x"c", 
+                                                x"2", x"a", x"6", x"e", 
+                                                x"1", x"9", x"5", x"d",
+                                                x"3", x"b", x"7", x"f");
+    type rc_reorder_type is array(0 to 15) of integer range 0 to 15;
+    constant rc1_out_ro : rc_reorder_type := (0, 8, 1, 9, 2, 10, 3, 11,
+                                              4, 12, 5, 13, 6, 14, 7, 15);
+    constant rc2_out_ro : rc_reorder_type := (0, 1, 8, 9, 2, 3, 10, 11,
+                                              4, 5, 12, 13, 6, 7, 14, 15);
+    constant rc3_out_ro : rc_reorder_type := (0, 1, 2, 3, 8, 9, 10, 11,
+                                              4, 5, 6, 7, 12, 13, 14, 15);
+    constant rc1_in_ro : rc_reorder_type := (0, 2, 4, 6, 8, 10, 12, 14,
+                                             1, 3, 5, 7, 9, 11, 13, 15);
+    constant rc2_in_ro : rc_reorder_type := (0, 1, 4, 5, 8, 9, 12, 13, 
+                                             2, 3, 6, 7, 10, 11, 14, 15);
+    constant rc3_in_ro : rc_reorder_type := (0, 1, 2, 3, 8, 9, 10, 11,
+                                             4, 5, 6, 7, 12, 13, 14, 15);
     signal rcrom16_data : complex_signed_half_array;
     signal rcrom32_data : complex_signed_half_array;
     signal rcrom64_data : complex_signed_half_array;
@@ -58,6 +71,8 @@ architecture rtl of fft_controller is
     signal rcromcur_data : complex_signed_half_array;
     signal recomb_writeaddr : nibble_array;
     signal recomb_writedata : complex_signed_array;
+    signal recomb_readaddr : nibble_array;
+    signal recomb_readdata : complex_signed_array;
     signal recomb_write : std_logic_vector(0 to 15);
     signal recomb_done : std_logic_vector(0 to 7);
 begin
@@ -107,25 +122,37 @@ begin
 
         with control_state select fdom_writedata(i) <=
             dft_out_data(i) when dftcomp,
-            recomb_writedata(i) when recomb1,
-            recomb_writedata(i) when recomb2,
-            recomb_writedata(i) when recomb3,
+            recomb_writedata(rc1_out_ro(i)) when recomb1,
+            recomb_writedata(rc2_out_ro(i)) when recomb2,
+            recomb_writedata(rc3_out_ro(i)) when recomb3,
             recomb_writedata(i) when recomb4,
             (others => '0') when others;
         with control_state select fdom_writeaddr(i) <=
             dft_out_addr(i) when dftcomp,
-            recomb_writeaddr(i) when recomb1,
-            recomb_writeaddr(i) when recomb2,
-            recomb_writeaddr(i) when recomb3,
+            recomb_writeaddr(rc1_out_ro(i)) when recomb1,
+            recomb_writeaddr(rc2_out_ro(i)) when recomb2,
+            recomb_writeaddr(rc3_out_ro(i)) when recomb3,
             recomb_writeaddr(i) when recomb4,
             (others => '0') when others;
         with control_state select fdom_write_en(i) <=
             dft_out_write(i) when dftcomp,
-            recomb_write(i) when recomb1,
-            recomb_write(i) when recomb2,
-            recomb_write(i) when recomb3,
+            recomb_write(rc1_out_ro(i)) when recomb1,
+            recomb_write(rc2_out_ro(i)) when recomb2,
+            recomb_write(rc3_out_ro(i)) when recomb3,
             recomb_write(i) when recomb4,
             '0' when others;
+        with control_state select fdom_readaddr(i) <=
+            recomb_readaddr(rc1_out_ro(i)) when recomb1,
+            recomb_readaddr(rc2_out_ro(i)) when recomb2,
+            recomb_readaddr(rc3_out_ro(i)) when recomb3,
+            recomb_readaddr(i) when recomb4,
+            (others => '0') when others;
+        with control_state select recomb_readdata(i) <=
+            fdom_readdata(rc1_in_ro(i)) when recomb1,
+            fdom_readdata(rc2_in_ro(i)) when recomb2,
+            fdom_readdata(rc3_in_ro(i)) when recomb3,
+            fdom_readdata(i) when recomb4,
+            (others => '0') when others;
     end generate DFT_GEN;
 
     RECOMB_GEN : for i in 0 to 7 generate
@@ -134,14 +161,14 @@ begin
             reset => start_recomb,
             rom_addr => rcromcur_addr(i),
             rom_data => rcromcur_data(i),
-            low_readaddr => fdom_readaddr(i),
+            low_readaddr => recomb_readaddr(i),
             low_writeaddr => recomb_writeaddr(i),
-            low_readdata => fdom_readdata(i),
+            low_readdata => recomb_readdata(i),
             low_writedata => recomb_writedata(i),
             low_write_en => recomb_write(i),
-            high_readaddr => fdom_readaddr(i + 8),
+            high_readaddr => recomb_readaddr(i + 8),
             high_writeaddr => recomb_writeaddr(i + 8),
-            high_readdata => fdom_readdata(i + 8),
+            high_readdata => recomb_readdata(i + 8),
             high_writedata => recomb_writedata(i + 8),
             high_write_en => recomb_write(i + 8),
             done => recomb_done(i)
