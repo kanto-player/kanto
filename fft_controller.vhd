@@ -44,6 +44,7 @@ architecture rtl of fft_controller is
     signal dft_reset : std_logic;
     signal mm_done : std_logic;
     signal start_write : std_logic;
+    signal start_recomb : std_logic;
     type reorder_type is array(0 to 15) of unsigned(3 downto 0); 
     constant fft_reorder : reorder_type := (x"0", x"8", x"4", x"c", 
                                             x"2", x"a", x"6", x"e", 
@@ -55,6 +56,10 @@ architecture rtl of fft_controller is
     signal rcrom128_data : complex_signed_half_array;
     signal rcromcur_addr : nibble_half_array;
     signal rcromcur_data : complex_signed_half_array;
+    signal recomb_writeaddr : nibble_array;
+    signal recomb_writedata : complex_signed_array;
+    signal recomb_write : std_logic_vector(0 to 15);
+    signal recomb_done : std_logic_vector(0 to 7);
 begin
     TDOM_RAM : entity work.fft_tdom_ram port map (
         writedata => tdom_writedata,
@@ -102,14 +107,46 @@ begin
 
         with control_state select fdom_writedata(i) <=
             dft_out_data(i) when dftcomp,
+            recomb_writedata(i) when recomb1,
+            recomb_writedata(i) when recomb2,
+            recomb_writedata(i) when recomb3,
+            recomb_writedata(i) when recomb4,
             (others => '0') when others;
         with control_state select fdom_writeaddr(i) <=
             dft_out_addr(i) when dftcomp,
+            recomb_writeaddr(i) when recomb1,
+            recomb_writeaddr(i) when recomb2,
+            recomb_writeaddr(i) when recomb3,
+            recomb_writeaddr(i) when recomb4,
             (others => '0') when others;
         with control_state select fdom_write_en(i) <=
             dft_out_write(i) when dftcomp,
+            recomb_write(i) when recomb1,
+            recomb_write(i) when recomb2,
+            recomb_write(i) when recomb3,
+            recomb_write(i) when recomb4,
             '0' when others;
     end generate DFT_GEN;
+
+    RECOMB_GEN : for i in 0 to 7 generate
+        RECOMB : entity work.fft_recomb port map (
+            clk => clk,
+            reset => start_recomb,
+            rom_addr => rcromcur_addr(i),
+            rom_data => rcromcur_data(i),
+            low_readaddr => fdom_readaddr(i),
+            low_writeaddr => recomb_writeaddr(i),
+            low_readdata => fdom_readdata(i),
+            low_writedata => recomb_writedata(i),
+            low_write_en => recomb_write(i),
+            high_readaddr => fdom_readaddr(i + 8),
+            high_writeaddr => recomb_writeaddr(i + 8),
+            high_readdata => fdom_readdata(i + 8),
+            high_writedata => recomb_writedata(i + 8),
+            high_write_en => recomb_write(i + 8),
+            done => recomb_done(i)
+        );
+    end generate RECOMB_GEN;
 
     with control_state select rcromcur_data <=
         rcrom16_data when recomb1,
