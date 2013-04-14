@@ -261,7 +261,8 @@ begin
         sram_writedata => fft_writedata,
         sram_addr => fft_addr,
         sram_req => fft_req,
-        sram_ack => fft_ack
+        sram_ack => fft_ack,
+        sram_base => (others => '0')
     );
     
     DFT_TEST : entity work.dft_test_setup port map (
