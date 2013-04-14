@@ -30,7 +30,7 @@ architecture rtl of audio_buffer is
               i2c_sdat : inout std_logic);
     end component;
     
-    signal addr : unsigned(9 downto 0);
+    signal addr : unsigned(8 downto 0);
     signal sram_data : std_logic_vector(15 downto 0);
     signal audio_data : std_logic_vector(15 downto 0);
     signal audio_request : std_logic;

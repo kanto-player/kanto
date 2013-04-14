@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity ab_middleman is
-    port (addr : in unsigned(9 downto 0);
+    port (addr : in unsigned(8 downto 0);
           data : out std_logic_vector(15 downto 0);
           clk  : in std_logic;
           en   : in std_logic;
@@ -37,5 +37,5 @@ begin
     end process;
 
     sram_req <= '1' when state = REQUESTING else '0';
-    sram_addr <= "00000000" & std_logic_vector(addr);
+    sram_addr <= "000000000" & std_logic_vector(addr);
 end rtl;
