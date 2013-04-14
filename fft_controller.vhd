@@ -30,7 +30,8 @@ architecture rtl of fft_controller is
     signal tdom_readaddr : byte_array;
     signal fdom_writedata : complex_signed_array;
     signal fdom_readdata : complex_signed_array;
-    signal fdom_rwaddr : nibble_array;
+    signal fdom_readaddr : nibble_array;
+    signal fdom_writeaddr : nibble_array;
     signal fdom_bigdata : signed(31 downto 0);
     signal fdom_bigaddr : unsigned(7 downto 0);
     signal fdom_write_en : std_logic_vector(0 to 15);
@@ -69,7 +70,8 @@ begin
         readdata => fdom_readdata,
         bigdata => fdom_bigdata,
         bigaddr => fdom_bigaddr,
-        rwaddr => fdom_rwaddr,
+        readaddr => fdom_readaddr,
+        writeaddr => fdom_writeaddr,
         write_en => fdom_write_en,
         clk => clk
     );
@@ -101,7 +103,7 @@ begin
         with control_state select fdom_writedata(i) <=
             dft_out_data(i) when dftcomp,
             (others => '0') when others;
-        with control_state select fdom_rwaddr(i) <=
+        with control_state select fdom_writeaddr(i) <=
             dft_out_addr(i) when dftcomp,
             (others => '0') when others;
         with control_state select fdom_write_en(i) <=

@@ -8,7 +8,8 @@ use work.types_pkg.all;
 entity fft_fdom_ram is
     port (writedata : in complex_signed_array;
           readdata : out complex_signed_array;
-          rwaddr : in nibble_array;
+          readaddr : in nibble_array;
+          writeaddr : in nibble_array;
           bigdata : out signed(31 downto 0);
           bigaddr : in unsigned(7 downto 0);
           write_en : in std_logic_vector(0 to 15);
@@ -26,11 +27,11 @@ begin
     bigdata <= ram_data(to_integer(bigaddr_upper), to_integer(bigaddr_lower));
     
     LUMAP : for i in 0 to 15 generate
-        readdata(i) <= ram_data(i, to_integer(rwaddr(i)));
+        readdata(i) <= ram_data(i, to_integer(readaddr(i)));
         process (clk)
         begin
             if rising_edge(clk) and write_en(i) = '1' then
-                ram_data(i, to_integer(rwaddr(i))) <= writedata(i);
+                ram_data(i, to_integer(writeaddr(i))) <= writedata(i);
             end if;
         end process;
     end generate LUMAP;
