@@ -502,6 +502,10 @@ set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id dft_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "5600 ns" -section_id dft_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME dft_tb -section_id dft_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE dft_tb.vhd -section_id dft_tb
+set_global_assignment -name VHDL_FILE recomb_rom128.vhd
+set_global_assignment -name VHDL_FILE recomb_rom64.vhd
+set_global_assignment -name VHDL_FILE recomb_rom32.vhd
+set_global_assignment -name VHDL_FILE recomb_rom16.vhd
 set_global_assignment -name VHDL_FILE fft_middleman.vhd
 set_global_assignment -name VHDL_FILE dft_test_setup.vhd
 set_global_assignment -name VHDL_FILE dft_coeff_rom.vhd

@@ -48,6 +48,12 @@ architecture rtl of fft_controller is
                                             x"2", x"a", x"6", x"e", 
                                             x"1", x"9", x"5", x"d",
                                             x"3", x"b", x"7", x"f");
+    signal rcrom16_data : complex_signed_half_array;
+    signal rcrom32_data : complex_signed_half_array;
+    signal rcrom64_data : complex_signed_half_array;
+    signal rcrom128_data : complex_signed_half_array;
+    signal rcromcur_addr : nibble_half_array;
+    signal rcromcur_data : complex_signed_half_array;
 begin
     TDOM_RAM : entity work.fft_tdom_ram port map (
         writedata => tdom_writedata,
@@ -103,6 +109,12 @@ begin
             '0' when others;
     end generate DFT_GEN;
 
+    with control_state select rcromcur_data <=
+        rcrom16_data when recomb1,
+        rcrom32_data when recomb2,
+        rcrom64_data when recomb3,
+        rcrom128_data when others;
+
     MM : entity work.fft_middleman port map (
         clk => clk,
         done => mm_done,
@@ -125,6 +137,28 @@ begin
         fdom_addr => fdom_bigaddr
     );
 
+    RCR16 : entity work.recomb_rom16 port map (
+        addr => rcromcur_addr,
+        data => rcrom16_data
+    );
+
+    RCR32 : entity work.recomb_rom32 port map (
+        addr => rcromcur_addr,
+        data => rcrom32_data
+    );
+
+
+    RCR64 : entity work.recomb_rom64 port map (
+        addr => rcromcur_addr,
+        data => rcrom64_data
+    );
+
+
+    RCR128 : entity work.recomb_rom128 port map (
+        addr => rcromcur_addr,
+        data => rcrom128_data
+    );
+    
     process (clk)
     begin
         if rising_edge(clk) then
