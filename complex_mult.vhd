@@ -13,10 +13,10 @@ entity complex_mult is
 end complex_mult;
 
 architecture rtl of complex_mult is
-    signal xryr : in std_logic_vector(31 downto 0);
-    signal xryi : in std_logic_vector(31 downto 0);
-    signal xiyr : in std_logic_vector(31 downto 0);
-    signal xiyi : in std_logic_vector(31 downto 0);
+    signal xryr : signed(31 downto 0);
+    signal xryi : signed(31 downto 0);
+    signal xiyr : signed(31 downto 0);
+    signal xiyi : signed(31 downto 0);
 begin
     MXRYR : entity work.mult port map (
         dataa => std_logic_vector(realx),
