@@ -16,6 +16,8 @@ architecture sim of audio_buffer_tb is
     signal sclk : std_logic;
     signal sdat : std_logic;
 
+    signal adclrck : std_logic;
+    signal adcdat : std_logic;
     signal daclrck : std_logic;
     signal dacdat : std_logic;
     signal bclk : std_logic;
@@ -33,12 +35,11 @@ begin
         sram_readdata => readdata,
         sram_addr => addr,
         
-        initialized => initialized,
-        fault => fault,
-
         i2c_sdat => sdat,
         i2c_sclk => sclk,
 
+        aud_adclrck => adclrck,
+        aud_adcdat => adcdat,
         aud_daclrck => daclrck,
         aud_dacdat => dacdat,
         aud_bclk => bclk
