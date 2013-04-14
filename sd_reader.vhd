@@ -11,7 +11,13 @@ port(
     init_done   : in std_logic;
     mosi        : out std_logic;
     cs          : out std_logic;
-    play        : in std_logic
+    play        : in std_logic;
+    
+    s_writedata     : out std_logic_vector(15 downto 0);
+    s_address       : buffer std_logic_vector(17 downto 0);
+    s_write         : out std_logic;
+    s_req           : out std_logic;
+    s_ack           : in std_logic
 );
 end sd_reader;
 
@@ -31,6 +37,8 @@ architecture rtl of sd_reader is
 begin
 
     cs <= '0';
+    s_writedata <= sd_data;
+    s_write <= '1';
 
     process(clk)
 
@@ -48,6 +56,7 @@ begin
         -- immediately on the 50MHz clock
         when idle =>
             mosi <= '1';
+            s_req <= '0';
             clk_stretch <= '0';
             if play = '1' then
                 current_state <= send_cmd_begin;
@@ -151,6 +160,7 @@ begin
                     current_state <= data_write;
                     mosi <= '1';
                     clk_stretch <= '1';
+                    s_req <= '1';
                 end if;
             end if;
 
@@ -158,10 +168,12 @@ begin
         -- this is not synchronized to the clock enbale, so that
         -- writes happen as quickly as possible
         when data_write =>
-
-            -- TODO: write to sram here
-
-            if write_done = '1' then
+            if s_ack = '1' then
+                clk_stretch <= '0';
+                s_address <= std_logic_vector(unsigned(s_address) + 1);
+                s_req <= '0';
+                mosi <= '1';
+            
                 if counter /= 255 then
                     counter := counter + 1;
                     current_state <= data_recv;
@@ -169,8 +181,6 @@ begin
                     counter := 0;
                     current_state <= crc_rev;
                 end if;
-                mosi <= '1';
-                clk_stretch <= '0';
             end if;
 
         -- simply ignore the 16 bit CRC data
@@ -182,6 +192,7 @@ begin
                 else
                     counter := 0;
                     current_state <= idle;
+                    cmd_addr <= std_logic_vector(unsigned(cmd_addr) + 512);
                     mosi <= '1';
                 end if;
             end if;

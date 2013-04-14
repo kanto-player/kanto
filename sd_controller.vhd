@@ -9,7 +9,15 @@ port (
     mosi            : out std_logic;
     miso            : in std_logic;
     play            : in std_logic;
-    ready           : out std_logic
+    ready           : out std_logic;
+    
+    s_writedata     : out std_logic_vector(15 downto 0);
+    s_address       : out std_logic_vector(17 downto 0);
+    s_write         : out std_logic;
+    s_req           : out std_logic;
+    s_ack           : in std_logic;
+    
+    sd_clk          : out std_logic
 );
 end sd_controller;
 
@@ -27,6 +35,8 @@ architecture datapath of sd_controller is
     signal sd_clk_enable : std_logic := '1';
     signal clk_counter : integer range 0 to 255;
     signal init_done_old : std_logic;
+	 
+    signal sd_clk_stretch : std_logic;
 
 begin
 
@@ -43,11 +53,18 @@ begin
     READER : work.sd_reader port map (
         clk_en => sd_clk_enable,
         clk => clk50,
+        clk_stretch => sd_clk_stretch,
         sd_data => shift_reg_data,
         init_done => init_done,
         mosi => reader_mosi,
         cs => reader_cs,
-        play => play
+        play => play,
+        
+        s_writedata => s_writedata,
+        s_address => s_address,
+        s_write => s_write,
+        s_req => s_req,
+        s_ack => s_ack
     );
 
     -- initializes the sd card in spi mode. asserts done to high when
@@ -76,6 +93,7 @@ begin
         -- then reset counter
         if init_done /= init_done_old then
             clk_counter <= 0;
+            sd_clk <= '0';
 
         elsif rising_edge(clk50) then
 
@@ -83,9 +101,18 @@ begin
             -- enable clock for one cycle and reset counter
             if (init_done = '0' and clk_counter = 249)
                     or (init_done = '1' and clk_counter = 24) then
-                sd_clk_enable <= '1';
+                if sd_clk_stretch = '1' then
+                    sd_clk_enable <= '0';
+                else
+                    sd_clk_enable <= '1';
+                    sd_clk <= '1';
+                end if;
                 clk_counter <= 0;
             else
+                if (init_done = '0' and clk_counter = 124)
+                        or (init_done = '1' and clk_counter = 12) then
+                    sd_clk <= '0';
+                end if;
                 sd_clk_enable <= '0';
                 clk_counter <= clk_counter + 1;
             end if;

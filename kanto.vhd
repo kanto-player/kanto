@@ -184,6 +184,10 @@ architecture datapath of kanto is
 	 signal sd_play : std_logic;
 	 signal sd_ready : std_logic;
 	 signal sd_data_out : std_logic_vector(15 downto 0);
+     signal sd_ack : std_logic;
+     signal sd_write : std_logic;
+     signal sd_req : std_logic;
+     signal sd_address : std_logic_vector(17 downto 0);
 begin
 
     PLL : entity work.audpll port map (
@@ -229,21 +233,34 @@ begin
 	     mosi => SD_CMD,
 	     miso => SD_DAT,
 	     play => sd_play,
-	     ready => sd_ready
+	     ready => sd_ready,
+         s_ack => sd_ack,
+         s_write => sd_write,
+         s_writedata => sd_data_out,
+         s_address => sd_address,
+         s_req => sd_req,
+         sd_clk => SD_CLK
 	 );
 	 
 	 SDC_TEST : entity work.sd_test port map (
 	     clk => main_clk,
-		  play => sd_play,
-		  ready => sd_ready,
-		  data_out => sd_data_out,
-		  hex => HEX7
+		 play => sd_play,
+		 ready => sd_ready,
+		 data_out => sd_data_out,
+		 hex7 => HEX7,
+         hex6 => hex6,
+         hex5 => hex5,
+         hex4 => hex4,
+         
+         s_address => sd_address,
+         s_ack => sd_ack,
+         s_req => sd_req
 	 );
 
     --HEX7 <= "0001001"; -- Leftmost
-    HEX6 <= "0000110";
-    HEX5 <= "1000111";
-    HEX4 <= "1000111";
+    --HEX6 <= "0000110";
+    --HEX5 <= "1000111";
+    --HEX4 <= "1000111";
     HEX3 <= "1000000";
     HEX2 <= (others => '1');
 
