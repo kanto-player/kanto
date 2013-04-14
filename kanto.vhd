@@ -172,32 +172,43 @@ entity kanto is
 end kanto;
 
 architecture datapath of kanto is
-    signal ab_req : std_logic;
-    signal ab_ack : std_logic;
-    signal ab_addr : std_logic_vector(17 downto 0);
-    signal ab_readdata : std_logic_vector(15 downto 0);
-    
-    signal fft_req : std_logic;
-    signal fft_ack : std_logic;
-    signal fft_addr : std_logic_vector(17 downto 0);
-    signal fft_readdata : std_logic_vector(15 downto 0);
-    signal fft_writedata : std_logic_vector(15 downto 0);
-    signal fft_write : std_logic;
-    signal fft_start : std_logic;
-    
-    signal main_clk : std_logic;
-    signal aud_clk : std_logic;
-    signal sdram_clk : std_logic;
-    signal start : std_logic;
-    
-    signal dft_test_reset : std_logic;
-    signal dft_test_addr : unsigned(3 downto 0);
-    signal dft_test_data : signed(31 downto 0);
-     
-     -- inserted for SDC testing
-     signal sd_play : std_logic;
-     signal sd_ready : std_logic;
-     signal sd_data_out : std_logic_vector(15 downto 0);
+	signal ab_req : std_logic;
+	signal ab_ack : std_logic;
+	signal ab_addr : std_logic_vector(17 downto 0);
+	signal ab_readdata : std_logic_vector(15 downto 0);
+
+	signal fft_req : std_logic;
+	signal fft_ack : std_logic;
+	signal fft_addr : std_logic_vector(17 downto 0);
+	signal fft_readdata : std_logic_vector(15 downto 0);
+	signal fft_writedata : std_logic_vector(15 downto 0);
+	signal fft_write : std_logic;
+	signal fft_start : std_logic;
+
+	signal main_clk : std_logic;
+	signal aud_clk : std_logic;
+	signal sdram_clk : std_logic;
+	signal start : std_logic;
+	 
+	signal dft_test_reset : std_logic;
+	signal dft_test_addr : unsigned(3 downto 0);
+	signal dft_test_data : signed(31 downto 0);
+	  
+	-- inserted for SDC testing
+	signal sd_play : std_logic;
+	signal sd_ready : std_logic;
+	signal sd_data_out : std_logic_vector(15 downto 0);
+	  
+	-- signals for sram controller testing
+	signal sram_test_reset : std_logic;
+	signal sram_test_readdata 	: std_logic_vector(15 downto 0);
+	signal sram_test_writedata 	: std_logic_vector(15 downto 0);
+	signal sram_test_addr 			: std_logic_vector(17 downto 0);
+	signal sram_test_write 		: std_logic;
+	signal sram_test_req 			: std_logic;
+	signal sram_test_ack			: std_logic;
+		
+	  
 begin
 
     PLL : entity work.audpll port map (
@@ -271,6 +282,45 @@ begin
         read_data => dft_test_data,
         read_addr => dft_test_addr
     );
+	 
+	 SRAMCTRL_TEST : entity work.sram_controller port map (
+		clk => main_clk,
+		reset => sram_test_reset,
+		SRAM_ADDR_out => SRAM_ADDR,
+		SRAM_CE_N_out => SRAM_CE_N,
+		SRAM_DQ_inout => SRAM_DQ,
+		SRAM_OE_N_out => SRAM_OE_N,
+		SRAM_WE_N_out => SRAM_WE_N,
+
+		sd_readdata => sram_test_readdata,
+		sd_writedata => sram_test_writedata,
+		sd_addr => sram_test_addr,
+		sd_write => sram_test_write,
+		sd_ack => sram_test_ack,
+		sd_req => sram_test_req,
+			
+		fft_readdata => sram_test_readdata,
+		fft_writedata => sram_test_writedata,
+		fft_addr => sram_test_addr,
+		fft_write => sram_test_write,
+		fft_ack => sram_test_ack,
+		fft_req => sram_test_req,
+		
+		ab_readdata => sram_test_readdata,
+		ab_writedata => sram_test_writedata,
+		ab_addr => sram_test_addr,
+		ab_write => sram_test_write,
+		ab_ack => sram_test_ack,
+		ab_req => sram_test_req,
+		
+		viz_readdata => sram_test_readdata,
+		viz_writedata => sram_test_writedata,
+		viz_addr => sram_test_addr,
+		viz_write => sram_test_write,
+		viz_ack => sram_test_ack,
+		viz_req => sram_test_req
+
+	 );
 
     --HEX7 <= "0001001"; -- Leftmost
     HEX6 <= "0000110";

@@ -71,12 +71,12 @@ begin
 					
 				-- SD REQ AREA --	
 				when SD_1 =>
-					sd_ack <= '1';
 					SRAM_WE_N_out <= NOT sd_write;
 					SRAM_ADDR_out <= sd_addr;
 					state := SD_2;
 					
 				when SD_2 => -- push or pull data from dq line
+					sd_ack <= '1';
 					if sd_write = '1' then SRAM_DQ_inout <= sd_writedata;
 					else sd_readdata <= SRAM_DQ_inout;
 					end if;
@@ -91,12 +91,12 @@ begin
 					
 				-- AB REQ AREA --	
 				when AB_1 =>
-					ab_ack <= '1';
 					SRAM_WE_N_out <= NOT ab_write;
 					SRAM_ADDR_out <= ab_addr;
 					state := AB_2;
 					
 				when AB_2 => -- push or pull data from dq line
+					ab_ack <= '1';
 					if ab_write = '1' then SRAM_DQ_inout <= ab_writedata;
 					else ab_readdata <= SRAM_DQ_inout;
 					end if;
@@ -111,12 +111,12 @@ begin
 							
 				-- FFT REQ AREA --	
 				when FFT_1 =>
-					fft_ack <= '1';
 					SRAM_WE_N_out <= NOT fft_write;
 					SRAM_ADDR_out <= fft_addr;
 					state := FFT_2;
 					
 				when FFT_2 => -- push or pull data from dq line
+					fft_ack <= '1';
 					if fft_write = '1' then SRAM_DQ_inout <= fft_writedata;
 					else fft_readdata <= SRAM_DQ_inout;
 					end if;
@@ -132,12 +132,12 @@ begin
 					
 				-- VIZ REQ AREA --	
 				when VIZ_1 =>
-					viz_ack <= '1';
 					SRAM_WE_N_out <= NOT viz_write;
 					SRAM_ADDR_out <= viz_addr;
 					state := VIZ_2;
 					
 				when VIZ_2 => -- push or pull data from dq line
+					viz_ack <= '1';
 					if viz_write = '1' then SRAM_DQ_inout <= viz_writedata;
 					else viz_readdata <= SRAM_DQ_inout;
 					end if;
