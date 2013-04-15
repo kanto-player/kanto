@@ -47,5 +47,6 @@ begin
             wait for 10 ns;
             i := i + 1;
         end loop;
+        wait;
     end process;
 end sim;
