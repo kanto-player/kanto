@@ -15,13 +15,13 @@ entity fft_controller is
           sram_base : in unsigned(9 downto 0);
 
           clk : in std_logic;
-          start : in std_logic);
+          start : in std_logic;
+          done : out std_logic);
 end fft_controller;
 
 architecture rtl of fft_controller is
-    type control_state_type is (idle, loading, dftcomp, 
-                                recomb1, recomb2, recomb3, recomb4, 
-                                writing);
+    type control_state_type is (idle, loading, dftcomp, saving,
+                                recomb1, recomb2, recomb3, recomb4);
     signal control_state : control_state_type;
     signal tdom_writedata : signed(15 downto 0);
     signal tdom_writeaddr : unsigned(7 downto 0);
@@ -43,8 +43,9 @@ architecture rtl of fft_controller is
     signal dft_done : std_logic_vector(0 to 15);
     signal dft_reset : std_logic;
     signal mm_done : std_logic;
+    signal start_read : std_logic;
     signal start_write : std_logic;
-    signal start_recomb : std_logic;
+    signal recomb_reset : std_logic;
     type fft_reorder_type is array(0 to 15) of unsigned(3 downto 0); 
     constant fft_reorder : fft_reorder_type := (x"0", x"8", x"4", x"c", 
                                                 x"2", x"a", x"6", x"e", 
@@ -158,7 +159,7 @@ begin
     RECOMB_GEN : for i in 0 to 7 generate
         RECOMB : entity work.fft_recomb port map (
             clk => clk,
-            reset => start_recomb,
+            reset => recomb_reset,
             rom_addr => rcromcur_addr(i),
             rom_data => rcromcur_data(i),
             low_readaddr => recomb_readaddr(i),
@@ -184,7 +185,7 @@ begin
     MM : entity work.fft_middleman port map (
         clk => clk,
         done => mm_done,
-        start_read => start,
+        start_read => start_read,
         start_write => start_write,
         
         sram_req => sram_req,
@@ -224,6 +225,8 @@ begin
         addr => rcromcur_addr,
         data => rcrom128_data
     );
+
+    done <= '1' when control_state = idle else '0';
     
     process (clk)
     begin
@@ -232,8 +235,10 @@ begin
                 when idle =>
                     if start = '1' then
                         control_state <= loading;
+                        start_read <= '1';
                     end if;
                 when loading =>
+                    start_read <= '0';
                     if mm_done = '1' then
                         control_state <= dftcomp;
                         dft_reset <= '1';
@@ -242,9 +247,37 @@ begin
                     dft_reset <= '0';
                     if dft_done = x"ffff" then
                         control_state <= recomb1;
+                        recomb_reset <= '1';
                     end if;
-                when others =>
-                    control_state <= idle;
+                when recomb1 =>
+                    recomb_reset <= '0';
+                    if recomb_done = x"ff" then
+                        control_state <= recomb2;
+                        recomb_reset <= '1';
+                    end if;
+                when recomb2 =>
+                    recomb_reset <= '0';
+                    if recomb_done = x"ff" then
+                        control_state <= recomb3;
+                        recomb_reset <= '1';
+                    end if;
+                when recomb3 =>
+                    recomb_reset <= '0';
+                    if recomb_done = x"ff" then
+                        control_state <= recomb4;
+                        recomb_reset <= '1';
+                    end if;
+                when recomb4 =>
+                    recomb_reset <= '0';
+                    if recomb_done = x"ff" then
+                        control_state <= saving;
+                        start_write <= '1';
+                    end if;
+                when saving =>
+                    start_write <= '0';
+                    if mm_done = '1' then
+                        control_state <= idle;
+                    end if;
             end case;
         end if;
     end process;
