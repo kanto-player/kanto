@@ -7,12 +7,13 @@ use work.types_pkg.all;
 
 entity fft_controller is
     port (sram_readdata : in std_logic_vector(15 downto 0);
-          sram_writedata : out std_logic_vector(15 downto 0);
           sram_addr : out std_logic_vector(17 downto 0);
-          sram_write : out std_logic;
           sram_req : out std_logic;
           sram_ack : in std_logic;
           sram_base : in unsigned(9 downto 0);
+
+          fdom_data_out : out signed(31 downto 0);
+          fdom_addr_out : in unsigned(7 downto 0);
 
           clk : in std_logic;
           start : in std_logic;
@@ -20,7 +21,7 @@ entity fft_controller is
 end fft_controller;
 
 architecture rtl of fft_controller is
-    type control_state_type is (idle, loading, dftcomp, saving,
+    type control_state_type is (idle, loading, dftcomp,
                                 recomb1, recomb2, recomb3, recomb4);
     signal control_state : control_state_type;
     signal tdom_writedata : signed(15 downto 0);
@@ -32,8 +33,6 @@ architecture rtl of fft_controller is
     signal fdom_readdata : complex_signed_array;
     signal fdom_readaddr : nibble_array;
     signal fdom_writeaddr : nibble_array;
-    signal fdom_bigdata : signed(31 downto 0);
-    signal fdom_bigaddr : unsigned(7 downto 0);
     signal fdom_write_en : std_logic_vector(0 to 15);
     signal dft_rom_data : complex_signed_array;
     signal dft_rom_addr : byte_array;
@@ -44,7 +43,6 @@ architecture rtl of fft_controller is
     signal dft_reset : std_logic;
     signal mm_done : std_logic;
     signal start_read : std_logic;
-    signal start_write : std_logic;
     signal recomb_reset : std_logic;
     type fft_reorder_type is array(0 to 15) of unsigned(3 downto 0); 
     constant fft_reorder : fft_reorder_type := (x"0", x"8", x"4", x"c", 
@@ -89,8 +87,8 @@ begin
     FDOM_RAM : entity work.fft_fdom_ram port map (
         writedata => fdom_writedata,
         readdata => fdom_readdata,
-        bigdata => fdom_bigdata,
-        bigaddr => fdom_bigaddr,
+        bigdata => fdom_data_out,
+        bigaddr => fdom_addr_out,
         readaddr => fdom_readaddr,
         writeaddr => fdom_writeaddr,
         write_en => fdom_write_en,
@@ -186,22 +184,16 @@ begin
         clk => clk,
         done => mm_done,
         start_read => start_read,
-        start_write => start_write,
         
         sram_req => sram_req,
         sram_ack => sram_ack,
-        sram_write => sram_write,
         sram_readdata => sram_readdata,
-        sram_writedata => sram_writedata,
         sram_addr => sram_addr,
 
         tdom_data => tdom_writedata,
         tdom_addr => tdom_writeaddr,
         tdom_write => tdom_write_en,
-        tdom_base => sram_base,
-
-        fdom_data => fdom_bigdata,
-        fdom_addr => fdom_bigaddr
+        tdom_base => sram_base
     );
 
     RCR16 : entity work.recomb_rom16 port map (
@@ -270,12 +262,6 @@ begin
                 when recomb4 =>
                     recomb_reset <= '0';
                     if recomb_done = x"ff" then
-                        control_state <= saving;
-                        start_write <= '1';
-                    end if;
-                when saving =>
-                    start_write <= '0';
-                    if mm_done = '1' then
                         control_state <= idle;
                     end if;
             end case;

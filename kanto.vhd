@@ -181,9 +181,9 @@ architecture datapath of kanto is
 	signal fft_ack : std_logic;
 	signal fft_addr : std_logic_vector(17 downto 0);
 	signal fft_readdata : std_logic_vector(15 downto 0);
-	signal fft_writedata : std_logic_vector(15 downto 0);
-	signal fft_write : std_logic;
 	signal fft_start : std_logic;
+    signal fft_fdom_addr : unsigned(7 downto 0);
+    signal fft_fdom_data : signed(31 downto 0);
 
 	signal main_clk : std_logic;
 	signal aud_clk : std_logic;
@@ -269,11 +269,12 @@ begin
         clk => main_clk,
         start => fft_start,
         sram_readdata => fft_readdata,
-        sram_writedata => fft_writedata,
         sram_addr => fft_addr,
         sram_req => fft_req,
         sram_ack => fft_ack,
-        sram_base => (others => '0')
+        sram_base => (others => '0'),
+        fdom_addr_out => fft_fdom_addr,
+        fdom_data_out => fft_fdom_data
     );
     
     DFT_TEST : entity work.dft_test_setup port map (
