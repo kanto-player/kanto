@@ -16,12 +16,15 @@ entity visualizer is
     reset : in std_logic;
     clk   : in std_logic;                    -- Should be 25.125 MHz
 	 
-	 viz_readdata  : in std_logic_vector(15 downto 0);
-	 viz_writedata : out std_logic_vector(15 downto 0);
-    viz_addr      : out std_logic_vector(17 downto 0);
-	 viz_write     : out std_logic;
-    viz_req       : out std_logic;
-    viz_ack       : in std_logic ;
+	 --viz_readdata  : in std_logic_vector(15 downto 0);
+	 --viz_writedata : out std_logic_vector(15 downto 0);
+    --viz_addr      : out std_logic_vector(17 downto 0);
+	 --viz_write     : out std_logic;
+    --viz_req       : out std_logic;
+    --viz_ack       : in std_logic ;
+	 
+	 fft_fdom_addr : out unsigned(7 downto 0);
+    fft_fdom_data : in signed(31 downto 0);
 	 
     VGA_CLK,                         -- Clock
     VGA_HS,                          -- H_SYNC
@@ -71,16 +74,19 @@ architecture rtl of visualizer is
     vga_vblank, vga_vsync : std_logic;  -- Sync. signals
 
   signal rectangle : std_logic;  -- rectangle area
+ 
+  type sums is array (0 to 15) of std_logic_vector(19 downto 0):"00000000000000000000";
   
-  type ram_type is array(0 to 255) of std_logic_vector(15 downto 0);
-  signal ram_data : ram_type;
+  signal sum : sums;
   
-  signal read_complete : std_logic := '0';
-  signal address_r : integer := 512;
-  signal index : integer := 0;
-  signal sram_base : integer := 0;
-  signal counter : integer := 0;
-
+  signal read_complete  : std_logic := '0';
+  signal address_r      : integer := 512;
+  signal index 	      : integer := 0;
+  signal sram_base      : integer := 0;
+  signal counter 			: integer := 0;
+  signal addr_counter   : integer := 0;
+  signal sum_counter    : integer := 0;	
+  signal display        : std_logic := '0'; 
 begin
 
   -- Horizontal and vertical counters
@@ -92,42 +98,76 @@ begin
 		if read_complete='0' then
 		case state is
 			when A =>
-				viz_req<='1';
-				viz_write<='0';
-				viz_addr<= std_logic_vector(to_unsigned(address_r,viz_addr'length));
-				if viz_ack='1' then
-					ram_data(index)<=viz_readdata;
-					viz_req<='0';
+				if reset = '1' then
+					display <= '0';
 					state := B;
 				else 
-					state := A;
+					state:= A;
 				end if;
-			when B =>
-				if address_r=752 then
-					state := C;
-				else
-					address_r <= address_r+16;
-					index<=index+1;
-					state := A;
-				end if;
-			when C =>
-				if counter=500000 then
-					read_complete<='1';
-					counter<=0;
-					state := D;
-				else
-					counter<=counter+1;
-					state:=C;
-				end if;
-			when D =>
-				if(read_complete='1') then
-					state := D;
-					if(Vcount = VTOTAL-1 AND Hcount=HTOTAL-1) then
-						read_complete<='0';
+			when B => 
+				if addr_counter = 0 then
+					fft_fdom_addr <= addr_counter;
+					addr_counter  <= addr_counter + 1;
+				elsif fft_fdom_addr < 256 then
+					if addr_counter <= 16 then 
+						sum(0) <= sum(0) + fft_fdom_data;
+					elsif addr_counter <= 32 then 
+						sum(1) <= sum(1) + fft_fdom_data;
+					elsif addr_counter <= 48 then 
+						sum(2) <= sum(2) + fft_fdom_data;
+					elsif addr_counter <= 64 then 
+						sum(3) <= sum(3) + fft_fdom_data;
+					elsif addr_counter <= 80 then 
+						sum(4) <= sum(4) + fft_fdom_data;
+					elsif addr_counter <= 96 then 
+						sum(5) <= sum(5) + fft_fdom_data;
+					elsif addr_counter <= 112 then 
+						sum(6) <= sum(6) + fft_fdom_data;
+					elsif addr_counter <= 128 then 
+						sum(7) <= sum(7) + fft_fdom_data;
+					elsif addr_counter <= 144 then 
+						sum(8) <= sum(8) + fft_fdom_data;
+					elsif addr_counter <= 160 then 
+						sum(9) <= sum(9) + fft_fdom_data;	
+					elsif addr_counter <= 176 then 
+						sum(10) <= sum(10) + fft_fdom_data;
+					elsif addr_counter <= 192 then 
+						sum(11) <= sum(11) + fft_fdom_data;
+					elsif addr_counter <= 208 then 
+						sum(12) <= sum(12) + fft_fdom_data;
+					elsif addr_counter <= 224 then 
+						sum(13) <= sum(13) + fft_fdom_data;
+					elsif addr_counter <= 240 then 
+						sum(14) <= sum(14) + fft_fdom_data;
+					else
+						sum(15) <= sum(15) + fft_fdom_data;
 					end if;
+					fft_fdom_addr <= addr_counter;
+					addr_counter  <= addr_counter + 1;
 				else
-					state :=A;
-				end if;
+					addr_counter <= '0';
+					sum(15) <= sum(15) + fft_fdom_data;
+					state := C;
+				end if;std_logic
+			when C =>
+				sum(0)=sum(0) srl 4;
+				sum(1)=sum(1) srl 4;
+				sum(2)=sum(2) srl 4;
+				sum(3)=sum(3) srl 4;
+				sum(4)=sum(4) srl 4;
+				sum(5)=sum(5) srl 4;
+				sum(6)=sum(6) srl 4;
+				sum(7)=sum(7) srl 4;
+				sum(8)=sum(8) srl 4;
+				sum(9)=sum(9) srl 4;
+				sum(10)=sum(10) srl 4;
+				sum(11)=sum(11) srl 4;
+				sum(12)=sum(12) srl 4;
+				sum(13)=sum(13) srl 4;
+				sum(14)=sum(14) srl 4;
+				sum(15)=sum(15) srl 4;
+				display <= '1';
+				state := A;
 			end case;
 		end if;
 	end if;
