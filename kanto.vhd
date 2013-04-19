@@ -254,6 +254,7 @@ begin
         cs   => SD_DAT3,
         mosi => SD_CMD,
         miso => SD_DAT,
+        sclk => SD_CLK,
         play => sd_play,
         ready => sd_ready
     );
