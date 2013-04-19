@@ -39,64 +39,56 @@ begin
 
         -- asserting mosi and cs high for at least 74 clocks
         when send_assert =>
-            if clk_en = '1' then
-                init_done <= '0';
-                cs <= '1';
-                mosi <= '1';
-                if counter /= 79 then
-                    counter := counter + 1;
-                else
-                    counter := 0;
-                    current_state <= send_cmd;
-                    cs <= '0';
-                    mosi <= reset_cmd(counter);
-                end if;
+            init_done <= '0';
+            cs <= '1';
+            mosi <= '1';
+            if counter /= 79 then
+                counter := counter + 1;
+            else
+                counter := 0;
+                current_state <= send_cmd;
+                cs <= '0';
+                mosi <= reset_cmd(counter);
             end if;
 
         -- sending command for spi mode
         when send_cmd =>
-            if clk_en = '1' then
-                if counter /= 47 then
-                    counter := counter + 1;
-                    mosi <= reset_cmd(counter);
-                else
-                    counter := 0;
-                    current_state <= wait_resp_start;
-                    mosi <= '1';
-                end if;
+            if counter /= 47 then
+                counter := counter + 1;
+                mosi <= reset_cmd(counter);
+            else
+                counter := 0;
+                current_state <= wait_resp_start;
+                mosi <= '1';
             end if;
                 
         -- waiting for response after sending cmd
         -- if response does not begin within 16 cycles, resend
         when wait_resp_start =>
-            if clk_en = '1' then
-                if sd_data(0) = '0' then
-                    counter := 0;
-                    current_state <= wait_resp;
-                elsif counter = 15 then
-                    counter := 0;
-                    current_state <= send_cmd;
-                    mosi <= reset_cmd(counter);
-                else
-                    counter := counter + 1;
-                end if;
+            if sd_data(0) = '0' then
+                counter := 0;
+                current_state <= wait_resp;
+            elsif counter = 15 then
+                counter := 0;
+                current_state <= send_cmd;
+                mosi <= reset_cmd(counter);
+            else
+                counter := counter + 1;
             end if;
 
         -- wait 7 cycles for response
         -- if bad response, resend command
         when wait_resp =>
-            if clk_en = '1' then
-                if counter /= 6 then
-                    counter := counter + 1;
-                elsif sd_data(7 downto 0) /= "00000001" then
-                    counter := 0;
-                    current_state <= send_cmd;
-                    mosi <= reset_cmd(counter);
-                else
-                    counter := 0;
-                    current_state <= done;
-                    init_done <= '1';
-                end if;
+            if counter /= 6 then
+                counter := counter + 1;
+            elsif sd_data(7 downto 0) /= "00000001" then
+                counter := 0;
+                current_state <= send_cmd;
+                mosi <= reset_cmd(counter);
+            else
+                counter := 0;
+                current_state <= done;
+                init_done <= '1';
             end if;
 
         -- finished with initialization - sd controller will give

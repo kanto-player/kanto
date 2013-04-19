@@ -32,7 +32,8 @@ architecture datapath of sd_controller is
     signal reader_mosi : std_logic;
     signal reader_cs : std_logic;
 
-    signal sd_clk_enable : std_logic := '1';
+    signal sd_clk_en_rise : std_logic := '1';
+    signal sd_clk_en_fall : std_logic := '1';
     signal clk_counter : integer range 0 to 255;
     signal init_done_old : std_logic;
 	 
@@ -94,6 +95,8 @@ begin
         if init_done /= init_done_old then
             clk_counter <= 0;
             sd_clk <= '0';
+            sd_clk_en_fall = '0';
+            sd_clk_en_rise = '0';
 
         elsif rising_edge(clk50) then
 
@@ -101,19 +104,21 @@ begin
             -- enable clock for one cycle and reset counter
             if (init_done = '0' and clk_counter = 249)
                     or (init_done = '1' and clk_counter = 24) then
-                if sd_clk_stretch = '1' then
-                    sd_clk_enable <= '0';
-                else
-                    sd_clk_enable <= '1';
+                if sd_clk_stretch = '0' then
+                    sd_clk_en_rise <= '1';
                     sd_clk <= '1';
                 end if;
                 clk_counter <= 0;
-            else
-                if (init_done = '0' and clk_counter = 124)
-                        or (init_done = '1' and clk_counter = 12) then
+            elsif (init_done = '0' and clk_counter = 124)
+                    or (init_done = '1' and clk_counter = 12) then
+                if sd_clk_stretch = '0' then
+                    sd_clk_en_fall <= '1';
                     sd_clk <= '0';
                 end if;
-                sd_clk_enable <= '0';
+                clk_counter <= clk_counter + 1;
+            else
+                sd_clk_en_high <= '0';
+                sd_clk_en_low <= '0';
                 clk_counter <= clk_counter + 1;
             end if;
 
