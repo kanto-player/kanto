@@ -34,7 +34,7 @@ entity visualizer is
     VGA_SYNC : out std_logic;        -- SYNC
     VGA_R,                           -- Red[9:0]
     VGA_G,                           -- Green[9:0]
-    VGA_B : out unsigned(9 downto 0) -- Blue[9:0]
+    VGA_B : out std_logic_vector(9 downto 0) -- Blue[9:0]
     );
 
 end visualizer;
@@ -111,43 +111,43 @@ begin
 					addr_counter  <= addr_counter + 1;
 				elsif addr_counter < 256 then
 					if addr_counter <= 16 then 
-						sum(0) <= std_logic_vector(unsigned(sum(0)) + unsigned(fft_fdom_data));
+						sum(0) <= std_logic_vector(unsigned(sum(0)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 32 then 
-						sum(1) <= std_logic_vector(unsigned(sum(1)) + unsigned(fft_fdom_data));
+						sum(1) <= std_logic_vector(unsigned(sum(1)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 48 then 
-						sum(2) <= std_logic_vector(unsigned(sum(2)) + unsigned(fft_fdom_data));
+						sum(2) <= std_logic_vector(unsigned(sum(2)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 64 then 
-						sum(3) <= std_logic_vector(unsigned(sum(3)) + unsigned(fft_fdom_data));
+						sum(3) <= std_logic_vector(unsigned(sum(3)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 80 then 
-						sum(4) <= std_logic_vector(unsigned(sum(4)) + unsigned(fft_fdom_data));
+						sum(4) <= std_logic_vector(unsigned(sum(4)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 96 then 
-						sum(5) <= std_logic_vector(unsigned(sum(5)) + unsigned(fft_fdom_data));
+						sum(5) <= std_logic_vector(unsigned(sum(5)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 112 then 
-						sum(6) <= std_logic_vector(unsigned(sum(6)) + unsigned(fft_fdom_data));
+						sum(6) <= std_logic_vector(unsigned(sum(6)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 128 then 
-						sum(7) <= std_logic_vector(unsigned(sum(7)) + unsigned(fft_fdom_data));
+						sum(7) <= std_logic_vector(unsigned(sum(7)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 144 then 
-						sum(8) <= std_logic_vector(unsigned(sum(8)) + unsigned(fft_fdom_data));
+						sum(8) <= std_logic_vector(unsigned(sum(8)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 160 then 
-						sum(9) <= std_logic_vector(unsigned(sum(9)) + unsigned(fft_fdom_data));
+						sum(9) <= std_logic_vector(unsigned(sum(9)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 176 then 
-						sum(10) <= std_logic_vector(unsigned(sum(10)) + unsigned(fft_fdom_data));
+						sum(10) <= std_logic_vector(unsigned(sum(10)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 192 then 
-						sum(11) <= std_logic_vector(unsigned(sum(11)) + unsigned(fft_fdom_data));
+						sum(11) <= std_logic_vector(unsigned(sum(11)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 208 then 
-						sum(12) <= std_logic_vector(unsigned(sum(12)) + unsigned(fft_fdom_data));
+						sum(12) <= std_logic_vector(unsigned(sum(12)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 224 then 
-						sum(13) <= std_logic_vector(unsigned(sum(13)) + unsigned(fft_fdom_data));
+						sum(13) <= std_logic_vector(unsigned(sum(13)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 240 then 
-						sum(14) <= std_logic_vector(unsigned(sum(14)) + unsigned(fft_fdom_data));
+						sum(14) <= std_logic_vector(unsigned(sum(14)) + unsigned(fft_fdom_data(31 downto 16)));
 					else
-						sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(fft_fdom_data));
+						sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(fft_fdom_data(31 downto 16)));
 					end if;
 					fft_fdom_addr <= to_unsigned(addr_counter,fft_fdom_addr'length);
 					addr_counter  <= addr_counter + 1;
 				else
 					addr_counter <= 0;
-					sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(fft_fdom_data));
+					sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(fft_fdom_data(31 downto 16)));
 					reset <= '1';
 					state := A;
 				end if;

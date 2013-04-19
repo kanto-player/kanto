@@ -182,9 +182,10 @@ architecture datapath of kanto is
 	signal fft_addr : std_logic_vector(17 downto 0);
 	signal fft_readdata : std_logic_vector(15 downto 0);
 	signal fft_start : std_logic;
-    signal fft_fdom_addr : unsigned(7 downto 0);
-    signal fft_fdom_data : signed(31 downto 0);
-
+   signal fft_fdom_addr : unsigned(7 downto 0);
+   signal fft_fdom_data : signed(31 downto 0);
+	signal fft_done      : std_logic;
+	
 	signal main_clk : std_logic;
 	signal aud_clk : std_logic;
 	signal sdram_clk : std_logic;
@@ -320,9 +321,23 @@ begin
 		viz_write => sram_test_write,
 		viz_ack => sram_test_ack,
 		viz_req => sram_test_req
-
 	 );
-
+	 
+	 VISUALIZER : entity work.visualizer port map(
+		clk   			=> main_clk,
+		reset_data		=> fft_done,
+		fft_fdom_addr 	=> fft_fdom_addr,
+		fft_fdom_data 	=> fft_fdom_data,
+		VGA_CLK        => VGA_CLK,
+		VGA_HS         => VGA_HS,
+		VGA_VS         => VGA_VS,
+		VGA_BLANK      => VGA_BLANK,
+		VGA_SYNC 		=> VGA_SYNC,
+		VGA_R      		=> VGA_R,
+		VGA_G          => VGA_G,
+		VGA_B 			=> VGA_B
+	 );
+	 
     --HEX7 <= "0001001"; -- Leftmost
     HEX6 <= "0000110";
     HEX5 <= "1000111";
@@ -339,15 +354,6 @@ begin
     LCD_RW   <= '1';
     LCD_EN   <= '0';
     LCD_RS   <= '0';
-
-    VGA_CLK <= '0';
-    VGA_HS <= '0';
-    VGA_VS <= '0';
-    VGA_BLANK <= '0';
-    VGA_SYNC <= '0';
-    VGA_R <= (others => '0');
-    VGA_G <= (others => '0');
-    VGA_B <= (others => '0');
 
     --SD_DAT3 <= '1';    
     --SD_CMD <= '1';
