@@ -8,6 +8,7 @@ port (
     cs              : out std_logic;
     mosi            : out std_logic;
     miso            : in std_logic;
+    sclk            : out std_logic;
     play            : in std_logic;
     ready           : out std_logic
 );
@@ -81,7 +82,7 @@ begin
 
             -- if we've reached the appropriate count
             -- enable clock for one cycle and reset counter
-            if (init_done = '0' and clk_counter = 249)
+            if (init_done = '0' and clk_counter = 124)
                     or (init_done = '1' and clk_counter = 24) then
                 sd_clk_enable <= '1';
                 clk_counter <= 0;
