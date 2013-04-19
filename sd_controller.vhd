@@ -21,9 +21,11 @@ architecture datapath of sd_controller is
 
     signal init_mosi : std_logic;
     signal init_cs : std_logic;
+    signal init_sclk : std_logic;
 
     signal reader_mosi : std_logic;
     signal reader_cs : std_logic;
+    signal reader_sclk : std_logic;
 
     signal sd_clk_enable : std_logic := '1';
     signal clk_counter : integer range 0 to 255;
@@ -56,9 +58,10 @@ begin
     INIT : entity work.sd_initializer port map (
         clk_en => sd_clk_enable,
         clk => clk50,
-        sd_data => shift_reg_data,
         init_done => init_done,
         mosi => init_mosi,
+        miso => miso,
+        sclk => init_sclk,
         cs => init_cs
     );
 
@@ -67,6 +70,8 @@ begin
             else reader_mosi;
     cs <= init_cs when init_done = '0'
           else reader_cs;
+    sclk <= init_sclk when init_done = '0'
+          else reader_sclk;
 
 
     -- clock divider for sd clock
@@ -82,7 +87,7 @@ begin
 
             -- if we've reached the appropriate count
             -- enable clock for one cycle and reset counter
-            if (init_done = '0' and clk_counter = 124)
+            if (init_done = '0' and clk_counter = 62)
                     or (init_done = '1' and clk_counter = 24) then
                 sd_clk_enable <= '1';
                 clk_counter <= 0;
