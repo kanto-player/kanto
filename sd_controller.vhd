@@ -23,7 +23,8 @@ architecture rtl of sd_controller is
 
     constant reset_cmd : std_logic_vector(0 to 47) := "010000000000000000000000000000000000000010010101";
     type state is (init_hold, send_cmd0, wait_cmd0_resp, cmd0_resp, 
-                   send_cmd1, wait_cmd1_resp, cmd1_resp, done);
+                   send_cmd17, cmd17_check_noerr, cmd17_wait_data, cmd17_read_data,
+                   mem_write, done);
     signal current_state : state := init_hold;
     signal sclk_sig : std_logic := '0';
     signal read_resp : std_logic_vector(15 downto 0);
@@ -150,9 +151,10 @@ begin
         when done =>
             init_done <= '1';
             read_done <= '1';
-
-            if hold_play = '1' then
-
+        
+        when others =>
+            init_done <= '1';
+            read_done <= '1';
 
     end case; -- current_state
     
