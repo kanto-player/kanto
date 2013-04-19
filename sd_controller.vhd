@@ -10,7 +10,9 @@ port (
     miso            : in std_logic;
     sclk            : out std_logic;
     play            : in std_logic;
-    ready           : out std_logic
+    ready           : out std_logic;
+    err             : out std_logic;
+    resp_debug      : out std_logic_vector(15 downto 0)
 );
 end sd_controller;
 
@@ -24,15 +26,16 @@ architecture rtl of sd_controller is
     constant reset_cmd : std_logic_vector(0 to 47) := "010000000000000000000000000000000000000010010101";
     type state is (init_hold, send_cmd0, wait_cmd0_resp, cmd0_resp, 
                    send_cmd17, cmd17_check_noerr, cmd17_wait_data, cmd17_read_data,
-                   mem_write, done);
+                   mem_write, done, init_err);
     signal current_state : state := init_hold;
     signal sclk_sig : std_logic := '0';
-    signal read_resp : std_logic_vector(15 downto 0);
+    signal read_resp : std_logic_vector(15 downto 0) := (others => '1');
 
     signal hold_play : std_logic;
 begin
     sclk <= sclk_sig;
     ready <= init_done and read_done;
+    resp_debug <= read_resp;
     
     -- clock divider for sd clock
     process(clk50)
@@ -70,7 +73,7 @@ begin
     begin
 
     if rising_edge(clk50) then
-    if clk_en = '1' then
+    if clk_enable = '1' then
 
     case current_state is
 
@@ -79,72 +82,69 @@ begin
             init_done <= '0';
             cs <= '1';
             mosi <= '1';
-            if counter /= 75 then
-                if sclk_sig = '1' then
+            err <= '0';
+            if sclk_sig = '1' then
+                if counter /= 75 then
                     counter := counter + 1;
+                else
+                    counter := 0;
+                    current_state <= send_cmd0;
+                    cs <= '0';
+                    mosi <= reset_cmd(counter);
+                    sclk_sig <= '0';
                 end if;
-                sclk_sig <= not sclk_sig;
-            else -- clock should be low at this point
-                counter := 0;
-                current_state <= send_cmd0;
-                cs <= '0';
-                mosi <= reset_cmd(counter);
-                sclk_sig <= '1';
             end if;
+            sclk_sig <= not sclk_sig;
 
         -- sending command for spi mode
         when send_cmd0 =>
-            if counter /= 47 then
-                if sclk_sig = '0' then
+            read_resp <= x"001d";
+            if sclk_sig = '1' then
+                if counter /= 47 then
                     counter := counter + 1;
                     mosi <= reset_cmd(counter);
+                else -- clock should be high at this point
+                    counter := 0;
+                    current_state <= wait_cmd0_resp;
+                    mosi <= '1';
                 end if;
-                sclk_sig <= not sclk_sig;
-            else -- clock should be high at this point
-                counter := 0;
-                current_state <= wait_cmd0_resp;
-                mosi <= '1';
-                sclk_sig <= '0';
             end if;
+            sclk_sig <= not sclk_sig;
                 
         -- waiting for response after sending cmd
         -- if response does not begin within 16 cycles, resend
         when wait_cmd0_resp =>
-            if miso = '0' and sclk_sig = '1' then
-                counter := 0;
-                current_state <= cmd0_resp;
-                sclk_sig <= '0';
-            elsif counter = 15 then -- sclk should be low at this point
-                counter := 0;
-                current_state <= send_cmd0;
-                mosi <= reset_cmd(counter);
-                sclk_sig <= '1';
-            else
-                if sclk_sig = '1' then
+            if sclk_sig = '1' then
+                if miso = '0' then
+                    counter := 0;
+                    current_state <= cmd0_resp;
+                    read_resp <= x"fffe";
+                elsif counter = 15 then
+                    counter := 0;
+                    current_state <= send_cmd0;
+                    mosi <= reset_cmd(counter);
+                else
                     counter := counter + 1;
                 end if;
-                sclk_sig <= not sclk_sig;
             end if;
+            sclk_sig <= not sclk_sig;
 
         -- wait 7 cycles for response
         -- if bad response, resend command
         when cmd0_resp =>
-            if counter /= 6 then
-                if sclk_sig = '1' then
+            if sclk_sig = '1' then
+                if counter /= 7 then
                     read_resp <= read_resp(14 downto 0) & miso;
                     counter := counter + 1;
+                elsif read_resp(7 downto 0) /= "00000001" then
+                    current_state <= init_err;
+                else
+                    counter := 0;
+                    current_state <= done;
+                    init_done <= '1';
                 end if;
-                sclk_sig <= not sclk_sig;
-            elsif read_resp(7 downto 0) /= "00000001" then
-                -- sclk should be low here
-                counter := 0;
-                current_state <= send_cmd0;
-                mosi <= reset_cmd(counter);
-            else
-                counter := 0;
-                current_state <= done;
-                init_done <= '1';
             end if;
+            sclk_sig <= not sclk_sig;
 
         -- finished with initialization - sd controller will give
         -- control of cs and mosi to another component
@@ -153,8 +153,7 @@ begin
             read_done <= '1';
         
         when others =>
-            init_done <= '1';
-            read_done <= '1';
+            err <= '1';
 
     end case; -- current_state
     

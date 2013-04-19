@@ -198,7 +198,8 @@ architecture datapath of kanto is
 	-- inserted for SDC testing
 	signal sd_play : std_logic;
 	signal sd_ready : std_logic;
-	signal sd_data_out : std_logic_vector(15 downto 0);
+    signal sd_err : std_logic;
+    signal sd_resp_debug : std_logic_vector(15 downto 0);
 	  
 	-- signals for sram controller testing
 	signal sram_test_reset : std_logic;
@@ -208,9 +209,11 @@ architecture datapath of kanto is
 	signal sram_test_write 		: std_logic;
 	signal sram_test_req 			: std_logic;
 	signal sram_test_ack			: std_logic;
-		
 	  
 begin
+
+    LEDG(0) <= sd_ready;
+    LEDR(0) <= sd_err;
 
     PLL : entity work.audpll port map (
         inclk0 => CLOCK_50,
@@ -256,15 +259,9 @@ begin
         miso => SD_DAT,
         sclk => SD_CLK,
         play => sd_play,
-        ready => sd_ready
-    );
-     
-    SDC_TEST : entity work.sd_test port map (
-        clk => main_clk,
-        play => sd_play,
         ready => sd_ready,
-        data_out => sd_data_out,
-        hex => HEX7
+        err => sd_err,
+        resp_debug => sd_resp_debug
     );
     
     FFT : entity work.fft_controller port map (
@@ -338,15 +335,31 @@ begin
 		VGA_G          => VGA_G,
 		VGA_B 			=> VGA_B
 	 );
+
+    SS0 : entity work.sevenseg port map (
+        number => sd_resp_debug(3 downto 0),
+        display => HEX0
+    );
+
+    SS1 : entity work.sevenseg port map (
+        number => sd_resp_debug(7 downto 4),
+        display => HEX1
+    );
+    
+    SS2 : entity work.sevenseg port map (
+        number => sd_resp_debug(11 downto 8),
+        display => HEX2
+    );
+    
+    SS3 : entity work.sevenseg port map (
+        number => sd_resp_debug(15 downto 12),
+        display => HEX3
+    );
 	 
-    --HEX7 <= "0001001"; -- Leftmost
+    HEX7 <= "0001001"; -- Leftmost
     HEX6 <= "0000110";
     HEX5 <= "1000111";
     HEX4 <= "1000111";
-    HEX3 <= "1000000";
-    HEX2 <= (others => '1');
-    HEX1 <= (others => '1');
-    HEX0 <= (others => '1');
 
     LEDG(7 downto 1) <= (others => '0');
     
