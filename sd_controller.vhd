@@ -14,92 +14,151 @@ port (
 );
 end sd_controller;
 
-architecture datapath of sd_controller is
-     
-    signal shift_reg_data : std_logic_vector(15 downto 0);
-    signal init_done : std_logic;
-
-    signal init_mosi : std_logic;
-    signal init_cs : std_logic;
-    signal init_sclk : std_logic;
-
-    signal reader_mosi : std_logic;
-    signal reader_cs : std_logic;
-    signal reader_sclk : std_logic;
-
-    signal sd_clk_enable : std_logic := '1';
+architecture rtl of sd_controller is
+    signal clk_enable : std_logic := '1';
     signal clk_counter : integer range 0 to 255;
+    signal init_done : std_logic := '0';
     signal init_done_old : std_logic;
+    signal read_done : std_logic := '1';
 
+    constant reset_cmd : std_logic_vector(0 to 47) := "010000000000000000000000000000000000000010010101";
+    type state is (init_hold, send_cmd0, wait_cmd0_resp, cmd0_resp, 
+                   send_cmd1, wait_cmd1_resp, cmd1_resp, done);
+    signal current_state : state := init_hold;
+    signal sclk_sig : std_logic := '0';
+    signal read_resp : std_logic_vector(15 downto 0);
+
+    signal hold_play : std_logic;
 begin
-
-    -- shift register which gets the data coming from the sd card
-    SHIFT_REG : entity work.sd_shift_register port map (
-        clk_en => sd_clk_enable,
-        clk => clk50,
-        data_in => miso,
-        data_out => shift_reg_data
-    );
-
-    -- responsible for sending read commands to sd card and writing
-    -- response to sram
-    READER : entity work.sd_reader port map (
-        clk_en => sd_clk_enable,
-        clk => clk50,
-        sd_data => shift_reg_data,
-        init_done => init_done,
-        mosi => reader_mosi,
-        cs => reader_cs,
-        play => play
-    );
-
-    -- initializes the sd card in spi mode. asserts done to high when
-    -- initialization is complete
-    INIT : entity work.sd_initializer port map (
-        clk_en => sd_clk_enable,
-        clk => clk50,
-        init_done => init_done,
-        mosi => init_mosi,
-        miso => miso,
-        sclk => init_sclk,
-        cs => init_cs
-    );
-
-    -- multiplex mosi and cs signals between initializer and reader
-    mosi <= init_mosi when init_done = '0'
-            else reader_mosi;
-    cs <= init_cs when init_done = '0'
-          else reader_cs;
-    sclk <= init_sclk when init_done = '0'
-          else reader_sclk;
-
-
+    sclk <= sclk_sig;
+    ready <= init_done and read_done;
+    
     -- clock divider for sd clock
-    process(init_done, clk50)
+    process(clk50)
     begin
 
         -- if we change states (i.e. desired sd_clk frequency)
         -- then reset counter
-        if init_done /= init_done_old then
-            clk_counter <= 0;
-
-        elsif rising_edge(clk50) then
-
+        if rising_edge(clk50) then
             -- if we've reached the appropriate count
             -- enable clock for one cycle and reset counter
             if (init_done = '0' and clk_counter = 62)
                     or (init_done = '1' and clk_counter = 24) then
-                sd_clk_enable <= '1';
+                clk_enable <= '1';
                 clk_counter <= 0;
             else
-                sd_clk_enable <= '0';
+                clk_enable <= '0';
                 clk_counter <= clk_counter + 1;
             end if;
+            
+            if init_done /= init_done_old then
+                clk_counter <= 0;
+            end if;
+            
+            init_done_old <= init_done;
 
+            if play = '1' then
+                hold_play <= '1';
+            end if;
         end if; -- rising_edge(clk50)
 
-        init_done_old <= init_done;
-        
     end process;
 
-end datapath;
+    process(clk50)
+        variable counter : integer range 0 to 127 := 0;
+    begin
+
+    if rising_edge(clk50) then
+    if clk_en = '1' then
+
+    case current_state is
+
+        -- asserting mosi and cs high for at least 74 clocks
+        when init_hold =>
+            init_done <= '0';
+            cs <= '1';
+            mosi <= '1';
+            if counter /= 75 then
+                if sclk_sig = '1' then
+                    counter := counter + 1;
+                end if;
+                sclk_sig <= not sclk_sig;
+            else -- clock should be low at this point
+                counter := 0;
+                current_state <= send_cmd0;
+                cs <= '0';
+                mosi <= reset_cmd(counter);
+                sclk_sig <= '1';
+            end if;
+
+        -- sending command for spi mode
+        when send_cmd0 =>
+            if counter /= 47 then
+                if sclk_sig = '0' then
+                    counter := counter + 1;
+                    mosi <= reset_cmd(counter);
+                end if;
+                sclk_sig <= not sclk_sig;
+            else -- clock should be high at this point
+                counter := 0;
+                current_state <= wait_cmd0_resp;
+                mosi <= '1';
+                sclk_sig <= '0';
+            end if;
+                
+        -- waiting for response after sending cmd
+        -- if response does not begin within 16 cycles, resend
+        when wait_cmd0_resp =>
+            if miso = '0' and sclk_sig = '1' then
+                counter := 0;
+                current_state <= cmd0_resp;
+                sclk_sig <= '0';
+            elsif counter = 15 then -- sclk should be low at this point
+                counter := 0;
+                current_state <= send_cmd0;
+                mosi <= reset_cmd(counter);
+                sclk_sig <= '1';
+            else
+                if sclk_sig = '1' then
+                    counter := counter + 1;
+                end if;
+                sclk_sig <= not sclk_sig;
+            end if;
+
+        -- wait 7 cycles for response
+        -- if bad response, resend command
+        when cmd0_resp =>
+            if counter /= 6 then
+                if sclk_sig = '1' then
+                    read_resp <= read_resp(14 downto 0) & miso;
+                    counter := counter + 1;
+                end if;
+                sclk_sig <= not sclk_sig;
+            elsif read_resp(7 downto 0) /= "00000001" then
+                -- sclk should be low here
+                counter := 0;
+                current_state <= send_cmd0;
+                mosi <= reset_cmd(counter);
+            else
+                counter := 0;
+                current_state <= done;
+                init_done <= '1';
+            end if;
+
+        -- finished with initialization - sd controller will give
+        -- control of cs and mosi to another component
+        when done =>
+            init_done <= '1';
+            read_done <= '1';
+
+            if hold_play = '1' then
+
+
+    end case; -- current_state
+    
+    end if; -- clk_en = '1'
+    end if; -- rising_edge(clk)
+
+    end process;
+
+end rtl;
