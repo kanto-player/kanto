@@ -194,7 +194,7 @@ begin
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
                 return_state <= check_cmd41;
-                last_resp <= '1';
+                last_resp <= '0';
                 state_indicator <= x"41";
             else
                 state_indicator <= x"55";
@@ -203,14 +203,12 @@ begin
 
         when check_cmd41 =>
             if readdata(7 downto 0) = x"00" then
-                state <= cmd_done;
+                return_state <= cmd_done;
+                state <= deselect;
             elsif readdata(7 downto 0) = x"01" then
-                command <= cmd55;
-                counter <= to_unsigned(47, 8);
-                state <= send_cmd;
-                return_state <= check_cmd55;
-                state_indicator <= x"55";
-                last_resp <= '1';
+                return_state <= check_cmd41;
+                state <= recv_resp;
+                last_resp <= '0';
             else
                 state_indicator <= x"41";
                 state <= cmd_err;
