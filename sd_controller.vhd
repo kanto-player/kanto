@@ -9,9 +9,10 @@ port (
     mosi            : out std_logic;
     miso            : in std_logic;
     sclk            : out std_logic;
-    start            : in std_logic;
+    start           : in std_logic;
     ready           : out std_logic;
     err             : out std_logic;
+    waiting         : out std_logic;
     resp_debug      : out std_logic_vector(15 downto 0)
 );
 end sd_controller;
@@ -45,6 +46,7 @@ begin
     sclk <= sclk_sig;
     ready <= '1' when state = cmd_done else '0';
     err <= '1' when state = cmd_err else '0';
+    waiting <= '1' when state = wait_resp else '0';
     resp_debug <= readdata;
     
     -- clock divider for sd clock
@@ -91,7 +93,6 @@ begin
             init_done <= '1';
 
         when reset_clks1 =>
-            readdata <= x"f001";
             if counter = x"00" then
                 counter <= to_unsigned(32, 8);
                 state <= reset_clks2;
@@ -101,13 +102,13 @@ begin
             end if;
 
         when reset_clks2 =>
-            readdata <= x"f002";
             if counter = 0 then
                 command <= cmd0;
                 counter <= to_unsigned(47, 8);
                 return_state <= check_cmd0;
                 state <= send_cmd;
                 last_resp <= '1';
+                readdata(15 downto 8) <= x"00";
             else
                 counter <= counter - "1";
                 sclk_sig <= not sclk_sig;
@@ -120,6 +121,7 @@ begin
                 return_state <= check_cmd8_head;
                 state <= send_cmd;
                 last_resp <= '0';
+                readdata(15 downto 8) <= x"08";
             else
                 readdata(15 downto 8) <= x"00";
                 state <= cmd_err;
@@ -137,6 +139,7 @@ begin
                 return_state <= check_cmd58_head;
                 state <= send_cmd;
                 last_resp <= '0';
+                readdata(15 downto 8) <= x"58";
             end if;
 
         when check_cmd8_extra =>
@@ -146,6 +149,7 @@ begin
                 state <= send_cmd;
                 return_state <= check_cmd55;
                 last_resp <= '1';
+                readdata(15 downto 8) <= x"55";
             else
                 readdata(15 downto 12) <= (others => '0');
                 state <= cmd_err;
@@ -179,6 +183,7 @@ begin
             state <= send_cmd;
             return_state <= check_cmd55;
             last_resp <= '1';
+            readdata(15 downto 8) <= x"55";
 
         when check_cmd55 =>
             if readdata(7 downto 0) = x"01" then
@@ -187,6 +192,7 @@ begin
                 state <= send_cmd;
                 return_state <= check_cmd41;
                 last_resp <= '1';
+                readdata(15 downto 8) <= x"41";
             else
                 readdata(15 downto 8) <= x"55";
                 state <= cmd_err;
@@ -200,6 +206,7 @@ begin
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
                 return_state <= check_cmd55;
+                readdata(15 downto 8) <= x"55";
                 last_resp <= '1';
             else
                 readdata(15 downto 8) <= x"41";
@@ -207,7 +214,6 @@ begin
             end if;
 
         when send_cmd =>
-            readdata <= x"f003";
             if sclk_sig = '1' then
                 if counter = x"00" then
                     state <= wait_resp;
@@ -219,9 +225,8 @@ begin
             sclk_sig <= not sclk_sig;
 
         when wait_resp =>
-            readdata <= x"f004";
+            readdata(7 downto 0) <= (others => '0');
             if sclk_sig = '1' and miso = '0' then
-                readdata <= (others => '0');
                 counter <= to_unsigned(6, 8);
                 state <= recv_resp;
             end if;
