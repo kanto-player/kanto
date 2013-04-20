@@ -23,8 +23,8 @@ architecture rtl of sd_controller is
     signal init_done_old : std_logic;
     signal read_done : std_logic := '1';
 
-    constant reset_cmd : std_logic_vector(0 to 47) := x"400000000095";
-    constant init_cmd  : std_logic_vector(0 to 47) := x"410000000001";
+    constant reset_cmd : std_logic_vector(0 to 47) := "010000000000000000000000000000000000000010010101";
+    constant init_cmd  : std_logic_vector(0 to 47) := "010000010000000000000000000000000000000000000001";
     type state is (init_hold, send_cmd0, wait_cmd0_resp, cmd0_resp, 
                    send_cmd1, wait_cmd1_resp, cmd1_resp,
                    mem_write, done, init_err);
