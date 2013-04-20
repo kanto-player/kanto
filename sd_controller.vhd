@@ -13,7 +13,8 @@ port (
     ready           : out std_logic;
     err             : out std_logic;
     waiting         : out std_logic;
-    resp_debug      : out std_logic_vector(15 downto 0)
+    state_debug     : out std_logic_vector(7 downto 0);
+    resp_debug      : out std_logic_vector(7 downto 0)
 );
 end sd_controller;
 
@@ -42,12 +43,14 @@ architecture rtl of sd_controller is
 
     signal init_done : std_logic;
     signal hold_start : std_logic;
+    signal state_indicator : unsigned(7 downto 0) := x"00";
 begin
     sclk <= sclk_sig;
     ready <= '1' when state = cmd_done else '0';
     err <= '1' when state = cmd_err else '0';
+    resp_debug <= readdata(7 downto 0);
+    state_debug <= std_logic_vector(state_indicator);
     waiting <= '1' when state = wait_resp else '0';
-    resp_debug <= readdata;
     
     -- clock divider for sd clock
     process(clk50)
@@ -108,7 +111,7 @@ begin
                 return_state <= check_cmd0;
                 state <= send_cmd;
                 last_resp <= '1';
-                readdata(15 downto 8) <= x"00";
+                state_indicator <= x"00";
             else
                 counter <= counter - "1";
                 sclk_sig <= not sclk_sig;
@@ -121,9 +124,9 @@ begin
                 return_state <= check_cmd8_head;
                 state <= send_cmd;
                 last_resp <= '0';
-                readdata(15 downto 8) <= x"08";
+                state_indicator <= x"08";
             else
-                readdata(15 downto 8) <= x"00";
+                state_indicator <= x"00";
                 state <= cmd_err;
             end if;
 
@@ -139,7 +142,7 @@ begin
                 return_state <= check_cmd58_head;
                 state <= send_cmd;
                 last_resp <= '0';
-                readdata(15 downto 8) <= x"58";
+                state_indicator <= x"58";
             end if;
 
         when check_cmd8_extra =>
@@ -149,7 +152,7 @@ begin
                 state <= send_cmd;
                 return_state <= check_cmd55;
                 last_resp <= '1';
-                readdata(15 downto 8) <= x"55";
+                state_indicator <= x"55";
             else
                 readdata(15 downto 12) <= (others => '0');
                 state <= cmd_err;
@@ -157,7 +160,7 @@ begin
 
         when check_cmd58_head =>
             if readdata(2) = '1' then
-                readdata(15 downto 8) <= x"58";
+                state_indicator <= x"58";
                 state <= cmd_err;
             else
                 counter <= to_unsigned(15, 8);
@@ -168,7 +171,7 @@ begin
 
         when check_cmd58_voltage =>
             if readdata(5) = '0' then
-                readdata(15 downto 8) <= x"f8";
+                state_indicator <= x"f8";
                 state <= cmd_err;
             else
                 counter <= to_unsigned(15, 8);
@@ -183,7 +186,7 @@ begin
             state <= send_cmd;
             return_state <= check_cmd55;
             last_resp <= '1';
-            readdata(15 downto 8) <= x"55";
+            state_indicator <= x"55";
 
         when check_cmd55 =>
             if readdata(7 downto 0) = x"01" then
@@ -192,9 +195,9 @@ begin
                 state <= send_cmd;
                 return_state <= check_cmd41;
                 last_resp <= '1';
-                readdata(15 downto 8) <= x"41";
+                state_indicator <= x"41";
             else
-                readdata(15 downto 8) <= x"55";
+                state_indicator <= x"55";
                 state <= cmd_err;
             end if;
 
@@ -206,10 +209,10 @@ begin
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
                 return_state <= check_cmd55;
-                readdata(15 downto 8) <= x"55";
+                state_indicator <= x"55";
                 last_resp <= '1';
             else
-                readdata(15 downto 8) <= x"41";
+                state_indicator <= x"41";
                 state <= cmd_err;
             end if;
 
@@ -225,10 +228,10 @@ begin
             sclk_sig <= not sclk_sig;
 
         when wait_resp =>
-            readdata(7 downto 0) <= (others => '0');
             if sclk_sig = '1' and miso = '0' then
                 counter <= to_unsigned(6, 8);
                 state <= recv_resp;
+                readdata <= (others => '0');
             end if;
             sclk_sig <= not sclk_sig;
 

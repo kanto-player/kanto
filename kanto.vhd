@@ -200,7 +200,8 @@ architecture datapath of kanto is
 	signal sd_ready : std_logic;
     signal sd_err : std_logic;
     signal sd_waiting : std_logic;
-    signal sd_resp_debug : std_logic_vector(15 downto 0);
+    signal sd_resp_debug : std_logic_vector(7 downto 0);
+    signal sd_state_debug : std_logic_vector(7 downto 0);
 	  
 	-- signals for sram controller testing
 	signal sram_test_reset : std_logic;
@@ -264,7 +265,9 @@ begin
         start => sd_start,
         ready => sd_ready,
         err => sd_err,
-        resp_debug => sd_resp_debug
+        waiting => sd_waiting,
+        resp_debug => sd_resp_debug,
+        state_debug => sd_state_debug
     );
     
     FFT : entity work.fft_controller port map (
@@ -350,12 +353,12 @@ begin
     );
     
     SS2 : entity work.sevenseg port map (
-        number => sd_resp_debug(11 downto 8),
+        number => sd_state_debug(3 downto 0),
         display => HEX2
     );
     
     SS3 : entity work.sevenseg port map (
-        number => sd_resp_debug(15 downto 12),
+        number => sd_state_debug(7 downto 4),
         display => HEX3
     );
 	 
