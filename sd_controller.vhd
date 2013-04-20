@@ -22,7 +22,7 @@ architecture rtl of sd_controller is
     signal counter : unsigned(7 downto 0);
 
     constant reset_cmd : std_logic_vector(47 downto 0) := x"400000000095";
-    constant init_cmd  : std_logic_vector(47 downto 0) := x"410000000001";
+    constant init_cmd  : std_logic_vector(47 downto 0) := x"4100000000ff";
     signal command : std_logic_vector(47 downto 0);
     type sd_state is (reset_state, reset_clks1, reset_clks2, 
                       send_cmd, wait_resp, recv_resp,
@@ -131,7 +131,6 @@ begin
             if sclk_sig = '1' then
                 if counter = x"00" then
                     state <= wait_resp;
-                    counter <= to_unsigned(255, 8);
                 else
                     counter <= counter - "1";
                     command <= command(46 downto 0) & "1";
@@ -145,8 +144,6 @@ begin
                 readdata <= (others => '0');
                 counter <= to_unsigned(6, 8);
                 state <= recv_resp;
-            else
-                counter <= counter - "1";
             end if;
             sclk_sig <= not sclk_sig;
 
