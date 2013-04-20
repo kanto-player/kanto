@@ -24,18 +24,20 @@ architecture rtl of sd_controller is
     constant cmd0  : std_logic_vector(47 downto 0) := x"400000000095";
     constant cmd8  : std_logic_vector(47 downto 0) := x"48000001AA87";
     constant cmd55 : std_logic_vector(47 downto 0) := x"770000000065";
-    constant cmd41 : std_logic_vector(47 downto 0) := x"6900000000e5";
+    constant cmd41 : std_logic_vector(47 downto 0) := x"694000000077";
     constant cmd58 : std_logic_vector(47 downto 0) := x"7a00000000fd";
     signal command : std_logic_vector(47 downto 0);
     type sd_state is (reset_state, reset_clks1, reset_clks2, 
-                      send_cmd, wait_resp, recv_resp,
+                      send_cmd, wait_resp, recv_resp, deselect,
                       check_cmd0, check_cmd8_head, check_cmd8_extra,
                       check_cmd58_head, check_cmd58_voltage, check_cmd58_extra,
                       check_cmd55, check_cmd41, cmd_done, cmd_err);
     signal state : sd_state := reset_state;
+    signal last_state : sd_state := reset_state;
     signal return_state : sd_state;
     signal sclk_sig : std_logic;
     signal readdata : std_logic_vector(15 downto 0) := (others => '1');
+    signal last_resp : std_logic;
 
     signal init_done : std_logic;
     signal hold_start : std_logic;
@@ -70,6 +72,7 @@ begin
     end process;
 
     mosi <= command(47);
+    cs <= '1' when state = reset_clks1 or state = deselect else '0';
     
     process(clk50)
     begin
@@ -81,7 +84,6 @@ begin
 
         -- asserting mosi and cs high for at least 74 clocks
         when reset_state =>
-            cs <= '1';
             command <= (others => '1');
             sclk_sig <= '0';
             counter <= to_unsigned(160, 8);
@@ -92,7 +94,6 @@ begin
             readdata <= x"f001";
             if counter = x"00" then
                 counter <= to_unsigned(32, 8);
-                cs <= '0';
                 state <= reset_clks2;
             else
                 counter <= counter - "1";
@@ -106,6 +107,7 @@ begin
                 counter <= to_unsigned(47, 8);
                 return_state <= check_cmd0;
                 state <= send_cmd;
+                last_resp <= '1';
             else
                 counter <= counter - "1";
                 sclk_sig <= not sclk_sig;
@@ -117,6 +119,7 @@ begin
                 counter <= to_unsigned(47, 8);
                 return_state <= check_cmd8_head;
                 state <= send_cmd;
+                last_resp <= '0';
             else
                 readdata(15 downto 8) <= x"00";
                 state <= cmd_err;
@@ -127,11 +130,13 @@ begin
                 counter <= to_unsigned(31, 8);
                 state <= recv_resp;
                 return_state <= check_cmd8_extra;
+                last_resp <= '1';
             else
                 counter <= to_unsigned(47, 8);
                 command <= cmd58;
                 return_state <= check_cmd58_head;
                 state <= send_cmd;
+                last_resp <= '0';
             end if;
 
         when check_cmd8_extra =>
@@ -140,6 +145,7 @@ begin
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
                 return_state <= check_cmd55;
+                last_resp <= '1';
             else
                 readdata(15 downto 12) <= (others => '0');
                 state <= cmd_err;
@@ -153,6 +159,7 @@ begin
                 counter <= to_unsigned(15, 8);
                 return_state <= check_cmd58_voltage;
                 state <= recv_resp;
+                last_resp <= '0';
             end if;
 
         when check_cmd58_voltage =>
@@ -163,6 +170,7 @@ begin
                 counter <= to_unsigned(15, 8);
                 return_state <= check_cmd58_extra;
                 state <= recv_resp;
+                last_resp <= '1';
             end if;
 
         when check_cmd58_extra =>
@@ -170,6 +178,7 @@ begin
             counter <= to_unsigned(47, 8);
             state <= send_cmd;
             return_state <= check_cmd55;
+            last_resp <= '1';
 
         when check_cmd55 =>
             if readdata(7 downto 0) = x"01" then
@@ -177,6 +186,7 @@ begin
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
                 return_state <= check_cmd41;
+                last_resp <= '1';
             else
                 readdata(15 downto 8) <= x"55";
                 state <= cmd_err;
@@ -190,6 +200,7 @@ begin
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
                 return_state <= check_cmd55;
+                last_resp <= '1';
             else
                 readdata(15 downto 8) <= x"41";
                 state <= cmd_err;
@@ -220,12 +231,25 @@ begin
             if sclk_sig = '1' then
                 readdata <= readdata(14 downto 0) & miso;
                 if counter = 0 then
-                    state <= return_state;
+                    if last_resp = '1' then
+                        state <= return_state;
+                    else
+                        counter <= to_unsigned(15, 8);
+                        state <= deselect;
+                    end if;
                 else
                     counter <= counter - "1";
                 end if;
             end if;
             sclk_sig <= not sclk_sig;
+
+        when deselect =>
+            if counter = 0 then
+                state <= return_state;
+            else
+                counter <= counter - 1;
+                sclk_sig <= not sclk_sig;
+            end if;
 
         when cmd_done =>
             init_done <= '1';
