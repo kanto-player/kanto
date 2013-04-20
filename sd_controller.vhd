@@ -237,12 +237,7 @@ begin
             if sclk_sig = '1' then
                 readdata <= readdata(14 downto 0) & miso;
                 if counter = 0 then
-                    if last_resp = '0' then
-                        state <= return_state;
-                    else
-                        counter <= to_unsigned(15, 8);
-                        state <= deselect;
-                    end if;
+                    state <= return_state;
                 else
                     counter <= counter - "1";
                 end if;
