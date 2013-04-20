@@ -196,7 +196,7 @@ architecture datapath of kanto is
 	signal dft_test_data : signed(31 downto 0);
 	  
 	-- inserted for SDC testing
-	signal sd_play : std_logic;
+	signal sd_start : std_logic;
 	signal sd_ready : std_logic;
     signal sd_err : std_logic;
     signal sd_resp_debug : std_logic_vector(15 downto 0);
@@ -214,6 +214,7 @@ begin
 
     LEDG(0) <= sd_ready;
     LEDR(0) <= sd_err;
+    sd_start <= '0';
 
     PLL : entity work.audpll port map (
         inclk0 => CLOCK_50,
@@ -258,7 +259,7 @@ begin
         mosi => SD_CMD,
         miso => SD_DAT,
         sclk => SD_CLK,
-        play => sd_play,
+        start => sd_start,
         ready => sd_ready,
         err => sd_err,
         resp_debug => sd_resp_debug
