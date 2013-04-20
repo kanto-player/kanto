@@ -44,6 +44,7 @@ architecture rtl of sd_controller is
     signal init_done : std_logic;
     signal hold_start : std_logic;
     signal state_indicator : unsigned(7 downto 0) := x"00";
+    signal ccs : std_logic;
 begin
     sclk <= sclk_sig;
     ready <= '1' when state = cmd_done else '0';
@@ -151,7 +152,7 @@ begin
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
                 return_state <= check_cmd55;
-                last_resp <= '1';
+                last_resp <= '0';
                 state_indicator <= x"55";
             else
                 readdata(15 downto 12) <= (others => '0');
@@ -185,7 +186,7 @@ begin
             counter <= to_unsigned(47, 8);
             state <= send_cmd;
             return_state <= check_cmd55;
-            last_resp <= '1';
+            last_resp <= '0';
             state_indicator <= x"55";
 
         when check_cmd55 =>
@@ -206,9 +207,16 @@ begin
                 return_state <= cmd_done;
                 state <= deselect;
             elsif readdata(7 downto 0) = x"01" then
+                state <= recv_resp;
+                counter <= to_unsigned(7, 8);
+                state_indicator <= x"41";
                 return_state <= check_cmd41;
-                state <= wait_resp;
-                last_resp <= '0';
+            elsif readdata(7 downto 0) = x"ff" then
+                state <= send_cmd;
+                command <= cmd55;
+                counter <= to_unsigned(47, 8);
+                return_state <= check_cmd55;
+                state_indicator <= x"55";
             else
                 state_indicator <= x"41";
                 state <= cmd_err;
