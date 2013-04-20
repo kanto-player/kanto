@@ -18,15 +18,20 @@ end sd_controller;
 
 architecture rtl of sd_controller is
     signal clk_enable : std_logic := '1';
-    signal clk_divider : unsigned(7 downto 0) := x"00";
+    signal clk_divider : unsigned(3 downto 0) := x"0";
     signal counter : unsigned(7 downto 0);
 
-    constant reset_cmd : std_logic_vector(47 downto 0) := x"400000000095";
-    constant init_cmd  : std_logic_vector(47 downto 0) := x"4100000000ff";
+    constant cmd0   : std_logic_vector(47 downto 0) := x"400000000095";
+    constant cmd8   : std_logic_vector(47 downto 0) := x"48000001AA0f";
+    constant cmd55  : std_logic_vector(47 downto 0) := x"7700000000ff";
+    constant acmd41 : std_logic_vector(47 downto 0) := x"e900000000ff";
+    constant cmd58  : std_logic_vector(47 downto 0) := x"7a00000000ff";
     signal command : std_logic_vector(47 downto 0);
     type sd_state is (reset_state, reset_clks1, reset_clks2, 
                       send_cmd, wait_resp, recv_resp,
-                      check_cmd0, check_cmd1, cmd_done, cmd_err);
+                      check_cmd0, check_cmd8_head, check_cmd8_extra,
+                      check_cmd58_head, check_cmd58_voltage, check_cmd58_extra,
+                      check_cmd55, check_acmd41, cmd_done, cmd_err);
     signal state : sd_state := reset_state;
     signal return_state : sd_state;
     signal sclk_sig : std_logic;
@@ -49,10 +54,9 @@ begin
         if rising_edge(clk50) then
             -- if we've reached the appropriate count
             -- enable clock for one cycle and reset counter
-            if (clk_divider = x"40" and init_done = '0') 
-                    or (clk_divider = x"10" and init_done = '1') then
+            if clk_divider = x"7" then
                 clk_enable <= '1';
-                clk_divider <= x"00";
+                clk_divider <= x"0";
             else
                 clk_enable <= '0';
                 clk_divider <= clk_divider + "1";
@@ -98,7 +102,7 @@ begin
         when reset_clks2 =>
             readdata <= x"f002";
             if counter = 0 then
-                command <= reset_cmd;
+                command <= cmd0;
                 counter <= to_unsigned(47, 8);
                 return_state <= check_cmd0;
                 state <= send_cmd;
@@ -109,20 +113,85 @@ begin
 
         when check_cmd0 =>
             if readdata(7 downto 0) = x"01" then
-                command <= init_cmd;
+                command <= cmd8;
                 counter <= to_unsigned(47, 8);
-                return_state <= check_cmd1;
+                return_state <= check_cmd8_head;
                 state <= send_cmd;
             else
-                readdata(15 downto 8) <= x"10";
+                readdata(15 downto 8) <= x"00";
                 state <= cmd_err;
             end if;
 
-        when check_cmd1 =>
+        when check_cmd8_head =>
+            if readdata(2) = '0' then
+                counter <= to_unsigned(31, 8);
+                state <= recv_resp;
+                return_state <= check_cmd8_extra;
+            else
+                counter <= to_unsigned(47, 8);
+                command <= cmd58;
+                return_state <= check_cmd58_head;
+                state <= send_cmd;
+            end if;
+
+        when check_cmd8_extra =>
+            if readdata(11 downto 0) = "000110101010" then
+                command <= cmd55;
+                counter <= to_unsigned(47, 8);
+                state <= send_cmd;
+                return_state <= check_cmd55;
+            else
+                readdata(15 downto 12) <= (others => '0');
+                state <= cmd_err;
+            end if;
+
+        when check_cmd58_head =>
+            if readdata(2) = '1' then
+                readdata(15 downto 8) <= x"58";
+                state <= cmd_err;
+            else
+                counter <= to_unsigned(15, 8);
+                return_state <= check_cmd58_voltage;
+                state <= recv_resp;
+            end if;
+
+        when check_cmd58_voltage =>
+            if readdata(5) = '1' then
+                readdata(15 downto 8) <= x"f8";
+                state <= cmd_err;
+            else
+                counter <= to_unsigned(15, 8);
+                return_state <= check_cmd58_extra;
+                state <= recv_resp;
+            end if;
+
+        when check_cmd58_extra =>
+            command <= cmd55;
+            counter <= to_unsigned(47, 8);
+            state <= send_cmd;
+            return_state <= check_cmd55;
+
+        when check_cmd55 =>
+            if readdata(7 downto 0) = x"01" then
+                command <= acmd41;
+                counter <= to_unsigned(47, 8);
+                state <= send_cmd;
+                return_state <= check_acmd41;
+            else
+                readdata(15 downto 8) <= x"55";
+                state <= cmd_err;
+            end if;
+
+        when check_acmd41 =>
             if readdata(7 downto 0) = x"00" then
                 state <= cmd_done;
+            elsif readdata(7 downto 0) = x"01" then
+                command <= cmd55;
+                counter <= to_unsigned(47, 8);
+                state <= send_cmd;
+                return_state <= check_cmd55;
             else
-                readdata(15 downto 8) <= x"11";
+                readdata(15 downto 8) <= x"41";
                 state <= cmd_err;
             end if;
 
