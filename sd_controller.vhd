@@ -21,17 +21,17 @@ architecture rtl of sd_controller is
     signal clk_divider : unsigned(3 downto 0) := x"0";
     signal counter : unsigned(7 downto 0);
 
-    constant cmd0   : std_logic_vector(47 downto 0) := x"400000000095";
-    constant cmd8   : std_logic_vector(47 downto 0) := x"48000001AA87";
-    constant cmd55  : std_logic_vector(47 downto 0) := x"770000000065";
-    constant acmd41 : std_logic_vector(47 downto 0) := x"e900000000df";
-    constant cmd58  : std_logic_vector(47 downto 0) := x"7a00000000fd";
+    constant cmd0  : std_logic_vector(47 downto 0) := x"400000000095";
+    constant cmd8  : std_logic_vector(47 downto 0) := x"48000001AA87";
+    constant cmd55 : std_logic_vector(47 downto 0) := x"770000000065";
+    constant cmd41 : std_logic_vector(47 downto 0) := x"6900000000e5";
+    constant cmd58 : std_logic_vector(47 downto 0) := x"7a00000000fd";
     signal command : std_logic_vector(47 downto 0);
     type sd_state is (reset_state, reset_clks1, reset_clks2, 
                       send_cmd, wait_resp, recv_resp,
                       check_cmd0, check_cmd8_head, check_cmd8_extra,
                       check_cmd58_head, check_cmd58_voltage, check_cmd58_extra,
-                      check_cmd55, check_acmd41, cmd_done, cmd_err);
+                      check_cmd55, check_cmd41, cmd_done, cmd_err);
     signal state : sd_state := reset_state;
     signal return_state : sd_state;
     signal sclk_sig : std_logic;
@@ -173,16 +173,16 @@ begin
 
         when check_cmd55 =>
             if readdata(7 downto 0) = x"01" then
-                command <= acmd41;
+                command <= cmd41;
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
-                return_state <= check_acmd41;
+                return_state <= check_cmd41;
             else
                 readdata(15 downto 8) <= x"55";
                 state <= cmd_err;
             end if;
 
-        when check_acmd41 =>
+        when check_cmd41 =>
             if readdata(7 downto 0) = x"00" then
                 state <= cmd_done;
             elsif readdata(7 downto 0) = x"01" then
