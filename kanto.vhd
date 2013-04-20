@@ -199,7 +199,6 @@ architecture datapath of kanto is
 	signal sd_play : std_logic;
 	signal sd_ready : std_logic;
     signal sd_err : std_logic;
-    signal sd_resp_debug : std_logic_vector(15 downto 0);
 	  
 	-- signals for sram controller testing
 	signal sram_test_reset : std_logic;
@@ -260,8 +259,7 @@ begin
         sclk => SD_CLK,
         play => sd_play,
         ready => sd_ready,
-        err => sd_err,
-        resp_debug => sd_resp_debug
+        err => sd_err
     );
     
     FFT : entity work.fft_controller port map (
@@ -335,31 +333,15 @@ begin
 		VGA_G          => VGA_G,
 		VGA_B 			=> VGA_B
 	 );
-
-    SS0 : entity work.sevenseg port map (
-        number => sd_resp_debug(3 downto 0),
-        display => HEX0
-    );
-
-    SS1 : entity work.sevenseg port map (
-        number => sd_resp_debug(7 downto 4),
-        display => HEX1
-    );
-    
-    SS2 : entity work.sevenseg port map (
-        number => sd_resp_debug(11 downto 8),
-        display => HEX2
-    );
-    
-    SS3 : entity work.sevenseg port map (
-        number => sd_resp_debug(15 downto 12),
-        display => HEX3
-    );
 	 
-    HEX7 <= "0001001"; -- Leftmost
-    HEX6 <= "0000110";
-    HEX5 <= "1000111";
-    HEX4 <= "1000111";
+    HEX7 <= (others => '1');
+    HEX6 <= (others => '1');
+    HEX5 <= (others => '1');
+    HEX4 <= (others => '1');
+    HEX3 <= (others => '1');
+    HEX2 <= (others => '1');
+    HEX1 <= (others => '1');
+    HEX0 <= (others => '1');
 
     LEDG(7 downto 1) <= (others => '0');
     

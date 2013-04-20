@@ -11,8 +11,7 @@ port (
     sclk            : out std_logic;
     play            : in std_logic;
     ready           : out std_logic;
-    err             : out std_logic;
-    resp_debug      : out std_logic_vector(15 downto 0)
+    err             : out std_logic
 );
 end sd_controller;
 
@@ -35,7 +34,6 @@ architecture rtl of sd_controller is
 begin
     sclk <= sclk_sig;
     ready <= init_done and read_done;
-    resp_debug <= read_resp;
     
     -- clock divider for sd clock
     process(clk50)
