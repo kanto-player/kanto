@@ -23,19 +23,20 @@ architecture rtl of sd_controller is
     signal init_done_old : std_logic;
     signal read_done : std_logic := '1';
 
-    constant reset_cmd : std_logic_vector(0 to 47) := "010000000000000000000000000000000000000010010101";
+    constant reset_cmd : std_logic_vector(0 to 47) := x"400000000095";
+    constant init_cmd  : std_logic_vector(0 to 47) := x"410000000001";
     type state is (init_hold, send_cmd0, wait_cmd0_resp, cmd0_resp, 
-                   send_cmd17, cmd17_check_noerr, cmd17_wait_data, cmd17_read_data,
+                   send_cmd1, wait_cmd1_resp, cmd1_resp,
                    mem_write, done, init_err);
     signal current_state : state := init_hold;
     signal sclk_sig : std_logic := '0';
-    signal read_resp : std_logic_vector(15 downto 0) := (others => '1');
+    signal readdata : std_logic_vector(15 downto 0) := (others => '1');
 
     signal hold_play : std_logic;
 begin
     sclk <= sclk_sig;
     ready <= init_done and read_done;
-    resp_debug <= read_resp;
+    resp_debug <= readdata;
     
     -- clock divider for sd clock
     process(clk50)
@@ -98,7 +99,6 @@ begin
 
         -- sending command for spi mode
         when send_cmd0 =>
-            read_resp <= x"001d";
             if sclk_sig = '1' then
                 if counter /= 47 then
                     counter := counter + 1;
@@ -117,9 +117,9 @@ begin
             if sclk_sig = '1' then
                 if miso = '0' then
                     counter := 0;
+                    readdata <= x"0000";
                     current_state <= cmd0_resp;
-                    read_resp <= x"fffe";
-                elsif counter = 15 then
+                elsif counter = 127 then
                     counter := 0;
                     current_state <= send_cmd0;
                     mosi <= reset_cmd(counter);
@@ -134,9 +134,60 @@ begin
         when cmd0_resp =>
             if sclk_sig = '1' then
                 if counter /= 7 then
-                    read_resp <= read_resp(14 downto 0) & miso;
+                    readdata <= readdata(14 downto 0) & miso;
                     counter := counter + 1;
-                elsif read_resp(7 downto 0) /= "00000001" then
+                elsif readdata(7 downto 0) /= x"01" then
+                    readdata(15 downto 8) <= x"10";
+                    current_state <= init_err;
+                else
+                    counter := 0;
+                    current_state <= send_cmd1;
+                    mosi <= init_cmd(counter);
+                end if;
+            end if;
+            sclk_sig <= not sclk_sig;
+
+        -- sending command for spi mode
+        when send_cmd1 =>
+            if sclk_sig = '1' then
+                if counter /= 47 then
+                    counter := counter + 1;
+                    mosi <= init_cmd(counter);
+                else -- clock should be high at this point
+                    counter := 0;
+                    current_state <= wait_cmd1_resp;
+                    mosi <= '1';
+                end if;
+            end if;
+            sclk_sig <= not sclk_sig;
+                
+        -- waiting for response after sending cmd
+        -- if response does not begin within 16 cycles, resend
+        when wait_cmd1_resp =>
+            if sclk_sig = '1' then
+                if miso = '0' then
+                    counter := 0;
+                    readdata <= x"0000";
+                    current_state <= cmd1_resp;
+                elsif counter = 127 then
+                    counter := 0;
+                    current_state <= send_cmd1;
+                    mosi <= init_cmd(counter);
+                else
+                    counter := counter + 1;
+                end if;
+            end if;
+            sclk_sig <= not sclk_sig;
+
+        -- wait 7 cycles for response
+        -- if bad response, resend command
+        when cmd1_resp =>
+            if sclk_sig = '1' then
+                if counter /= 7 then
+                    readdata <= readdata(14 downto 0) & miso;
+                    counter := counter + 1;
+                elsif readdata(7 downto 0) /= x"00" then
+                    readdata(15 downto 8) <= x"11";
                     current_state <= init_err;
                 else
                     counter := 0;
