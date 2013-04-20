@@ -207,7 +207,7 @@ begin
                 state <= deselect;
             elsif readdata(7 downto 0) = x"01" then
                 return_state <= check_cmd41;
-                state <= recv_resp;
+                state <= wait_resp;
                 last_resp <= '0';
             else
                 state_indicator <= x"41";
@@ -237,7 +237,7 @@ begin
             if sclk_sig = '1' then
                 readdata <= readdata(14 downto 0) & miso;
                 if counter = 0 then
-                    if last_resp = '1' then
+                    if last_resp = '0' then
                         state <= return_state;
                     else
                         counter <= to_unsigned(15, 8);
