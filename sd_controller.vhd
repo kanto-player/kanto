@@ -22,10 +22,10 @@ architecture rtl of sd_controller is
     signal counter : unsigned(7 downto 0);
 
     constant cmd0   : std_logic_vector(47 downto 0) := x"400000000095";
-    constant cmd8   : std_logic_vector(47 downto 0) := x"48000001AA0f";
-    constant cmd55  : std_logic_vector(47 downto 0) := x"7700000000ff";
-    constant acmd41 : std_logic_vector(47 downto 0) := x"e900000000ff";
-    constant cmd58  : std_logic_vector(47 downto 0) := x"7a00000000ff";
+    constant cmd8   : std_logic_vector(47 downto 0) := x"48000001AA87";
+    constant cmd55  : std_logic_vector(47 downto 0) := x"770000000065";
+    constant acmd41 : std_logic_vector(47 downto 0) := x"e900000000df";
+    constant cmd58  : std_logic_vector(47 downto 0) := x"7a00000000fd";
     signal command : std_logic_vector(47 downto 0);
     type sd_state is (reset_state, reset_clks1, reset_clks2, 
                       send_cmd, wait_resp, recv_resp,
