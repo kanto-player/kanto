@@ -156,7 +156,7 @@ begin
             end if;
 
         when check_cmd58_voltage =>
-            if readdata(5) = '1' then
+            if readdata(5) = '0' then
                 readdata(15 downto 8) <= x"f8";
                 state <= cmd_err;
             else
