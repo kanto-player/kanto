@@ -16,7 +16,7 @@ port (
     ccs             : out std_logic;
 
     writedata       : out signed(15 downto 0);
-    writeaddr       : out unsigned(8 downto 0);
+    writeaddr       : out unsigned(7 downto 0);
     write_en        : out std_logic;
     
     state_debug     : out std_logic_vector(7 downto 0);
@@ -49,7 +49,7 @@ architecture rtl of sd_controller is
     signal hold_start : std_logic;
     signal state_indicator : unsigned(7 downto 0) := x"00";
 
-    signal waddr_sig : unsigned(8 downto 0);
+    signal waddr_sig : unsigned(7 downto 0);
     signal blocknum :  unsigned(22 downto 0) := (others => '0');
     signal word_count : unsigned(7 downto 0);
 begin
