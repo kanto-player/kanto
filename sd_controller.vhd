@@ -36,11 +36,10 @@ architecture rtl of sd_controller is
     constant cmd58 : std_logic_vector(47 downto 0) := x"7a00000000fd";
     signal command : std_logic_vector(47 downto 0);
     type sd_state is (reset_state, reset_clks1, reset_clks2, 
-                      send_cmd, wait_resp, recv_resp, deselect,
+                      send_cmd, wait_resp, recv_resp, 
                       check_cmd0, check_cmd8_head, check_cmd8_extra,
-                      check_cmd58_head, check_cmd58_ccs, cmd58_flush,
-                      check_cmd17, wait_block_start, 
-                      write_word, clear_write, crc_flush,
+                      check_cmd58_head, check_cmd58_ccs, 
+                      check_cmd17, wait_block_start, write_word, clear_write, 
                       check_cmd55, check_cmd41, cmd_done, cmd_err);
     signal state : sd_state := reset_state;
     signal return_state : sd_state;
@@ -51,7 +50,7 @@ architecture rtl of sd_controller is
     signal state_indicator : unsigned(7 downto 0) := x"00";
 
     signal waddr_sig : unsigned(8 downto 0);
-    signal blocknum :  unsigned(22 downto 0) := x"0000" & "0000001";
+    signal blocknum :  unsigned(22 downto 0) := (others => '0');
     signal word_count : unsigned(7 downto 0);
 begin
     sclk <= sclk_sig;
@@ -81,9 +80,8 @@ begin
     end process;
 
     mosi <= command(47);
-    cs <= '1' when state = reset_clks1 or 
-                   state = deselect or
-                   state = cmd_done or 
+    cs <= '1' when state = reset_clks1 or
+                   state = cmd_done or
                    state = cmd_err else '0';
     
     process(clk50)
@@ -169,11 +167,7 @@ begin
             ccs <= readdata(14);
             counter <= to_unsigned(15, 8);
             state <= recv_resp;
-            return_state <= cmd58_flush;
-
-        when cmd58_flush =>
-            counter <= to_unsigned(7, 8);
-            state <= deselect;
+            return_state <= cmd_done;
 
         when check_cmd55 =>
             if readdata(7 downto 0) = x"01" then
@@ -241,14 +235,6 @@ begin
             end if;
             sclk_sig <= not sclk_sig;
 
-        when deselect =>
-            if counter = 0 then
-                state <= cmd_done;
-            else
-                counter <= counter - 1;
-                sclk_sig <= not sclk_sig;
-            end if;
-
         when cmd_done =>
             if hold_start = '1' then
                 counter <= to_unsigned(47, 8);
@@ -291,12 +277,11 @@ begin
         when clear_write =>
             write_en <= '1';
             waddr_sig <= waddr_sig + 1;
-            state_indicator <= word_count;
             
             if word_count = x"ff" then
                 -- read the CRC (last 2 bytes) and ignore it
                 counter <= to_unsigned(15, 8);
-                return_state <= crc_flush;
+                return_state <= cmd_done;
                 state <= recv_resp;
             else
                 counter <= to_unsigned(15, 8);
@@ -304,10 +289,6 @@ begin
                 state <= recv_resp;
                 word_count <= word_count + 1;
             end if;
-
-        when crc_flush =>
-            counter <= to_unsigned(7, 8);
-            state <= deselect;
 
         when cmd_err =>
             sclk_sig <= sclk_sig;
