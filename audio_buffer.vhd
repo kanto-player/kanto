@@ -2,10 +2,15 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library work;
+use work.types_pkg.all;
+
 entity audio_buffer is
     port (clk : in std_logic;
-          en  : in std_logic;
+          mute : in std_logic;
           aud_clk : in std_logic;
+          swapped : out std_logic;
+          write_done : in std_logic;
 
           aud_adcdat : in std_logic;
           aud_adclrck : inout std_logic;
@@ -15,11 +20,13 @@ entity audio_buffer is
           
           i2c_sdat : inout std_logic;
           i2c_sclk : out std_logic;
-          
-          sram_req : out std_logic;
-          sram_ack : in std_logic;
-          sram_readdata : in std_logic_vector(15 downto 0);
-          sram_addr : out std_logic_vector(17 downto 0));
+
+          writeaddr : in unsigned(7 downto 0);
+          writedata : in signed(15 downto 0);
+          write_en : in std_logic;
+
+          readaddr : in byte_array;
+          readdata : out real_signed_array);
 end audio_buffer;
 
 architecture rtl of audio_buffer is
@@ -30,13 +37,21 @@ architecture rtl of audio_buffer is
               i2c_sdat : inout std_logic);
     end component;
     
-    signal addr : unsigned(8 downto 0);
-    signal sram_data : std_logic_vector(15 downto 0);
-    signal audio_data : std_logic_vector(15 downto 0);
+    signal audio_addr : unsigned(8 downto 0) := (others => '0');
+    signal audio_data : signed(15 downto 0);
     signal audio_request : std_logic;
-    signal mm_en : std_logic;
+    
+    signal first_write : std_logic := '1';
+    signal wlr : std_logic := '0'; -- writes leading reads
+    signal wfulladdr : unsigned(8 downto 0);
+    signal rfulladdr : aud_addr_array;
+    type ram_type is array(0 to 511) of signed(15 downto 0);
+    signal audio_ram : ram_type;
+
+    signal audio_en : std_logic;
     signal counter_en : std_logic;
 begin
+    audio_en <= not (mute or first_write);
 
     I2C_CONF : de2_i2c_av_config port map (
         iclk => clk,
@@ -45,42 +60,51 @@ begin
         i2c_sclk => i2c_sclk
     );
 
-    process (clk) -- assert mm_en one clock behind counter_en
+    wfulladdr <= wlr & writeaddr;
+    process (clk)
     begin
         if rising_edge(clk) then
-            if counter_en = '1' then
-                counter_en <= '0';
-                audio_data <= sram_data;
-            elsif en = '1' then
-                counter_en <= audio_request;
-            else
-                audio_data <= x"0000";
-                counter_en <= '0';
+            if write_en = '1' then
+                audio_ram(to_integer(wfulladdr)) <= writedata;
             end if;
-            mm_en <= counter_en;
         end if;
     end process;
 
-    COUNTER : entity work.ab_counter port map (
-        addr => addr,
-        clk => clk,
-        en => counter_en
-    );
+    AURDGEN : for i in 0 to 15 generate
+        rfulladdr(i) <= (not wlr) & readaddr(i);
+        readdata(i) <= audio_ram(to_integer(rfulladdr(i)));
+    end generate AURDGEN;
 
-    MM : entity work.ab_middleman port map (
-        addr => addr,
-        data => sram_data,
-        clk => clk,
-        en => mm_en,
-        sram_req => sram_req,
-        sram_ack => sram_ack,
-        sram_readdata => sram_readdata,
-        sram_addr => sram_addr
-    );
+    process (clk) -- assert mm_en one clock behind counter_en
+    begin
+        if rising_edge(clk) then
+            swapped <= '0';
+
+            if first_write = '0' then
+                if counter_en = '1' then
+                    -- swap when audio address reaches 255 or 511
+                    if audio_addr(7 downto 0) = x"ff" then
+                        wlr <= audio_addr(8);
+                        swapped <= '1';
+                    end if;
+                    counter_en <= '0';
+                    audio_addr <= audio_addr + 1;
+                else
+                    counter_en <= audio_request and audio_en;
+                end if;
+            elsif write_done = '1' then
+                wlr <= '1';
+                first_write <= '0';
+            end if;
+        end if;
+    end process;
+
+    audio_data <= audio_ram(to_integer(audio_addr)) 
+                    when audio_en = '1' else (others => '0');
 
     CODEC : entity work.de2_wm8731_audio port map (
         clk => aud_clk,
-        reset_n => en,
+        reset_n => audio_en,
         test_mode => '0',
         
         aud_adclrck => aud_adclrck,
@@ -89,7 +113,7 @@ begin
         aud_dacdat => aud_dacdat,
         aud_bclk => aud_bclk,
 
-        data => audio_data,
+        data => std_logic_vector(audio_data),
         audio_request => audio_request
     );
 end rtl;
