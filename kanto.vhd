@@ -217,7 +217,7 @@ begin
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_waiting;
     LEDR(0) <= sd_err;
-    sd_start <= '0';
+    sd_start <= not KEY(3);
 
     PLL : entity work.audpll port map (
         inclk0 => CLOCK_50,
