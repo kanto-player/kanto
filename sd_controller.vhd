@@ -13,6 +13,11 @@ port (
     ready           : out std_logic;
     err             : out std_logic;
     waiting         : out std_logic;
+
+    writedata       : out signed(15 downto 0);
+    writeaddr       : out unsigned(8 downto 0);
+    write_en        : out std_logic;
+    
     state_debug     : out std_logic_vector(7 downto 0);
     resp_debug      : out std_logic_vector(7 downto 0)
 );
@@ -20,7 +25,7 @@ end sd_controller;
 
 architecture rtl of sd_controller is
     signal clk_enable : std_logic := '1';
-    signal clk_divider : unsigned(3 downto 0) := x"0";
+    signal clk_divider : unsigned(2 downto 0) := "000";
     signal counter : unsigned(7 downto 0);
 
     constant cmd0  : std_logic_vector(47 downto 0) := x"400000000095";
@@ -28,23 +33,25 @@ architecture rtl of sd_controller is
     constant cmd55 : std_logic_vector(47 downto 0) := x"770000000065";
     constant cmd41 : std_logic_vector(47 downto 0) := x"694000000077";
     constant cmd58 : std_logic_vector(47 downto 0) := x"7a00000000fd";
+    constant cmd17 : std_logic_vector(47 downto 0) := x"8100000000ff";
     signal command : std_logic_vector(47 downto 0);
     type sd_state is (reset_state, reset_clks1, reset_clks2, 
                       send_cmd, wait_resp, recv_resp, deselect,
                       check_cmd0, check_cmd8_head, check_cmd8_extra,
                       check_cmd58_head, check_cmd58_voltage, check_cmd58_extra,
+                      check_cmd17, wait_block_start, write_word, clear_write,
                       check_cmd55, check_cmd41, cmd_done, cmd_err);
     signal state : sd_state := reset_state;
-    signal last_state : sd_state := reset_state;
     signal return_state : sd_state;
     signal sclk_sig : std_logic;
     signal readdata : std_logic_vector(15 downto 0) := (others => '1');
-    signal last_resp : std_logic;
 
-    signal init_done : std_logic;
     signal hold_start : std_logic;
     signal state_indicator : unsigned(7 downto 0) := x"00";
-    signal ccs : std_logic;
+
+    signal waddr_sig : unsigned(8 downto 0);
+    signal blocknum :  unsigned(22 downto 0) := (others => '0');
+    signal word_count : unsigned(7 downto 0);
 begin
     sclk <= sclk_sig;
     ready <= '1' when state = cmd_done else '0';
@@ -52,33 +59,31 @@ begin
     resp_debug <= readdata(7 downto 0);
     state_debug <= std_logic_vector(state_indicator);
     waiting <= '1' when state = wait_resp else '0';
+    clk_enable <= '1' when clk_divider = "111" else '0';
+    writeaddr <= waddr_sig;
     
     -- clock divider for sd clock
     process(clk50)
     begin
-
-        -- if we change states (i.e. desired sd_clk frequency)
-        -- then reset counter
         if rising_edge(clk50) then
-            -- if we've reached the appropriate count
-            -- enable clock for one cycle and reset counter
-            if clk_divider = x"7" then
-                clk_enable <= '1';
-                clk_divider <= x"0";
-            else
-                clk_enable <= '0';
-                clk_divider <= clk_divider + "1";
-            end if;
+            clk_divider <= clk_divider + 1;
             
+            -- hold start so that it is visible on next clock enable
             if start = '1' then
                 hold_start <= '1';
             end if;
-        end if; -- rising_edge(clk50)
 
+            if state /= cmd_done then
+                hold_start <= '0';
+            end if;
+        end if; -- rising_edge(clk50)
     end process;
 
     mosi <= command(47);
-    cs <= '1' when state = reset_clks1 or state = deselect else '0';
+    cs <= '1' when state = reset_clks1 or 
+                   state = deselect or
+                   state = cmd_done or 
+                   state = cmd_err else '0';
     
     process(clk50)
     begin
@@ -94,7 +99,6 @@ begin
             sclk_sig <= '0';
             counter <= to_unsigned(160, 8);
             state <= reset_clks1;
-            init_done <= '1';
 
         when reset_clks1 =>
             if counter = x"00" then
@@ -111,7 +115,6 @@ begin
                 counter <= to_unsigned(47, 8);
                 return_state <= check_cmd0;
                 state <= send_cmd;
-                last_resp <= '1';
                 state_indicator <= x"00";
             else
                 counter <= counter - "1";
@@ -124,7 +127,6 @@ begin
                 counter <= to_unsigned(47, 8);
                 return_state <= check_cmd8_head;
                 state <= send_cmd;
-                last_resp <= '0';
                 state_indicator <= x"08";
             else
                 state_indicator <= x"00";
@@ -136,13 +138,11 @@ begin
                 counter <= to_unsigned(31, 8);
                 state <= recv_resp;
                 return_state <= check_cmd8_extra;
-                last_resp <= '1';
             else
                 counter <= to_unsigned(47, 8);
                 command <= cmd58;
                 return_state <= check_cmd58_head;
                 state <= send_cmd;
-                last_resp <= '0';
                 state_indicator <= x"58";
             end if;
 
@@ -152,7 +152,6 @@ begin
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
                 return_state <= check_cmd55;
-                last_resp <= '0';
                 state_indicator <= x"55";
             else
                 readdata(15 downto 12) <= (others => '0');
@@ -167,7 +166,6 @@ begin
                 counter <= to_unsigned(15, 8);
                 return_state <= check_cmd58_voltage;
                 state <= recv_resp;
-                last_resp <= '0';
             end if;
 
         when check_cmd58_voltage =>
@@ -178,7 +176,6 @@ begin
                 counter <= to_unsigned(15, 8);
                 return_state <= check_cmd58_extra;
                 state <= recv_resp;
-                last_resp <= '1';
             end if;
 
         when check_cmd58_extra =>
@@ -186,7 +183,6 @@ begin
             counter <= to_unsigned(47, 8);
             state <= send_cmd;
             return_state <= check_cmd55;
-            last_resp <= '0';
             state_indicator <= x"55";
 
         when check_cmd55 =>
@@ -195,7 +191,6 @@ begin
                 counter <= to_unsigned(47, 8);
                 state <= send_cmd;
                 return_state <= check_cmd41;
-                last_resp <= '0';
                 state_indicator <= x"41";
             else
                 state_indicator <= x"55";
@@ -204,7 +199,6 @@ begin
 
         when check_cmd41 =>
             if readdata(7 downto 0) = x"00" then
-                return_state <= cmd_done;
                 state <= deselect;
             elsif readdata(7 downto 0) = x"01" then
                 state <= recv_resp;
@@ -254,16 +248,70 @@ begin
 
         when deselect =>
             if counter = 0 then
-                state <= return_state;
+                state <= cmd_done;
             else
                 counter <= counter - 1;
                 sclk_sig <= not sclk_sig;
             end if;
 
         when cmd_done =>
-            init_done <= '1';
+            if hold_start = '1' then
+                counter <= to_unsigned(47, 8);
+                command <= cmd17;
+                command(39 downto 17) <= std_logic_vector(blocknum);
+                blocknum <= blocknum + "1";
+                return_state <= check_cmd17;
+                state <= send_cmd;
+                state_indicator <= x"17";
+            end if;
 
-        when others =>
+        when check_cmd17 =>
+            if readdata(7 downto 0) = x"00" then
+                -- read command OK, wait for start byte
+                counter <= to_unsigned(7, 8);
+                return_state <= wait_block_start;
+                state <= recv_resp;
+                word_count <= x"00";
+            else
+                state <= cmd_err;
+            end if;
+
+        when wait_block_start =>
+            state_indicator <= x"ab";
+            if readdata(7 downto 0) = x"fe" then
+                -- block has started, proceed with reading
+                counter <= to_unsigned(15, 8);
+                return_state <= write_word;
+                state <= recv_resp;
+            else
+                counter <= to_unsigned(7, 8);
+                return_state <= wait_block_start;
+                state <= recv_resp;
+            end if;
+        
+        when write_word =>
+            writedata <= signed(readdata);
+            write_en <= '1';
+            state <= clear_write;
+
+        when clear_write =>
+            write_en <= '1';
+            waddr_sig <= waddr_sig + 1;
+            state_indicator <= x"ac";
+            
+            if word_count = x"ff" then
+                -- read the CRC (last 2 bytes) and ignore it
+                counter <= to_unsigned(15, 8);
+                return_state <= deselect;
+                state <= recv_resp;
+            else
+                counter <= to_unsigned(15, 8);
+                return_state <= write_word;
+                state <= recv_resp;
+                word_count <= word_count + 1;
+            end if;
+
+        when cmd_err =>
             sclk_sig <= sclk_sig;
 
     end case; -- state
