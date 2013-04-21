@@ -51,7 +51,7 @@ architecture rtl of sd_controller is
     signal state_indicator : unsigned(7 downto 0) := x"00";
 
     signal waddr_sig : unsigned(8 downto 0);
-    signal blocknum :  unsigned(22 downto 0) := (others => '0');
+    signal blocknum :  unsigned(22 downto 0) := x"0000" & "0000001";
     signal word_count : unsigned(7 downto 0);
 begin
     sclk <= sclk_sig;
@@ -252,7 +252,7 @@ begin
         when cmd_done =>
             if hold_start = '1' then
                 counter <= to_unsigned(47, 8);
-                command <= x"81" & std_logic_vector(blocknum) & 
+                command <= x"51" & std_logic_vector(blocknum) & 
                                 "000000000" & x"ff";
                 blocknum <= blocknum + "1";
                 return_state <= check_cmd17;
