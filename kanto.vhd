@@ -370,10 +370,6 @@ begin
     HEX6 <= (others => '1');
     HEX5 <= (others => '1');
     HEX4 <= (others => '1');
-    HEX3 <= (others => '1');
-    HEX2 <= (others => '1');
-    HEX1 <= (others => '1');
-    HEX0 <= (others => '1');
 
     LEDG(7 downto 2) <= (others => '0');
     LEDR(17 downto 2) <= (others => '0');
