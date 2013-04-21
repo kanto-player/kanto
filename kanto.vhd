@@ -176,6 +176,7 @@ architecture datapath of kanto is
 	signal ab_ack : std_logic;
 	signal ab_addr : std_logic_vector(17 downto 0);
 	signal ab_readdata : std_logic_vector(15 downto 0);
+    signal ab_en : std_logic;
 
 	signal fft_req : std_logic;
 	signal fft_ack : std_logic;
@@ -202,6 +203,7 @@ architecture datapath of kanto is
     signal sd_waiting : std_logic;
     signal sd_resp_debug : std_logic_vector(7 downto 0);
     signal sd_state_debug : std_logic_vector(7 downto 0);
+    signal sd_ccs : std_logic;
 	  
 	-- signals for sram controller testing
 	signal sram_test_reset : std_logic;
@@ -215,9 +217,11 @@ architecture datapath of kanto is
 begin
 
     LEDG(0) <= sd_ready;
-    LEDG(1) <= sd_waiting;
+    LEDG(1) <= sd_ccs;
     LEDR(0) <= sd_err;
+    LEDR(1) <= sd_waiting;
     sd_start <= not KEY(3);
+    ab_en <= SW(17);
 
     PLL : entity work.audpll port map (
         inclk0 => CLOCK_50,
@@ -231,7 +235,7 @@ begin
     AB : entity work.audio_buffer port map (
         clk => main_clk,
         aud_clk => aud_clk,
-        en => SW(17),
+        en => ab_en,
 
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk,
@@ -266,6 +270,7 @@ begin
         ready => sd_ready,
         err => sd_err,
         waiting => sd_waiting,
+        ccs => sd_ccs,
         resp_debug => sd_resp_debug,
         state_debug => sd_state_debug
     );
@@ -368,6 +373,7 @@ begin
     HEX4 <= "1000111";
 
     LEDG(7 downto 2) <= (others => '0');
+    LEDR(17 downto 2) <= (others => '0');
     
     LCD_ON   <= '1';
     LCD_BLON <= '1';
