@@ -4,8 +4,7 @@ use ieee.numeric_std.all;
 
 entity dft_top is
     port (tdom_data : in signed(15 downto 0);
-          tdom_addr : out unsigned(7 downto 0);
-          tdom_offset : in unsigned(3 downto 0);
+          tdom_addr : out unsigned(3 downto 0);
           clk : in std_logic;
           reset : in std_logic;
           rom_data : in signed(31 downto 0);
@@ -33,7 +32,6 @@ begin
     S1 : entity work.dft_stage1 port map (
         tdom_data => tdom_data,
         tdom_addr => tdom_addr,
-        tdom_offset => tdom_offset,
 
         clk => clk,
         reset => reset,

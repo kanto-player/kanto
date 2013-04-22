@@ -20,7 +20,7 @@ use ieee.numeric_std.all;
 
 entity dft_test_tdom_rom is
     port (data : out signed(15 downto 0);
-          addr : in unsigned(7 downto 0));
+          addr : in unsigned(3 downto 0));
 end dft_test_tdom_rom;
 
 architecture rtl of dft_test_tdom_rom is
@@ -30,7 +30,7 @@ architecture rtl of dft_test_tdom_rom is
                                      x"3223", x"7bcf", x"f1e6", x"8016", 
                                      x"e8e1", x"792f", x"3a64", x"97d0");
 begin
-    data <= rom_data(to_integer(addr(7 downto 4)));
+    data <= rom_data(to_integer(addr));
 end rtl;
 
 library ieee;
@@ -73,7 +73,7 @@ end dft_test_setup;
 
 architecture rtl of dft_test_setup is
     signal tdom_data : signed(15 downto 0);
-    signal tdom_addr : unsigned(7 downto 0);
+    signal tdom_addr : unsigned(3 downto 0);
     signal rom_data : signed(31 downto 0);
     signal rom_addr : unsigned(7 downto 0);
     signal fdom_data : signed(31 downto 0);
@@ -83,7 +83,6 @@ begin
     DFT : entity work.dft_top port map (
         tdom_data => tdom_data,
         tdom_addr => tdom_addr,
-        tdom_offset => x"0",
 
         clk => clk,
         reset => reset,

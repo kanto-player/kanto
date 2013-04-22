@@ -7,7 +7,7 @@ use work.types_pkg.all;
 
 entity fft_controller is
     port (tdom_data_in : in real_signed_array;
-          tdom_addr_in : out byte_array;
+          tdom_addr_in : out nibble_array;
 
           fdom_data_out : out signed(31 downto 0);
           fdom_addr_out : in unsigned(7 downto 0);
@@ -34,11 +34,11 @@ architecture rtl of fft_controller is
     signal dft_done : std_logic_vector(0 to 15);
     signal dft_reset : std_logic;
     signal recomb_reset : std_logic;
-    type fft_reorder_type is array(0 to 15) of unsigned(3 downto 0); 
-    constant fft_reorder : fft_reorder_type := (x"0", x"8", x"4", x"c", 
-                                                x"2", x"a", x"6", x"e", 
-                                                x"1", x"9", x"5", x"d",
-                                                x"3", x"b", x"7", x"f");
+    type fft_reorder_type is array(0 to 15) of integer range 0 to 15; 
+    constant fft_reorder : fft_reorder_type := (0, 8, 4, 12, 
+                                                2, 10, 6, 14,
+                                                1, 9, 5, 13,
+                                                3, 11, 7, 15);
     type rc_reorder_type is array(0 to 15) of integer range 0 to 15;
     constant rc1_out_ro : rc_reorder_type := (0, 8, 1, 9, 2, 10, 3, 11,
                                               4, 12, 5, 13, 6, 14, 7, 15);
@@ -84,9 +84,8 @@ begin
 
     DFT_GEN : for i in 0 to 15 generate
         DFT : entity work.dft_top port map (
-            tdom_data => tdom_data_in(to_integer(fft_reorder(i))),
-            tdom_addr => tdom_addr_in(to_integer(fft_reorder(i))),
-            tdom_offset => fft_reorder(i),
+            tdom_data => tdom_data_in(fft_reorder(i)),
+            tdom_addr => tdom_addr_in(fft_reorder(i)),
 
             clk => clk,
             reset => dft_reset,
