@@ -6,11 +6,8 @@ library work;
 use work.types_pkg.all;
 
 entity fft_controller is
-    port (sram_readdata : in std_logic_vector(15 downto 0);
-          sram_addr : out std_logic_vector(17 downto 0);
-          sram_req : out std_logic;
-          sram_ack : in std_logic;
-          sram_base : in unsigned(9 downto 0);
+    port (tdom_data_in : in real_signed_array;
+          tdom_addr_in : out byte_array;
 
           fdom_data_out : out signed(31 downto 0);
           fdom_addr_out : in unsigned(7 downto 0);
@@ -21,14 +18,9 @@ entity fft_controller is
 end fft_controller;
 
 architecture rtl of fft_controller is
-    type control_state_type is (idle, loading, dftcomp,
-                                recomb1, recomb2, recomb3, recomb4);
+    type control_state_type is (idle, dftcomp, recomb1, 
+                                recomb2, recomb3, recomb4);
     signal control_state : control_state_type;
-    signal tdom_writedata : signed(15 downto 0);
-    signal tdom_writeaddr : unsigned(7 downto 0);
-    signal tdom_write_en : std_logic;
-    signal tdom_readdata : real_signed_array;
-    signal tdom_readaddr : byte_array;
     signal fdom_writedata : complex_signed_array;
     signal fdom_readdata : complex_signed_array;
     signal fdom_readaddr : nibble_array;
@@ -41,8 +33,6 @@ architecture rtl of fft_controller is
     signal dft_out_write : std_logic_vector(0 to 15);
     signal dft_done : std_logic_vector(0 to 15);
     signal dft_reset : std_logic;
-    signal mm_done : std_logic;
-    signal start_read : std_logic;
     signal recomb_reset : std_logic;
     type fft_reorder_type is array(0 to 15) of unsigned(3 downto 0); 
     constant fft_reorder : fft_reorder_type := (x"0", x"8", x"4", x"c", 
@@ -75,15 +65,7 @@ architecture rtl of fft_controller is
     signal recomb_write : std_logic_vector(0 to 15);
     signal recomb_done : std_logic_vector(0 to 7);
 begin
-    TDOM_RAM : entity work.fft_tdom_ram port map (
-        writedata => tdom_writedata,
-        writeaddr => tdom_writeaddr,
-        write_en => tdom_write_en,
-        readdata => tdom_readdata,
-        readaddr => tdom_readaddr,
-        clk => clk
-    );
-
+    
     FDOM_RAM : entity work.fft_fdom_ram port map (
         writedata => fdom_writedata,
         readdata => fdom_readdata,
@@ -102,8 +84,8 @@ begin
 
     DFT_GEN : for i in 0 to 15 generate
         DFT : entity work.dft_top port map (
-            tdom_data => tdom_readdata(to_integer(fft_reorder(i))),
-            tdom_addr => tdom_readaddr(to_integer(fft_reorder(i))),
+            tdom_data => tdom_data_in(to_integer(fft_reorder(i))),
+            tdom_addr => tdom_addr_in(to_integer(fft_reorder(i))),
             tdom_offset => fft_reorder(i),
 
             clk => clk,
@@ -180,22 +162,6 @@ begin
         rcrom64_data when recomb3,
         rcrom128_data when others;
 
-    MM : entity work.fft_middleman port map (
-        clk => clk,
-        done => mm_done,
-        start_read => start_read,
-        
-        sram_req => sram_req,
-        sram_ack => sram_ack,
-        sram_readdata => sram_readdata,
-        sram_addr => sram_addr,
-
-        tdom_data => tdom_writedata,
-        tdom_addr => tdom_writeaddr,
-        tdom_write => tdom_write_en,
-        tdom_base => sram_base
-    );
-
     RCR16 : entity work.recomb_rom16 port map (
         addr => rcromcur_addr,
         data => rcrom16_data
@@ -226,14 +192,7 @@ begin
             case control_state is
                 when idle =>
                     if start = '1' then
-                        control_state <= loading;
-                        start_read <= '1';
-                    end if;
-                when loading =>
-                    start_read <= '0';
-                    if mm_done = '1' then
                         control_state <= dftcomp;
-                        dft_reset <= '1';
                     end if;
                 when dftcomp =>
                     dft_reset <= '0';

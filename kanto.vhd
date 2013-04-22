@@ -284,11 +284,9 @@ begin
     FFT : entity work.fft_controller port map (
         clk => main_clk,
         start => fft_start,
-        sram_readdata => fft_readdata,
-        sram_addr => fft_addr,
-        sram_req => fft_req,
-        sram_ack => fft_ack,
-        sram_base => (others => '0'),
+        
+        tdom_addr_in => fft_tdom_addr,
+        tdom_data_in => fft_tdom_data,
         fdom_addr_out => fft_fdom_addr,
         fdom_data_out => fft_fdom_data
     );
