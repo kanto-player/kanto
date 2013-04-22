@@ -267,7 +267,7 @@ begin
                     blockaddr <= blockaddr + 512;
                 end if;
                 return_state <= check_cmd17;
-                state <= send_cmd;
+                state <= clear_input;
                 state_indicator <= x"17";
             end if;
 
