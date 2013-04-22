@@ -50,8 +50,9 @@ architecture rtl of sd_controller is
     signal state_indicator : unsigned(7 downto 0) := x"00";
 
     signal waddr_sig : unsigned(7 downto 0);
-    signal blocknum :  unsigned(22 downto 0) := (others => '0');
+    signal blockaddr :  unsigned(31 downto 0) := (others => '0');
     signal word_count : unsigned(7 downto 0);
+    signal hc : std_logic;
 begin
     sclk <= sclk_sig;
     ready <= '1' when state = cmd_done else '0';
@@ -61,6 +62,7 @@ begin
     waiting <= '1' when state = wait_resp else '0';
     clk_enable <= '1' when clk_divider = "111" else '0';
     writeaddr <= waddr_sig;
+    ccs <= hc;
     
     -- clock divider for sd clock
     process(clk50)
@@ -164,7 +166,7 @@ begin
             end if;
 
         when check_cmd58_ccs =>
-            ccs <= readdata(14);
+            hc <= readdata(14);
             counter <= to_unsigned(15, 8);
             state <= recv_resp;
             return_state <= cmd_done;
@@ -238,9 +240,12 @@ begin
         when cmd_done =>
             if hold_start = '1' then
                 counter <= to_unsigned(47, 8);
-                command <= x"51" & std_logic_vector(blocknum) & 
-                                "000000000" & x"ff";
-                blocknum <= blocknum + "1";
+                command <= x"51" & std_logic_vector(blockaddr) & x"ff";
+                if hc = '1' then
+                    blockaddr <= blockaddr + 1;
+                else
+                    blockaddr <= blockaddr + 512;
+                end if;
                 return_state <= check_cmd17;
                 state <= send_cmd;
                 state_indicator <= x"17";
