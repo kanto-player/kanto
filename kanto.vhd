@@ -175,7 +175,9 @@ entity kanto is
 end kanto;
 
 architecture datapath of kanto is
-    signal ab_mute : std_logic;
+    signal ab_play : std_logic;
+    signal ab_swapped : std_logic;
+    signal ab_force_swap : std_logic;
 
 	signal fft_req : std_logic;
 	signal fft_ack : std_logic;
@@ -217,14 +219,14 @@ architecture datapath of kanto is
 	signal sram_test_write 		: std_logic;
 	signal sram_test_req 			: std_logic;
 	signal sram_test_ack			: std_logic;
-	  
+
 begin
 
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
     LEDR(0) <= sd_err;
     LEDR(1) <= sd_waiting;
-    ab_mute <= not SW(17);
+    ab_play <= SW(17);
 
     PLL : entity work.audpll port map (
         inclk0 => CLOCK_50,
@@ -238,9 +240,9 @@ begin
     AB : entity work.audio_buffer port map (
         clk => main_clk,
         aud_clk => aud_clk,
-        mute => ab_mute,
-        swapped => sd_start,
-        write_done => sd_ready,
+        play => ab_play,
+        swapped => ab_swapped,
+        force_swap => ab_force_swap,
 
         i2c_sdat => i2c_sdat,
         i2c_sclk => i2c_sclk,
@@ -281,12 +283,6 @@ begin
         write_en => sd_write_en
     );
 
-    ABFFTOS : entity work.oneshot port map (
-        clk => main_clk,
-        level => sd_ready,
-        edge => fft_start
-    );
-    
     FFT : entity work.fft_controller port map (
         clk => main_clk,
         start => fft_start,

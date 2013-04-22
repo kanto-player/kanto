@@ -7,10 +7,10 @@ use work.types_pkg.all;
 
 entity audio_buffer is
     port (clk : in std_logic;
-          mute : in std_logic;
+          play : in std_logic;
           aud_clk : in std_logic;
           swapped : out std_logic;
-          write_done : in std_logic;
+          force_swap : in std_logic;
 
           aud_adcdat : in std_logic;
           aud_adclrck : inout std_logic;
@@ -41,7 +41,6 @@ architecture rtl of audio_buffer is
     signal audio_data : signed(15 downto 0);
     signal audio_request : std_logic;
     
-    signal first_write : std_logic := '1';
     signal wlr : std_logic := '0'; -- writes leading reads
     signal wfulladdr : unsigned(8 downto 0);
     signal rfulladdr : aud_addr_array;
@@ -51,8 +50,6 @@ architecture rtl of audio_buffer is
     signal audio_en : std_logic;
     signal counter_en : std_logic;
 begin
-    audio_en <= not (mute or first_write);
-
     I2C_CONF : de2_i2c_av_config port map (
         iclk => clk,
         irst_n => '1',
@@ -80,21 +77,20 @@ begin
         if rising_edge(clk) then
             swapped <= '0';
 
-            if first_write = '0' then
-                if counter_en = '1' then
-                    -- swap when audio address reaches 255 or 511
-                    if audio_addr(7 downto 0) = x"ff" then
-                        wlr <= audio_addr(8);
-                        swapped <= '1';
-                    end if;
-                    counter_en <= '0';
-                    audio_addr <= audio_addr + 1;
-                else
-                    counter_en <= audio_request and audio_en;
+            if counter_en = '1' then
+                -- swap when audio address reaches 255 or 511
+                if audio_addr(7 downto 0) = x"ff" then
+                    wlr <= audio_addr(8);
+                    swapped <= '1';
                 end if;
-            elsif write_done = '1' then
-                wlr <= '1';
-                first_write <= '0';
+                counter_en <= '0';
+                audio_addr <= audio_addr + 1;
+            elsif force_swap = '1' then
+                swapped <= '1';
+                audio_addr <= wlr & x"00";
+                wlr <= not wlr;
+            elsif play = '1' then
+                counter_en <= audio_request;
             end if;
         end if;
     end process;
@@ -104,7 +100,7 @@ begin
 
     CODEC : entity work.de2_wm8731_audio port map (
         clk => aud_clk,
-        reset_n => audio_en,
+        reset_n => play,
         test_mode => '0',
         
         aud_adclrck => aud_adclrck,
