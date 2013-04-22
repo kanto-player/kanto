@@ -37,6 +37,7 @@ architecture rtl of sd_controller is
     signal command : std_logic_vector(47 downto 0);
     type sd_state is (reset_state, reset_clks1, reset_clks2, 
                       send_cmd, wait_resp, recv_resp, 
+                      clear_input, check_clear,
                       check_cmd0, check_cmd8_head, check_cmd8_extra,
                       check_cmd58_head, check_cmd58_ccs, 
                       check_cmd17, wait_block_start, write_word, clear_write, 
@@ -44,7 +45,9 @@ architecture rtl of sd_controller is
     signal state : sd_state := reset_state;
     signal return_state : sd_state;
     signal sclk_sig : std_logic;
-    signal readdata : std_logic_vector(15 downto 0) := (others => '1');
+    signal response : std_logic_vector(15 downto 0) := (others => '1');
+    signal clearbuf : std_logic_vector(7 downto 0);
+    signal clrcount : unsigned(2 downto 0) := "111";
 
     signal hold_start : std_logic;
     signal state_indicator : unsigned(7 downto 0) := x"00";
@@ -57,7 +60,7 @@ begin
     sclk <= sclk_sig;
     ready <= '1' when state = cmd_done else '0';
     err <= '1' when state = cmd_err else '0';
-    resp_debug <= readdata(7 downto 0);
+    resp_debug <= response(7 downto 0);
     state_debug <= std_logic_vector(state_indicator);
     waiting <= '1' when state = wait_resp else '0';
     clk_enable <= '1' when clk_divider = "111" else '0';
@@ -84,6 +87,7 @@ begin
     mosi <= command(47);
     cs <= '1' when state = reset_clks1 or
                    state = cmd_done or
+                   state = clear_input or
                    state = cmd_err else '0';
     
     process(clk50)
@@ -123,11 +127,10 @@ begin
             end if;
 
         when check_cmd0 =>
-            if readdata(7 downto 0) = x"01" then
+            if response(7 downto 0) = x"01" then
                 command <= cmd8;
-                counter <= to_unsigned(47, 8);
                 return_state <= check_cmd8_head;
-                state <= send_cmd;
+                state <= clear_input;
                 state_indicator <= x"08";
             else
                 state_indicator <= x"00";
@@ -135,7 +138,7 @@ begin
             end if;
 
         when check_cmd8_head =>
-            if readdata(2) = '0' then
+            if response(2) = '0' then
                 counter <= to_unsigned(31, 8);
                 state <= recv_resp;
                 return_state <= check_cmd8_extra;
@@ -144,19 +147,18 @@ begin
             end if;
 
         when check_cmd8_extra =>
-            if readdata(11 downto 0) = "000110101010" then
+            if response(11 downto 0) = "000110101010" then
                 command <= cmd55;
-                counter <= to_unsigned(47, 8);
-                state <= send_cmd;
+                state <= clear_input;
                 return_state <= check_cmd55;
                 state_indicator <= x"55";
             else
-                readdata(15 downto 12) <= (others => '0');
+                response(15 downto 12) <= (others => '0');
                 state <= cmd_err;
             end if;
 
         when check_cmd58_head =>
-            if readdata(2) = '1' then
+            if response(2) = '1' then
                 state_indicator <= x"58";
                 state <= cmd_err;
             else
@@ -166,16 +168,15 @@ begin
             end if;
 
         when check_cmd58_ccs =>
-            hc <= readdata(14);
+            hc <= response(14);
             counter <= to_unsigned(15, 8);
             state <= recv_resp;
             return_state <= cmd_done;
 
         when check_cmd55 =>
-            if readdata(7 downto 0) = x"01" then
+            if response(7 downto 0) = x"01" then
                 command <= cmd41;
-                counter <= to_unsigned(47, 8);
-                state <= send_cmd;
+                state <= clear_input;
                 return_state <= check_cmd41;
                 state_indicator <= x"41";
             else
@@ -184,21 +185,19 @@ begin
             end if;
 
         when check_cmd41 =>
-            if readdata(7 downto 0) = x"00" then
-                counter <= to_unsigned(47, 8);
+            if response(7 downto 0) = x"00" then
                 command <= cmd58;
                 return_state <= check_cmd58_head;
                 state_indicator <= x"58";
-                state <= send_cmd;
-            elsif readdata(7 downto 0) = x"01" then
+                state <= clear_input;
+            elsif response(7 downto 0) = x"01" then
                 state <= recv_resp;
                 counter <= to_unsigned(7, 8);
                 state_indicator <= x"41";
                 return_state <= check_cmd41;
-            elsif readdata(7 downto 0) = x"ff" then
-                state <= send_cmd;
+            elsif response(7 downto 0) = x"ff" then
+                state <= clear_input;
                 command <= cmd55;
-                counter <= to_unsigned(47, 8);
                 return_state <= check_cmd55;
                 state_indicator <= x"55";
             else
@@ -222,20 +221,41 @@ begin
             if sclk_sig = '1' and miso = '0' then
                 counter <= to_unsigned(6, 8);
                 state <= recv_resp;
-                readdata <= (others => '0');
+                response <= (others => '0');
             end if;
             sclk_sig <= not sclk_sig;
 
         when recv_resp =>
             if sclk_sig = '1' then
-                readdata <= readdata(14 downto 0) & miso;
+                response <= response(14 downto 0) & miso;
                 if counter = 0 then
+                    counter <= to_unsigned(7, 8);
                     state <= return_state;
                 else
                     counter <= counter - "1";
                 end if;
             end if;
             sclk_sig <= not sclk_sig;
+
+        when clear_input =>
+            if sclk_sig = '1' then
+                clearbuf <= clearbuf(6 downto 0) & miso;
+                if clrcount = 0 then
+                    state <= check_clear;
+                    clrcount <= "111";
+                else
+                    clrcount <= clrcount - "1";
+                end if;
+            end if;
+            sclk_sig <= not sclk_sig;
+        
+        when check_clear =>
+            if clearbuf = x"ff" then
+                state <= send_cmd;
+                counter <= to_unsigned(47, 8);
+            else
+                state <= clear_input;
+            end if;
 
         when cmd_done =>
             if hold_start = '1' then
@@ -252,7 +272,7 @@ begin
             end if;
 
         when check_cmd17 =>
-            if readdata(7 downto 0) = x"00" then
+            if response(7 downto 0) = x"00" then
                 -- read command OK, wait for start byte
                 counter <= to_unsigned(7, 8);
                 return_state <= wait_block_start;
@@ -263,7 +283,7 @@ begin
             end if;
 
         when wait_block_start =>
-            if readdata(7 downto 0) = x"fe" then
+            if response(7 downto 0) = x"fe" then
                 -- block has started, proceed with reading
                 counter <= to_unsigned(15, 8);
                 return_state <= write_word;
@@ -275,7 +295,7 @@ begin
             end if;
         
         when write_word =>
-            writedata <= signed(readdata);
+            writedata <= signed(response);
             write_en <= '1';
             state <= clear_write;
 
