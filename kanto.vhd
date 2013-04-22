@@ -280,6 +280,12 @@ begin
         writeaddr => sd_writeaddr,
         write_en => sd_write_en
     );
+
+    ABFFTOS : entity work.oneshot port map (
+        clk => main_clk,
+        level => sd_ready,
+        edge => fft_start
+    );
     
     FFT : entity work.fft_controller port map (
         clk => main_clk,

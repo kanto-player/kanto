@@ -507,6 +507,7 @@ set_global_assignment -name EDA_TEST_BENCH_NAME recomb_tb -section_id eda_simula
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id recomb_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME recomb_tb -section_id recomb_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE recomb_tb.vhd -section_id recomb_tb
+set_global_assignment -name VHDL_FILE oneshot.vhd
 set_global_assignment -name VHDL_FILE sevenseg.vhd
 set_global_assignment -name VHDL_FILE visualizer.vhd
 set_global_assignment -name VHDL_FILE complex_mult.vhd
