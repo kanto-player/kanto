@@ -519,11 +519,9 @@ set_global_assignment -name VHDL_FILE recomb_rom128.vhd
 set_global_assignment -name VHDL_FILE recomb_rom64.vhd
 set_global_assignment -name VHDL_FILE recomb_rom32.vhd
 set_global_assignment -name VHDL_FILE recomb_rom16.vhd
-set_global_assignment -name VHDL_FILE fft_middleman.vhd
 set_global_assignment -name VHDL_FILE dft_test_setup.vhd
 set_global_assignment -name VHDL_FILE dft_coeff_rom.vhd
 set_global_assignment -name VHDL_FILE types_pkg.vhd
-set_global_assignment -name VHDL_FILE fft_tdom_ram.vhd
 set_global_assignment -name VHDL_FILE fft_fdom_ram.vhd
 set_global_assignment -name VHDL_FILE fft_controller.vhd
 set_global_assignment -name VHDL_FILE dft_top.vhd
