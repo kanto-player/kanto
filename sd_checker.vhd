@@ -33,15 +33,20 @@ begin
             case state is
                 when checking =>
                     if write_en = '1' then
-                        if lower_byte /= writeaddr 
-                                or phase /= higher_lsb then
-                            state <= oops;
-                            badaddr <= writeaddr;
-                            baddata <= lower_byte;
-                        elsif writeaddr = x"ff" then
-                            if phase = '0' then
+                        if phase = '0' then
+                            if lower_byte /= writeaddr then
+                                state <= oops;
+                                badaddr <= writeaddr;
+                                baddata <= lower_byte;
+                            elsif writeaddr = x"ff" then
                                 phase <= '1';
-                            else
+                            end if;
+                        else
+                            if lower_byte /= (not writeaddr) then
+                                state <= oops;
+                                badaddr <= writeaddr;
+                                baddata <= lower_byte;
+                            elsif writeaddr = x"ff" then
                                 state <= aok;
                             end if;
                         end if;
