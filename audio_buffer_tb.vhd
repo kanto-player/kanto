@@ -29,6 +29,7 @@ architecture sim of audio_buffer_tb is
     signal bclk : std_logic;
 
     signal readaddr : nibble_array;
+    signal readdata : real_signed_array;
 begin
     AB : entity work.audio_buffer port map (
         clk => clk,
@@ -48,6 +49,7 @@ begin
         aud_bclk => bclk,
 
         readaddr => readaddr,
+        readdata => readdata,
         audio_addr_debug => audio_addr,
         counter_en_debug => counter_en,
         audio_req_debug => audio_request
@@ -64,6 +66,10 @@ begin
 
     clk <= not clk after 10 ns;
     aud_clk <= not aud_clk after 44 ns;
+
+    ADDRGEN : for i in 0 to 15 generate
+        readaddr(i) <= audio_addr(3 downto 0);
+    end generate ADDRGEN;
 
     process
     begin
