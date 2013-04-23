@@ -219,8 +219,17 @@ architecture datapath of kanto is
 	signal sram_test_write 		: std_logic;
 	signal sram_test_req 			: std_logic;
 	signal sram_test_ack			: std_logic;
-
+	
+	  signal clk25 : std_logic := '0';
+	  
 begin
+
+  process (CLOCK_50)
+  begin
+    if rising_edge(CLOCK_50) then
+      clk25 <= not clk25;
+    end if;
+  end process;
 
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
@@ -339,7 +348,8 @@ begin
 	 );
 	 
 	 VISUALIZER : entity work.visualizer port map(
-		clk   			=> main_clk,
+		--clk   			=> main_clk,
+		    clk => clk25,
 		reset_data		=> fft_done,
 		fft_fdom_addr 	=> fft_fdom_addr,
 		fft_fdom_data 	=> fft_fdom_data,
@@ -350,7 +360,10 @@ begin
 		VGA_SYNC 		=> VGA_SYNC,
 		VGA_R      		=> VGA_R,
 		VGA_G          => VGA_G,
-		VGA_B 			=> VGA_B
+		VGA_B 			=> VGA_B,
+		ledr17				=> LEDR(17),
+		ledr16				=> LEDR(16),
+		ledr15				=> LEDR(15)
 	 );
     SS0 : entity work.sevenseg port map (
         number => sd_resp_debug(3 downto 0),
@@ -378,7 +391,7 @@ begin
     HEX4 <= (others => '1');
 
     LEDG(7 downto 2) <= (others => '0');
-    LEDR(17 downto 2) <= (others => '0');
+    LEDR(14 downto 2) <= (others => '0');
     
     LCD_ON   <= '1';
     LCD_BLON <= '1';
