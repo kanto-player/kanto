@@ -204,7 +204,7 @@ architecture datapath of kanto is
 	signal sd_ready : std_logic;
     signal sd_err : std_logic;
     signal sd_waiting : std_logic;
-    signal sd_resp_debug : std_logic_vector(7 downto 0);
+    signal sd_addr_debug : std_logic_vector(7 downto 0);
     signal sd_state_debug : std_logic_vector(7 downto 0);
     signal sd_ccs : std_logic;
     signal sd_writedata : signed(15 downto 0);
@@ -242,7 +242,6 @@ begin
     end if;
   end process;
 
-    sd_resp_debug <= std_logic_vector(check_writedata(7 downto 0));
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
     LEDG(2) <= ab_play;
@@ -318,7 +317,8 @@ begin
         writedata => check_writedata,
         write_en => check_write_en,
         
-        state_debug => sd_state_debug
+        state_debug => sd_state_debug,
+        addr_debug => sd_addr_debug
     );
 
     SDCHECK : entity work.sd_checker port map (
@@ -418,12 +418,12 @@ begin
 		ledr15				=> LEDR(15)
 	 );
     SS0 : entity work.sevenseg port map (
-        number => sd_resp_debug(3 downto 0),
+        number => sd_addr_debug(3 downto 0),
         display => HEX0
     );
 
     SS1 : entity work.sevenseg port map (
-        number => sd_resp_debug(7 downto 4),
+        number => sd_addr_debug(7 downto 4),
         display => HEX1
     );
     
