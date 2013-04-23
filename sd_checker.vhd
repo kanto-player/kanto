@@ -6,6 +6,7 @@ entity sd_checker is
     port (clk : in std_logic;
           err : out std_logic;
           ok  : out std_logic;
+          phase_out : out std_logic;
 
           badaddr : out unsigned(7 downto 0);
           baddata : out unsigned(7 downto 0);
@@ -24,6 +25,7 @@ architecture rtl of sd_checker is
 begin
     lower_byte <= unsigned(writedata(7 downto 0));
     higher_lsb <= writedata(8);
+    phase_out <= phase;
 
     process (clk)
     begin

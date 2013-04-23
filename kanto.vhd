@@ -218,6 +218,7 @@ architecture datapath of kanto is
     signal check_write_en : std_logic;
     signal check_err : std_logic;
     signal check_ok : std_logic;
+    signal check_phase : std_logic;
 	  
 	-- signals for sram controller testing
 	signal sram_test_reset : std_logic;
@@ -246,6 +247,7 @@ begin
     LEDG(1) <= sd_ccs;
     LEDG(2) <= ab_play;
     LEDG(3) <= check_ok;
+    LEDG(4) <= check_phase;
     LEDR(0) <= sd_err;
     LEDR(1) <= sd_waiting;
     LEDR(2) <= check_err;
@@ -323,6 +325,7 @@ begin
         clk => main_clk,
         err => check_err,
         ok => check_ok,
+        phase_out => check_phase,
 
         baddata => check_baddata,
         badaddr => check_badaddr,
@@ -454,7 +457,7 @@ begin
         display => HEX7
     );
     
-    LEDG(7 downto 4) <= (others => '0');
+    LEDG(7 downto 5) <= (others => '0');
     LEDR(14 downto 3) <= (others => '0');
     
     LCD_ON   <= '1';
