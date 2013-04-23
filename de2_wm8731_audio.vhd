@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity de2_wm8731_audio is
 port (
-    clk : in std_logic;       --  Audio CODEC Chip Clock AUD_XCK (18.43 MHz)
+    clk : in std_logic;       --  Audio CODEC Chip Clock AUD_XCK (11.29 MHz)
     reset_n : in std_logic;
     test_mode : in std_logic;       --    Audio CODEC controller test mode
     audio_request : out std_logic;  --    Audio controller request new data
@@ -42,7 +42,7 @@ begin
   begin
     if rising_edge(clk) then
       if reset_n = '0' then 
-        lrck_divider <= (others => '0');
+        lrck_divider <= (others => '1');
       else 
         lrck_divider <= lrck_divider + 1;
       end if;
@@ -61,7 +61,7 @@ begin
   end process;
 
   set_lrck <= '1' when lrck_divider = x"7F" or lrck_divider = x"FF" else '0';
-  lrck <= lrck_divider(7);
+  lrck <= not lrck_divider(7); -- high first, then low
     
   -- BCLK divider
   bclk <= bclk_divider(2);
@@ -99,7 +99,7 @@ begin
       if rising_edge(clk) then
         if reset_n = '0' then 
             sin_counter <= (others => '0');
-        elsif lrck_lat = '1' and lrck = '0'  then  
+        elsif lrck_divider = x"ff"  then  
           if sin_counter = "101111" then 
             sin_counter <= "000000";
           else  
@@ -109,14 +109,7 @@ begin
       end if;
     end process;
 
-    process(clk)
-    begin
-      if rising_edge(clk) then
-        lrck_lat <= lrck;
-      end if;
-    end process;
-
-    audio_request <= '1' when lrck_divider = x"fa" else '0';
+    audio_request <= '1' when lrck_divider = x"fe" else '0';
 
   with sin_counter select sin_out <=
     X"0000" when "000000",
