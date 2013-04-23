@@ -25,7 +25,7 @@ architecture rtl of de2_wm8731_audio is
     signal bclk : std_logic;
     
     signal lrck_divider : unsigned(7 downto 0); 
-    signal bclk_divider : unsigned(3 downto 0);
+    signal bclk_divider : unsigned(2 downto 0);
     
     signal set_lrck : std_logic;
     signal clr_bclk : std_logic;
@@ -64,8 +64,8 @@ begin
   lrck <= lrck_divider(7);
     
   -- BCLK divider
-  bclk <= bclk_divider(3);
-  clr_bclk <= '1' when bclk_divider = x"F" else '0';
+  bclk <= bclk_divider(2);
+  clr_bclk <= '1' when bclk_divider = "111" else '0';
   
   -- Audio data shift output
   process (clk)
