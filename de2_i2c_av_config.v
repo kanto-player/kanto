@@ -125,8 +125,8 @@ always
 begin
   case (LUT_INDEX)
   // Audio Config Data
-  SET_LIN_L    : LUT_DATA <= 16'h001A;
-  SET_LIN_R    : LUT_DATA <= 16'h021A;
+  SET_LIN_L    : LUT_DATA <= 16'h0079;
+  SET_LIN_R    : LUT_DATA <= 16'h0279;
   SET_HEAD_L   : LUT_DATA <= 16'h047B;
   SET_HEAD_R   : LUT_DATA <= 16'h067B;
   A_PATH_CTRL  : LUT_DATA <= 16'h08F8;
