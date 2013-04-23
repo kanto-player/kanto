@@ -176,6 +176,7 @@ end kanto;
 
 architecture datapath of kanto is
     signal ab_play : std_logic;
+    signal ab_audio_ok : std_logic;
     signal ab_swapped : std_logic;
     signal ab_force_swap : std_logic;
 
@@ -219,9 +220,11 @@ architecture datapath of kanto is
 	signal sram_test_write 		: std_logic;
 	signal sram_test_req 			: std_logic;
 	signal sram_test_ack			: std_logic;
-	
-	  signal clk25 : std_logic := '0';
+    signal clk25 : std_logic := '0';
 	  
+    signal master_reset_n : std_logic;
+
+    signal viz_reset : std_logic;
 begin
 
   process (CLOCK_50)
@@ -235,7 +238,8 @@ begin
     LEDG(1) <= sd_ccs;
     LEDR(0) <= sd_err;
     LEDR(1) <= sd_waiting;
-    ab_play <= SW(17);
+    ab_play <= SW(17) and ab_audio_ok;
+    master_reset_n <= KEY(0);
 
     PLL : entity work.audpll port map (
         inclk0 => CLOCK_50,
@@ -245,6 +249,19 @@ begin
     );
     
     AUD_XCK <= aud_clk;
+
+    CDTR : entity work.conductor port map (
+        clk => main_clk,
+        reset_n => master_reset_n,
+        ab_audio_ok => ab_audio_ok,
+        ab_swapped => ab_swapped,
+        ab_force_swap => ab_force_swap,
+        sd_start => sd_start,
+        sd_ready => sd_ready,
+        fft_start => fft_start,
+        fft_done => fft_done,
+        viz_reset => viz_reset
+    );
 
     AB : entity work.audio_buffer port map (
         clk => main_clk,
