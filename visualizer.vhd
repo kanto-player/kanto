@@ -93,8 +93,9 @@ architecture rtl of visualizer is
   signal sum_counter    : integer := 0;	
   signal reset        : std_logic := '0';
   signal reset_data_test : std_logic :='1';
-  signal test_ones : std_logic_vector (15 downto 0) := (others=>'1'); 
-  signal test_zeros : std_logic_vector (15 downto 0) := (others=>'0'); 
+  signal test_ones : std_logic_vector (15 downto 0) := "1011101111111110"; 
+  signal test_zeros : std_logic_vector (15 downto 0) := "0000111111111111"; 
+  signal test_half : std_logic_vector (15 downto 0) := "0011111111111000";
 begin
 
   -- Horizontal and vertical counters
@@ -123,37 +124,37 @@ begin
 					state := B;
 				elsif addr_counter < 256 then
 					if addr_counter <= 16 then 
-						sum(0) <= std_logic_vector(unsigned(sum(0)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(0) <= std_logic_vector(unsigned(sum(0)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 32 then 
-						sum(1) <= std_logic_vector(unsigned(sum(1)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(1) <= std_logic_vector(unsigned(sum(1)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 48 then 
 						sum(2) <= std_logic_vector(unsigned(sum(2)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 64 then 
-						sum(3) <= std_logic_vector(unsigned(sum(3)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(3) <= std_logic_vector(unsigned(sum(3)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 80 then 
-						sum(4) <= std_logic_vector(unsigned(sum(4)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(4) <= std_logic_vector(unsigned(sum(4)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 96 then 
 						sum(5) <= std_logic_vector(unsigned(sum(5)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 112 then 
-						sum(6) <= std_logic_vector(unsigned(sum(6)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(6) <= std_logic_vector(unsigned(sum(6)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 128 then 
-						sum(7) <= std_logic_vector(unsigned(sum(7)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(7) <= std_logic_vector(unsigned(sum(7)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 144 then 
-						sum(8) <= std_logic_vector(unsigned(sum(8)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(8) <= std_logic_vector(unsigned(sum(8)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 160 then 
 						sum(9) <= std_logic_vector(unsigned(sum(9)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 176 then 
-						sum(10) <= std_logic_vector(unsigned(sum(10)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(10) <= std_logic_vector(unsigned(sum(10)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 192 then 
 						sum(11) <= std_logic_vector(unsigned(sum(11)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 208 then 
 						sum(12) <= std_logic_vector(unsigned(sum(12)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 224 then 
-						sum(13) <= std_logic_vector(unsigned(sum(13)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(13) <= std_logic_vector(unsigned(sum(13)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 240 then 
 						sum(14) <= std_logic_vector(unsigned(sum(14)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
 					else
-						sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
 					end if;
 					fft_fdom_addr <= to_unsigned(addr_counter,fft_fdom_addr'length);
 					addr_counter  <= addr_counter + 1;
@@ -428,18 +429,18 @@ end process RectangleGen;
 		 elsif clk'event and clk = '1' then
 			if rectangle = '1' then
 				ledr16<='1';
-			VGA_R <= "1111111111";
+			VGA_R <= "0000000000";
 			VGA_G <= "1111111111";
-			VGA_B <= "1111111111";
+			VGA_B <= "1110011111";
 			elsif vga_hblank = '0' and vga_vblank ='0' then
 				ledr15<='1';
-			  VGA_R <= "0000000000";
-			  VGA_G <= "0000000000";
-			  VGA_B <= "0000000000";
+			  VGA_R <= "0000000011";
+			  VGA_G <= "0000000011";
+			  VGA_B <= "0000000011";
 			else
-			  VGA_R <= "0000000000";
-			  VGA_G <= "0000000000";
-			  VGA_B <= "0000000000";    
+			  VGA_R <= "0000000011";
+			  VGA_G <= "0000000011";
+			  VGA_B <= "0000000011";    
 			end if;
 		 end if;
 	end if;
