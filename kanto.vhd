@@ -210,6 +210,12 @@ architecture datapath of kanto is
     signal sd_writedata : signed(15 downto 0);
     signal sd_writeaddr : unsigned(7 downto 0);
     signal sd_write_en : std_logic;
+
+    signal check_writedata : signed(15 downto 0);
+    signal check_writeaddr : unsigned(7 downto 0);
+    signal check_write_en : std_logic;
+    signal check_err : std_logic;
+    signal check_ok : std_logic;
 	  
 	-- signals for sram controller testing
 	signal sram_test_reset : std_logic;
@@ -233,12 +239,14 @@ begin
     end if;
   end process;
 
-    sd_resp_debug <= std_logic_vector(sd_writedata(7 downto 0));
+    sd_resp_debug <= std_logic_vector(check_writedata(7 downto 0));
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
     LEDG(2) <= ab_play;
+    LEDG(3) <= check_ok;
     LEDR(0) <= sd_err;
     LEDR(1) <= sd_waiting;
+    LEDR(2) <= check_err;
     ab_play <= SW(17) and ab_audio_ok;
     master_reset_n <= KEY(0);
 
@@ -300,14 +308,28 @@ begin
         err => sd_err,
         waiting => sd_waiting,
         ccs => sd_ccs,
+        ready => sd_ready,
+
+        writeaddr => check_writeaddr,
+        writedata => check_writedata,
+        write_en => check_write_en,
         
         state_debug => sd_state_debug
+    );
+
+    SDCHECK : entity work.sd_checker port map (
+        clk => main_clk,
+        err => check_err,
+        ok => check_ok,
+
+        writedata => check_writedata,
+        writeaddr => check_writeaddr,
+        write_en => check_write_en
     );
 
     SDTEST : entity work.sd_dummy port map (
         clk => main_clk,
         start => sd_start,
-        ready => sd_ready,
         
         writedata => sd_writedata,
         writeaddr => sd_writeaddr,
@@ -412,8 +434,8 @@ begin
     HEX5 <= (others => '1');
     HEX4 <= (others => '1');
 
-    LEDG(7 downto 3) <= (others => '0');
-    LEDR(14 downto 2) <= (others => '0');
+    LEDG(7 downto 4) <= (others => '0');
+    LEDR(14 downto 3) <= (others => '0');
     
     LCD_ON   <= '1';
     LCD_BLON <= '1';

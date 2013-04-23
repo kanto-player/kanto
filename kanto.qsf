@@ -512,6 +512,7 @@ set_global_assignment -name EDA_TEST_BENCH_FILE dft_tb.vhd -section_id dft_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE recomb_tb.vhd -section_id recomb_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE visualizer_tb.vhd -section_id visualizer_tb
 
+set_global_assignment -name VHDL_FILE sd_checker.vhd
 set_global_assignment -name VHDL_FILE sd_dummy.vhd
 set_global_assignment -name VHDL_FILE conductor.vhd
 set_global_assignment -name VHDL_FILE sevenseg.vhd

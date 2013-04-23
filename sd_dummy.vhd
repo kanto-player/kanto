@@ -5,7 +5,6 @@ use ieee.numeric_std.all;
 entity sd_dummy is
     port (clk : in std_logic;
           start : in std_logic;
-          ready : out std_logic;
 
           writedata : out signed(15 downto 0);
           writeaddr : out unsigned(7 downto 0);
@@ -70,5 +69,4 @@ begin
     writeaddr <= waddr_sig;
     writedata <= rom_data(to_integer(rom_addr));
     write_en <= running;
-    ready <= not running;
 end rtl;
