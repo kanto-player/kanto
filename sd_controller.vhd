@@ -40,7 +40,7 @@ architecture rtl of sd_controller is
                       clear_input, check_clear,
                       check_cmd0, check_cmd8_head, check_cmd8_extra,
                       check_cmd58_head, check_cmd58_ccs, 
-                      check_cmd17, wait_block_start, write_word, clear_write, 
+                      check_cmd17, wait_block_start, write_word, 
                       check_cmd55, check_cmd41, cmd_done, cmd_err);
     signal state : sd_state := reset_state;
     signal return_state : sd_state;
@@ -52,7 +52,6 @@ architecture rtl of sd_controller is
     signal hold_start : std_logic;
     signal state_indicator : unsigned(7 downto 0) := x"00";
 
-    signal waddr_sig : unsigned(7 downto 0);
     signal blockaddr :  unsigned(31 downto 0) := (others => '0');
     signal word_count : unsigned(7 downto 0);
     signal hc : std_logic;
@@ -64,8 +63,8 @@ begin
     state_debug <= std_logic_vector(state_indicator);
     waiting <= '1' when state = wait_resp else '0';
     clk_enable <= '1' when clk_divider = "111" else '0';
-    writeaddr <= waddr_sig;
     ccs <= hc;
+    write_en <= '1' when state = write_word and clk_enable = '1' else '0';
     
     -- clock divider for sd clock
     process(clk50)
@@ -296,12 +295,7 @@ begin
         
         when write_word =>
             writedata <= signed(response);
-            write_en <= '1';
-            state <= clear_write;
-
-        when clear_write =>
-            write_en <= '0';
-            waddr_sig <= waddr_sig + 1;
+            writeaddr <= word_count;
             
             if word_count = x"ff" then
                 -- read the CRC (last 2 bytes) and ignore it
