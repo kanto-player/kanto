@@ -48,7 +48,7 @@ architecture rtl of audio_buffer is
     signal audio_ram : ram_type;
 
     signal audio_en : std_logic;
-    signal counter_en : std_logic;
+    signal counter_en : std_logic := '0';
 begin
     I2C_CONF : de2_i2c_av_config port map (
         iclk => clk,
