@@ -53,7 +53,7 @@ begin
   begin
     if rising_edge(clk) then      
       if reset_n = '0' or set_lrck = '1' then 
-        bclk_divider <= (others => '0');
+        bclk_divider <= (others => '1');
       else 
         bclk_divider <= bclk_divider + 1;
       end if;
