@@ -6,6 +6,9 @@ entity sd_checker is
     port (clk : in std_logic;
           err : out std_logic;
           ok  : out std_logic;
+
+          badaddr : out unsigned(7 downto 0);
+          baddata : out unsigned(7 downto 0);
           
           writedata : in signed(15 downto 0);
           writeaddr : in unsigned(7 downto 0);
@@ -15,9 +18,9 @@ end sd_checker;
 architecture rtl of sd_checker is
     type checker_state is (checking, aok, oops);
     signal state : checker_state;
-    signal extended : signed(15 downto 0);
+    signal lower_byte : unsigned(7 downto 0);
 begin
-    extended <= x"00" & signed(writeaddr);
+    lower_byte <= unsigned(writedata(7 downto 0));
 
     process (clk)
     begin
@@ -25,8 +28,10 @@ begin
             case state is
                 when checking =>
                     if write_en = '1' then
-                        if extended /= writedata then
+                        if lower_byte /= writeaddr then
                             state <= oops;
+                            badaddr <= writeaddr;
+                            baddata <= lower_byte;
                         elsif writeaddr = x"ff" then
                             state <= aok;
                         end if;
