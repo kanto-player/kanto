@@ -445,7 +445,7 @@ begin
     );
 
     SS6 : entity work.sevenseg port map (
-        number => std_logic_vector(check_badaddr(3 downto 0)),
+        number => std_logic_vector(check_baddata(3 downto 0)),
         display => HEX6
     );
 
