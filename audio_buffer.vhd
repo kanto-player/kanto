@@ -83,6 +83,7 @@ begin
                     swapped <= '1';
                 end if;
                 counter_en <= '0';
+                audio_data <= audio_ram(to_integer(audio_addr));
                 audio_addr <= audio_addr + 1;
             elsif force_swap = '1' then
                 swapped <= '1';
@@ -90,12 +91,11 @@ begin
                 wlr <= not wlr;
             elsif play = '1' then
                 counter_en <= audio_request;
+            else
+                audio_addr <= (others => '0');
             end if;
         end if;
     end process;
-
-    audio_data <= audio_ram(to_integer(audio_addr)) 
-                    when play = '1' else (others => '0');
 
     CODEC : entity work.de2_wm8731_audio port map (
         clk => aud_clk,
