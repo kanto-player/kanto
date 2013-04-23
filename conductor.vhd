@@ -56,7 +56,8 @@ begin
         end if;
     end process;
 
-    ab_audio_ok <= '1' when state = playing or state = block_end else '0';
+    ab_audio_ok <= '1' when state = playing or state = block_end or 
+                            state = fft_end else '0';
     ab_force_swap <= '1' when state = force_swap else '0';
     sd_start <= '1' when state = trigger_fw or state = block_end or
                          state = force_swap else '0';
