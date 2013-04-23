@@ -26,7 +26,7 @@ end sd_controller;
 
 architecture rtl of sd_controller is
     signal clk_enable : std_logic := '1';
-    signal clk_divider : unsigned(2 downto 0) := "000";
+    signal clk_divider : unsigned(1 downto 0) := "00";
     signal counter : unsigned(7 downto 0);
 
     constant cmd0  : std_logic_vector(47 downto 0) := x"400000000095";
@@ -62,7 +62,7 @@ begin
     resp_debug <= response(7 downto 0);
     state_debug <= std_logic_vector(state_indicator);
     waiting <= '1' when state = wait_resp else '0';
-    clk_enable <= '1' when clk_divider = "111" else '0';
+    clk_enable <= '1' when clk_divider = "11" else '0';
     ccs <= hc;
     write_en <= '1' when state = write_word and clk_enable = '1' else '0';
     
