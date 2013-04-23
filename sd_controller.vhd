@@ -64,7 +64,6 @@ begin
     waiting <= '1' when state = wait_resp else '0';
     clk_enable <= '1' when clk_divider = "11" else '0';
     ccs <= hc;
-    write_en <= '1' when state = write_word and clk_enable = '1' else '0';
     
     -- clock divider for sd clock
     process(clk50)
@@ -79,6 +78,12 @@ begin
 
             if state /= cmd_done then
                 hold_start <= '0';
+            end if;
+
+            if state = write_word and clk_enable = '1' then
+                write_en <= '1';
+            else
+                write_en <= '0';
             end if;
         end if; -- rising_edge(clk50)
     end process;
