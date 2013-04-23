@@ -22,6 +22,10 @@ entity audio_buffer is
           writedata : in signed(15 downto 0);
           write_en : in std_logic;
 
+          audio_addr_debug : out unsigned(8 downto 0);
+          counter_en_debug : out std_logic;
+          audio_req_debug : out std_logic;
+
           readaddr : in nibble_array;
           readdata : out real_signed_array);
 end audio_buffer;
@@ -40,6 +44,11 @@ architecture rtl of audio_buffer is
 
     signal counter_en : std_logic := '0';
 begin
+
+    audio_addr_debug <= audio_addr;
+    counter_en_debug <= counter_en;
+    audio_req_debug <= last_audio_request;
+
     wfulladdr <= wlr & writeaddr;
     process (clk)
     begin

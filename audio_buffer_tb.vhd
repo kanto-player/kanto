@@ -18,6 +18,9 @@ architecture sim of audio_buffer_tb is
     signal play : std_logic;
     signal start_write : std_logic;
     signal force_swap : std_logic;
+    signal audio_addr : unsigned(8 downto 0);
+    signal counter_en : std_logic;
+    signal audio_request : std_logic;
 
     signal adclrck : std_logic;
     signal adcdat : std_logic;
@@ -44,7 +47,10 @@ begin
         aud_dacdat => dacdat,
         aud_bclk => bclk,
 
-        readaddr => readaddr
+        readaddr => readaddr,
+        audio_addr_debug => audio_addr,
+        counter_en_debug => counter_en,
+        audio_req_debug => audio_request
     );
 
     SDD : entity work.sd_dummy port map (
