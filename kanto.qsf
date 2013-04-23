@@ -475,7 +475,7 @@ set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_RO
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
-set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH dft_tb -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH audio_buffer_tb -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_NAME audio_buffer_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id audio_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "227 us" -section_id audio_buffer_tb
@@ -504,13 +504,6 @@ set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME recomb_tb -section_id rec
 set_global_assignment -name EDA_TEST_BENCH_NAME visualizer_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id visualizer_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME visualizer_tb -section_id visualizer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE audio_buffer_tb.vhd -section_id audio_buffer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE i2c_tb.vhd -section_id i2c_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE codec_tb.vhd -section_id codec_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE audio_test_tb.vhd -section_id audio_test_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE dft_tb.vhd -section_id dft_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE recomb_tb.vhd -section_id recomb_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE visualizer_tb.vhd -section_id visualizer_tb
 
 set_global_assignment -name VHDL_FILE sd_checker.vhd
 set_global_assignment -name VHDL_FILE sd_dummy.vhd
@@ -552,3 +545,10 @@ set_global_assignment -name VHDL_FILE sd_test.vhd
 set_global_assignment -name QIP_FILE mult.qip
 set_global_assignment -name VHDL_FILE visualizer_tb.vhd
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name EDA_TEST_BENCH_FILE audio_buffer_tb.vhd -section_id audio_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE i2c_tb.vhd -section_id i2c_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE codec_tb.vhd -section_id codec_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE audio_test_tb.vhd -section_id audio_test_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE dft_tb.vhd -section_id dft_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE recomb_tb.vhd -section_id recomb_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE visualizer_tb.vhd -section_id visualizer_tb
