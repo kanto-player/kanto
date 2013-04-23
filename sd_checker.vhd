@@ -22,6 +22,7 @@ architecture rtl of sd_checker is
     signal lower_byte : unsigned(7 downto 0);
     signal higher_lsb : std_logic;
     signal phase : std_logic := '0';
+    signal old_write_en : std_logic;
 begin
     lower_byte <= unsigned(writedata(7 downto 0));
     higher_lsb <= writedata(8);
@@ -30,9 +31,10 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
+            old_write_en <= write_en;
             case state is
                 when checking =>
-                    if write_en = '1' then
+                    if write_en = '1' and old_write_en = '0' then
                         if phase = '0' then
                             if lower_byte /= writeaddr then
                                 state <= oops;
