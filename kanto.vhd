@@ -200,7 +200,6 @@ architecture datapath of kanto is
 	signal dft_test_addr : unsigned(3 downto 0);
 	signal dft_test_data : signed(31 downto 0);
 	  
-	-- inserted for SDC testing
 	signal sd_start : std_logic;
 	signal sd_ready : std_logic;
     signal sd_err : std_logic;
@@ -297,13 +296,18 @@ begin
         sclk => SD_CLK,
         
         start => sd_start,
-        ready => sd_ready,
         err => sd_err,
         waiting => sd_waiting,
         ccs => sd_ccs,
         
         resp_debug => sd_resp_debug,
-        state_debug => sd_state_debug,
+        state_debug => sd_state_debug
+    );
+
+    SDTEST : entity work.sd_dummy port map (
+        clk => main_clk,
+        start => sd_start,
+        ready => sd_ready,
         
         writedata => sd_writedata,
         writeaddr => sd_writeaddr,
