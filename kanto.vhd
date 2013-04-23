@@ -380,7 +380,8 @@ begin
 	 VISUALIZER : entity work.visualizer port map(
 		--clk   			=> main_clk,
 		    clk => clk25,
-		reset_data		=> fft_done,
+--		reset_data		=> fft_done,
+        reset_data_test      => '1',
 		fft_fdom_addr 	=> fft_fdom_addr,
 		fft_fdom_data 	=> fft_fdom_data,
 		VGA_CLK        => VGA_CLK,
@@ -395,6 +396,7 @@ begin
 		ledr16				=> LEDR(16),
 		ledr15				=> LEDR(15)
 	 );
+     
     SS0 : entity work.sevenseg port map (
         number => sd_resp_debug(3 downto 0),
         display => HEX0

@@ -13,18 +13,9 @@ use ieee.numeric_std.all;
 entity visualizer is
   
   port (
-    --reset : in std_logic;
     clk   : in std_logic;                    -- Should be 25.125 MHz
-	 reset_data: in std_logic;
-	 
-	 --viz_readdata  : in std_logic_vector(15 downto 0);
-	 --viz_writedata : out std_logic_vector(15 downto 0);
-    --viz_addr      : out std_logic_vector(17 downto 0);
-	 --viz_write     : out std_logic;
-    --viz_req       : out std_logic;
-    --viz_ack       : in std_logic ;
-	 
-	 fft_fdom_addr : out unsigned(7 downto 0);
+	 reset_data_test: in std_logic;
+	 	 fft_fdom_addr : out unsigned(7 downto 0);
     fft_fdom_data : in signed(31 downto 0);
 	 
 	 ledr17 : out std_logic;
@@ -62,14 +53,7 @@ architecture rtl of visualizer is
   constant bar_w : integer := 40;
   
   type states is (A,B);
-
   
-  
---  constant RECTANGLE_HSTART : integer := 100;
---  constant RECTANGLE_HEND   : integer := 540;
---  constant RECTANGLE_VSTART : integer := 100;
---  constant RECTANGLE_VEND   : integer := 380;
-
   -- Signals for the video controller
   signal Hcount : unsigned(9 downto 0);  -- Horizontal position (0-800)
   signal Vcount : unsigned(9 downto 0);  -- Vertical position (0-524)
@@ -84,18 +68,21 @@ architecture rtl of visualizer is
   
   signal sum : ram_type := ((others=>(others =>'0')));
   
-  signal read_complete  : std_logic := '0';
   signal address_r      : integer := 512;
   signal index 	      : integer := 0;
   signal sram_base      : integer := 0;
   signal counter 			: integer := 0;
   signal addr_counter   : integer := 0;
   signal sum_counter    : integer := 0;	
-  signal reset        : std_logic := '0';
-  signal reset_data_test : std_logic :='1';
   signal test_ones : std_logic_vector (15 downto 0) := "1011101111111110"; 
   signal test_zeros : std_logic_vector (15 downto 0) := "0000111111111111"; 
   signal test_half : std_logic_vector (15 downto 0) := "0011111111111000";
+  
+  -- reset stuff
+  signal reset        : std_logic := '0'; -- resets the screen
+--  signal reset_data_test : std_logic :='1'; -- signal that new data is available: 1 when 
+
+  
 begin
 
   -- Horizontal and vertical counters
@@ -104,20 +91,15 @@ begin
   variable state : states := A;
   begin
 	if rising_edge(clk) then
-		--if read_complete='0' then
 		case state is
 			when A =>
-				if reset_data_test= '1' then
-					read_complete<='0';
+				if reset_data_test = '1' then
 					reset <= '0';
 					state := B;
-					reset_data_test <= '0';
 				else 
 					state:= A;
-					--read_complete<='1';
 				end if;
 			when B =>
-				--ledr15 <='0';
 				if addr_counter = 0 then
 					fft_fdom_addr <= to_unsigned(addr_counter,fft_fdom_addr'length);
 					addr_counter  <= addr_counter + 1;
@@ -161,12 +143,8 @@ begin
 					state := B;
 				else
 					addr_counter <= 0;
-					read_complete<='1';
-					reset_data_test<= '0';
-					--ledr17 <= '1';
+					reset <='1';
 					sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
-					--test
-					reset <= '0';
 					state := A;
 				end if;
 			end case;
@@ -177,7 +155,6 @@ end process GetData;
   HCounter : process (clk)
   begin
     if rising_edge(clk) then
-		if read_complete='1' then
 			if reset = '1' then
 			  Hcount <= (others => '0');
 			elsif EndOfLine = '1' then
@@ -185,7 +162,6 @@ end process GetData;
 			else
 			  Hcount <= Hcount + 1;
 			end if;      
-		end if;
 	end if;
   end process HCounter;
 
@@ -194,7 +170,6 @@ end process GetData;
   VCounter: process (clk)
   begin
     if rising_edge(clk) then
-		if read_complete='1' then	 
 			if reset = '1' then
 			  Vcount <= (others => '0');
 			elsif EndOfLine = '1' then
@@ -204,7 +179,6 @@ end process GetData;
 				 Vcount <= Vcount + 1;
 			  end if;
 			end if;
-		end if;
     end if;
   end process VCounter;
 
@@ -216,20 +190,17 @@ end process GetData;
   HSyncGen : process (clk)
   begin
     if rising_edge(clk) then
-		if read_complete='1' then
 			if reset = '1' or EndOfLine = '1' then
 			  vga_hsync <= '1';
 			elsif Hcount = HSYNC - 1 then
 			  vga_hsync <= '0';
 			end if;
-		 end if;
 		end if;
   end process HSyncGen;
   
   HBlankGen : process (clk)
   begin
     if rising_edge(clk) then
-		if read_complete='1' then
 			if reset = '1' then
 			  vga_hblank <= '1';
 			elsif Hcount = HSYNC + HBACK_PORCH then
@@ -237,14 +208,12 @@ end process GetData;
 			elsif Hcount = HSYNC + HBACK_PORCH + HACTIVE then
 			  vga_hblank <= '1';
 			end if;      
-		 end if;
 		end if;
   end process HBlankGen;
 
   VSyncGen : process (clk)
   begin
     if rising_edge(clk) then
-		if read_complete='1' then
 			if reset = '1' then
 			  vga_vsync <= '1';
 			elsif EndOfLine ='1' then
@@ -254,14 +223,12 @@ end process GetData;
 				 vga_vsync <= '0';
 			  end if;
 			end if;
-		end if;
     end if;
   end process VSyncGen;
 
   VBlankGen : process (clk)
   begin
     if rising_edge(clk) then   
-		if read_complete='1' then
 			if reset = '1' then
 			  vga_vblank <= '1';
 			elsif EndOfLine = '1' then
@@ -270,46 +237,13 @@ end process GetData;
 			  elsif Vcount = VSYNC + VBACK_PORCH + VACTIVE - 1 then
 				 vga_vblank <= '1';
 			  end if;
-			end if;
 		end if;
     end if;
   end process VBlankGen;
 
-  -- Rectangle generator
-
---  RectangleHGen : process (clk)
---  begin
---    if rising_edge(clk) then     
---      if reset = '1' or Hcount = HSYNC + HBACK_PORCH + RECTANGLE_HSTART then
---        rectangle_h <= '1';
---      elsif Hcount = HSYNC + HBACK_PORCH + RECTANGLE_HEND then
---        rectangle_h <= '0';
---      end if;      
---    end if;
---  end process RectangleHGen;
---
---  RectangleVGen : process (clk)
---  begin
---    if rising_edge(clk) then
---      if reset = '1' then       
---        rectangle_v <= '0';
---      elsif EndOfLine = '1' then
---        if Vcount = VSYNC + VBACK_PORCH - 1 + RECTANGLE_VSTART then
---          rectangle_v <= '1';
---        elsif Vcount = VSYNC + VBACK_PORCH - 1 + RECTANGLE_VEND then
---          rectangle_v <= '0';
---        end if;
---      end if;      
---    end if;
---  end process RectangleVGen;
---
---  rectangle <= rectangle_h and rectangle_v;
-
 RectangleGen: process (clk)
 begin
 	if rising_edge(clk) then
-		if read_complete='1' then
-		--ledr17 <= '1';
 		if reset='1' then
 			rectangle<='0';
 		--division 1
@@ -405,14 +339,12 @@ begin
 		--division 16
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*15) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*16) then
 			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(15)(19 downto 11))) then
-				--ledr16 <= '1';
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		else
 			rectangle<='0';
 			end if;
-		end if;
 	end if;
 end process RectangleGen;
 
@@ -420,20 +352,16 @@ end process RectangleGen;
 
   VideoOut: process (clk, reset)
   begin
-  if read_complete='1' then
 		 if reset = '1' then
-			ledr17<='1';
 			VGA_R <= "0000000000";
 			VGA_G <= "1111111111";
 			VGA_B <= "0000000000";
 		 elsif clk'event and clk = '1' then
 			if rectangle = '1' then
-				ledr16<='1';
 			VGA_R <= "0000000000";
 			VGA_G <= "1111111111";
 			VGA_B <= "1110011111";
 			elsif vga_hblank = '0' and vga_vblank ='0' then
-				ledr15<='1';
 			  VGA_R <= "0000000011";
 			  VGA_G <= "0000000011";
 			  VGA_B <= "0000000011";
@@ -443,7 +371,6 @@ end process RectangleGen;
 			  VGA_B <= "0000000011";    
 			end if;
 		 end if;
-	end if;
   end process VideoOut;
 
   VGA_CLK <= clk;
