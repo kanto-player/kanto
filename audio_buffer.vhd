@@ -30,6 +30,7 @@ architecture rtl of audio_buffer is
     signal audio_addr : unsigned(8 downto 0) := (others => '0');
     signal audio_data : signed(15 downto 0);
     signal audio_request : std_logic;
+    signal last_audio_request : std_logic;
     
     signal wlr : std_logic := '0'; -- writes leading reads
     signal wfulladdr : unsigned(8 downto 0);
@@ -54,10 +55,15 @@ begin
         readdata(i) <= audio_ram(to_integer(rfulladdr(i)));
     end generate AURDGEN;
 
+    audio_data <= audio_ram(to_integer(audio_addr)) 
+                        when play = '1' else (others => '0');
+
     process (clk) -- assert mm_en one clock behind counter_en
     begin
         if rising_edge(clk) then
             swapped <= '0';
+            last_audio_request <= audio_request;
+            counter_en <= audio_request and (not last_audio_request);
 
             if counter_en = '1' then
                 -- swap when audio address reaches 255 or 511
@@ -66,16 +72,11 @@ begin
                     swapped <= '1';
                 end if;
                 counter_en <= '0';
-                audio_data <= audio_ram(to_integer(audio_addr));
                 audio_addr <= audio_addr + 1;
             elsif force_swap = '1' then
                 swapped <= '1';
                 audio_addr <= wlr & x"00";
                 wlr <= not wlr;
-            elsif play = '1' then
-                counter_en <= audio_request;
-            else
-                audio_addr <= (others => '0');
             end if;
         end if;
     end process;
