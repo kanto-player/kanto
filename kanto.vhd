@@ -225,6 +225,14 @@ architecture datapath of kanto is
     signal master_reset_n : std_logic;
 
     signal viz_reset : std_logic;
+
+
+    component de2_i2c_av_config is
+        port (iclk : in std_logic;
+              irst_n : in std_logic;
+              i2c_sclk : out std_logic;
+              i2c_sdat : inout std_logic);
+    end component;
 begin
 
   process (CLOCK_50)
@@ -251,6 +259,13 @@ begin
     
     AUD_XCK <= aud_clk;
 
+    I2C_CONF : de2_i2c_av_config port map (
+        iclk => main_clk,
+        irst_n => '1',
+        i2c_sdat => i2c_sdat,
+        i2c_sclk => i2c_sclk
+    );
+    
     CDTR : entity work.conductor port map (
         clk => main_clk,
         reset_n => master_reset_n,
@@ -270,9 +285,6 @@ begin
         play => ab_play,
         swapped => ab_swapped,
         force_swap => ab_force_swap,
-
-        i2c_sdat => i2c_sdat,
-        i2c_sclk => i2c_sclk,
 
         aud_adclrck => aud_adclrck,
         aud_adcdat => aud_adcdat,
