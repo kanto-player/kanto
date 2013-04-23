@@ -233,6 +233,7 @@ begin
     end if;
   end process;
 
+    sd_resp_debug <= std_logic_vector(sd_writedata(7 downto 0));
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
     LEDG(2) <= ab_play;
@@ -300,7 +301,6 @@ begin
         waiting => sd_waiting,
         ccs => sd_ccs,
         
-        resp_debug => sd_resp_debug,
         state_debug => sd_state_debug
     );
 

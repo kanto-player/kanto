@@ -19,8 +19,7 @@ port (
     writeaddr       : out unsigned(7 downto 0);
     write_en        : out std_logic;
     
-    state_debug     : out std_logic_vector(7 downto 0);
-    resp_debug      : out std_logic_vector(7 downto 0)
+    state_debug     : out std_logic_vector(7 downto 0)
 );
 end sd_controller;
 
@@ -60,7 +59,6 @@ begin
     sclk <= sclk_sig;
     ready <= '1' when state = cmd_done else '0';
     err <= '1' when state = cmd_err else '0';
-    resp_debug <= response(7 downto 0);
     state_debug <= std_logic_vector(state_indicator);
     waiting <= '1' when state = wait_resp else '0';
     clk_enable <= '1' when clk_divider = "111" else '0';
