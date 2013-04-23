@@ -298,7 +298,7 @@ begin
             state <= clear_write;
 
         when clear_write =>
-            write_en <= '1';
+            write_en <= '0';
             waddr_sig <= waddr_sig + 1;
             
             if word_count = x"ff" then
