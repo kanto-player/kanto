@@ -236,6 +236,7 @@ begin
 
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
+    LEDG(2) <= ab_play;
     LEDR(0) <= sd_err;
     LEDR(1) <= sd_waiting;
     ab_play <= SW(17) and ab_audio_ok;
@@ -407,7 +408,7 @@ begin
     HEX5 <= (others => '1');
     HEX4 <= (others => '1');
 
-    LEDG(7 downto 2) <= (others => '0');
+    LEDG(7 downto 3) <= (others => '0');
     LEDR(14 downto 2) <= (others => '0');
     
     LCD_ON   <= '1';
