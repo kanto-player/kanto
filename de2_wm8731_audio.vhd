@@ -116,16 +116,7 @@ begin
       end if;
     end process;
 
-    process (clk) 
-    begin
-      if rising_edge(clk) then 
-        if lrck_lat = '1' and lrck = '0' then
-          audio_request <= '1';
-        else 
-          audio_request <= '0';
-        end if;
-      end if;
-    end process;
+    audio_request <= '1' when lrck_divider = x"fa" else '0';
 
   with sin_counter select sin_out <=
     X"0000" when "000000",
