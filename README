@@ -13,3 +13,5 @@ VHDL Style Guide
    subsystem is prefixed with ab_).
  - First signal in port declaration on same line as "port (".
  - Final signal in port declaration on same line as final ");".
+ - Do not leave commented out code in your commits, just delete them.
+   That's what version control is for.

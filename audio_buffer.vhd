@@ -47,8 +47,7 @@ architecture rtl of audio_buffer is
     type ram_type is array(0 to 511) of signed(15 downto 0);
     signal audio_ram : ram_type;
 
-    signal audio_en : std_logic;
-    signal counter_en : std_logic;
+    signal counter_en : std_logic := '0';
 begin
     I2C_CONF : de2_i2c_av_config port map (
         iclk => clk,
@@ -96,7 +95,7 @@ begin
     end process;
 
     audio_data <= audio_ram(to_integer(audio_addr)) 
-                    when audio_en = '1' else (others => '0');
+                    when play = '1' else (others => '0');
 
     CODEC : entity work.de2_wm8731_audio port map (
         clk => aud_clk,
