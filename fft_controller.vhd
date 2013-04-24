@@ -192,6 +192,7 @@ begin
                 when idle =>
                     if start = '1' then
                         control_state <= dftcomp;
+                        dft_reset <= '1';
                     end if;
                 when dftcomp =>
                     dft_reset <= '0';
