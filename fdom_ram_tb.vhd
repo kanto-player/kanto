@@ -46,10 +46,13 @@ begin
         writeaddr(1) <= x"1";
         writedata(1) <= x"000000fa";
         write_en(1) <= '1';
+        readaddr(1) <= x"1";
         wait for 20 ns;
         write_en(1) <= '0';
         bigaddr <= x"11";
+        wait for 20 ns;
         assert bigdata = x"000000fa";
+        assert readdata(1) = x"000000fa";
         wait;
     end process;
 end sim;
