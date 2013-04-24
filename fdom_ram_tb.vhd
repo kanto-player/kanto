@@ -36,11 +36,13 @@ begin
     process
         variable i : integer range 0 to 16;
     begin
+        i := 0;
         while i < 16 loop
             writedata(i) <= (others => '0');
             writeaddr(i) <= (others => '0');
             write_en(i) <= '0';
             readaddr(i) <= (others => '0');
+            i := i + 1;
         end loop;
         reset <= '1';
         wait for 20 ns;
