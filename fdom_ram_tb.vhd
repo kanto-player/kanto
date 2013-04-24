@@ -34,12 +34,18 @@ begin
     clk <= not clk after 10 ns;
 
     process
-        variable i : integer range 0 to 15;
+        variable i : integer range 0 to 16;
     begin
-        wait for 10 ns;
+        while i < 16 loop
+            writedata(i) <= (others => '0');
+            writeaddr(i) <= (others => '0');
+            write_en(i) <= '0';
+            readaddr(i) <= (others => '0');
+        end loop;
         reset <= '1';
         wait for 20 ns;
         reset <= '0';
+        wait for 10 ns;
         bigaddr <= x"00";
         wait for 20 ns;
         assert bigdata = x"00000000";
