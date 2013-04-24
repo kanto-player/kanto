@@ -18,42 +18,41 @@ entity fft_fdom_ram is
 end fft_fdom_ram;
 
 architecture rtl of fft_fdom_ram is
-    type ram_type is array(0 to 15, 0 to 15) of signed(31 downto 0);
-    signal ram_data : ram_type;
     signal bigaddr_upper : unsigned(3 downto 0);
     signal bigaddr_lower : unsigned(3 downto 0);
+    signal bigdata_opt : complex_signed_array;
 begin
     bigaddr_upper <= bigaddr(7 downto 4);
     bigaddr_lower <= bigaddr(3 downto 0);
-    bigdata <= ram_data(to_integer(bigaddr_upper), to_integer(bigaddr_lower));
+
+    bigdata <= bigdata_opt(0) when bigaddr_upper = 0 else
+               bigdata_opt(1) when bigaddr_upper = 1 else
+               bigdata_opt(2) when bigaddr_upper = 2 else
+               bigdata_opt(3) when bigaddr_upper = 3 else
+               bigdata_opt(4) when bigaddr_upper = 4 else
+               bigdata_opt(5) when bigaddr_upper = 5 else
+               bigdata_opt(6) when bigaddr_upper = 6 else
+               bigdata_opt(7) when bigaddr_upper = 7 else
+               bigdata_opt(8) when bigaddr_upper = 8 else
+               bigdata_opt(9) when bigaddr_upper = 9 else
+               bigdata_opt(10) when bigaddr_upper = 10 else
+               bigdata_opt(11) when bigaddr_upper = 11 else
+               bigdata_opt(12) when bigaddr_upper = 12 else
+               bigdata_opt(13) when bigaddr_upper = 13 else
+               bigdata_opt(14) when bigaddr_upper = 14 else
+               bigdata_opt(15) when bigaddr_upper = 15;
     
     LUMAP : for i in 0 to 15 generate
-        readdata(i) <= ram_data(i, to_integer(readaddr(i)));
-        process (clk)
-        begin
-            if rising_edge(clk) then
-                if reset = '1' then 
-                    ram_data(i, 0)  <= x"00000000";
-                    ram_data(i, 1)  <= x"00000000";
-                    ram_data(i, 2)  <= x"00000000";
-                    ram_data(i, 3)  <= x"00000000";
-                    ram_data(i, 4)  <= x"00000000";
-                    ram_data(i, 5)  <= x"00000000";
-                    ram_data(i, 6)  <= x"00000000";
-                    ram_data(i, 7)  <= x"00000000";
-                    ram_data(i, 7)  <= x"00000000";
-                    ram_data(i, 8)  <= x"00000000";
-                    ram_data(i, 9)  <= x"00000000";
-                    ram_data(i, 10) <= x"00000000";
-                    ram_data(i, 11) <= x"00000000";
-                    ram_data(i, 12) <= x"00000000";
-                    ram_data(i, 13) <= x"00000000";
-                    ram_data(i, 14) <= x"00000000";
-                    ram_data(i, 15) <= x"00000000";
-                elsif write_en(i) = '1' then
-                    ram_data(i, to_integer(writeaddr(i))) <= writedata(i);
-                end if;
-            end if;
-        end process;
+        ROW : entity work.fft_fdom_ram_row port map (
+            clk => clk,
+            reset => reset,
+            writedata => writedata(i),
+            writeaddr => writeaddr(i),
+            write_en => write_en(i),
+            readdata => readdata(i),
+            readaddr => readaddr(i),
+            bigdata => bigdata_opt(i),
+            bigaddr => bigaddr_lower
+        );
     end generate LUMAP;
 end rtl;
