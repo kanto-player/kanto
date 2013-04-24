@@ -25,6 +25,7 @@ architecture rtl of fft_controller is
     type control_state_type is (idle, dftcomp, recomb1, 
                                 recomb2, recomb3, recomb4);
     signal control_state : control_state_type;
+    signal last_state : control_state_type;
     signal fdom_writedata : complex_signed_array;
     signal fdom_readdata : complex_signed_array;
     signal fdom_readaddr : nibble_array;
@@ -195,6 +196,7 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
+            last_state <= control_state;
             case control_state is
                 when idle =>
                     state_debug <= "000";
@@ -204,36 +206,41 @@ begin
                     end if;
                 when dftcomp =>
                     state_debug <= "001";
-                    dft_reset <= '0';
-                    if dft_done = x"ffff" then
+                    if last_state /= dftcomp then
+                        dft_reset <= '0';
+                    elsif dft_done = x"ffff" then
                         control_state <= recomb1;
                         recomb_reset <= '1';
                     end if;
                 when recomb1 =>
                     state_debug <= "010";
-                    recomb_reset <= '0';
-                    if recomb_done = x"ff" then
+                    if last_state /= recomb1 then
+                        recomb_reset <= '0';
+                    elsif recomb_done = x"ff" then
                         control_state <= recomb2;
                         recomb_reset <= '1';
                     end if;
                 when recomb2 =>
                     state_debug <= "011";
-                    recomb_reset <= '0';
-                    if recomb_done = x"ff" then
+                    if last_state /= recomb2 then
+                        recomb_reset <= '0';
+                    elsif recomb_done = x"ff" then
                         control_state <= recomb3;
                         recomb_reset <= '1';
                     end if;
                 when recomb3 =>
                     state_debug <= "100";
-                    recomb_reset <= '0';
-                    if recomb_done = x"ff" then
+                    if last_state /= recomb3 then
+                        recomb_reset <= '0';
+                    elsif recomb_done = x"ff" then
                         control_state <= recomb4;
                         recomb_reset <= '1';
                     end if;
                 when recomb4 =>
                     state_debug <= "101";
-                    recomb_reset <= '0';
-                    if recomb_done = x"ff" then
+                    if last_state /= recomb4 then
+                        recomb_reset <= '0';
+                    elsif recomb_done = x"ff" then
                         control_state <= idle;
                     end if;
             end case;
