@@ -75,6 +75,7 @@ begin
         readaddr => fdom_readaddr,
         writeaddr => fdom_writeaddr,
         write_en => fdom_write_en,
+        reset => dft_reset,
         clk => clk
     );
 
