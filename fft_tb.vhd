@@ -39,6 +39,9 @@ architecture sim of fft_tb is
     signal clk : std_logic := '0';
     signal start : std_logic;
     signal done : std_logic;
+    signal state_debug : unsigned(2 downto 0);
+    signal dft_done : std_logic;
+    signal recomb_done : std_logic;
     type rom_type is array(0 to 255) of signed(31 downto 0);
     constant expected : rom_type := (x"00c80000", x"000700c8", x"001b0055", x"001d0031", x"001e0020", x"001d0013", x"001e000c", x"001c0004", x"001c0000", x"001bfff8", x"001bfff2", x"001affeb", x"001affe2", x"001affd3", x"001cffb8", x"0023ff57", x"ffe50000", x"002600b5", x"00210052", x"00230036", x"00260026", x"002a001b", x"002f0012", x"00330009", x"00370000", x"003dfff1", x"0043ffe1", x"0047ffcd", x"004affae", x"004bff7e", x"0043ff20", x"0005fdec", x"02830000", x"000b0220", x"004a00e9", x"0053008a", x"00530058", x"00510038", x"004e0020", x"0048000e", x"00440000", x"003efff2", x"0038ffe7", x"0032ffdd", x"002effd0", x"002cffc0", x"002dffa1", x"0048ff36", x"ff200000", x"004600b8", x"0027004f", x"00230030", x"00230020", x"00230016", x"0026000f", x"00270007", x"00290000", x"002cfff6", x"002effec", x"002fffdf", x"0031ffcd", x"0033ffb1", x"0036ff7c", x"003efeca", x"fffa0000", x"003d0139", x"00370087", x"00360051", x"00350035", x"00330022", x"00330015", x"00310009", x"00300000", x"002efff6", x"002dffec", x"002dffe1", x"002cffd4", x"002dffbd", x"0031ff92", x"0043fefb", x"ffa00000", x"00430121", x"00380086", x"00390059", x"003e0040", x"0043002e", x"0048001e", x"004d000f", x"00510000", x"0054ffed", x"0057ffd9", x"0057ffbf", x"0053ff9d", x"0047ff6b", x"0024ff0e", x"ff55fddd", x"074e0000", x"ff4201f9", x"001200cf", x"00310077", x"00380049", x"003a002e", x"0039001a", x"0037000c", x"00340000", x"0033fff4", x"0030ffe9", x"002effdd", x"002affcc", x"0027ffb6", x"001dff8a", x"ffeafefc", x"01c20000", x"ffeb00ed", x"00180061", x"001d0037", x"001e0023", x"001d0016", x"001d000d", x"001b0006", x"001a0000", x"0019fffa", x"0018fff3", x"0016ffed", x"0014ffe3", x"000effd4", x"ffffffb8", x"ff9dff5a", x"035a0000", x"ff9d00a6", x"ffff0047", x"000f002b", x"0014001c", x"00170013", x"0018000c", x"001a0006", x"001a0000", x"001bfffa", x"001dfff2", x"001effe9", x"001effdc", x"001effc7", x"0018ff9e", x"ffebff11", x"01c30000", x"ffea0103", x"001d0074", x"0027004a", x"002c0032", x"002e0023", x"00310016", x"0033000b", x"00350000", x"0037fff3", x"0039ffe5", x"003bffd1", x"003affb6", x"0031ff88", x"0013ff30", x"ff43fe06", x"074f0000", x"ff550222", x"002600f1", x"00490094", x"00530062", x"00570040", x"00580026", x"00560012", x"00520000", x"004efff0", x"0048ffe1", x"0044ffd1", x"003effc0", x"003affa6", x"0039ff79", x"0044fede", x"ffa00000", x"00440104", x"0031006d", x"002d0042", x"002d002c", x"002d001e", x"002e0013", x"002f0009", x"00310000", x"0032fff6", x"0034ffea", x"0035ffdd", x"0035ffcb", x"0037ffad", x"0038ff78", x"003efec6", x"fffa0000", x"003f0135", x"00370083", x"0034004d", x"00330033", x"00310020", x"002f0013", x"002d0009", x"002a0000", x"0028fff8", x"0027fff0", x"0025ffe9", x"0024ffde", x"0025ffcf", x"0029ffb0", x"0047ff47", x"ff220000", x"004900c9", x"002e005e", x"002d003f", x"0030002e", x"00350022", x"003a0018", x"003f000d", x"00450000", x"004afff1", x"004fffdf", x"0053ffc7", x"0055ffa7", x"0055ff75", x"004cff16", x"000dfddf", x"02840000", x"00060213", x"004600df", x"004d0081", x"004c0051", x"00480032", x"0045001e", x"003f000e", x"003a0000", x"0035fff6", x"0030ffed", x"002cffe3", x"0028ffd8", x"0025ffc8", x"0023ffac", x"0028ff4a", x"ffe60000", x"002500a7", x"001e0047", x"001d002b", x"001c001d", x"001d0014", x"001d000d", x"001d0006", x"001e0000", x"001ffffa", x"0020fff3", x"0020ffeb", x"0020ffdf", x"0020ffcc", x"001dffaa", x"0009ff36");
 begin
@@ -53,6 +56,10 @@ begin
 
         fdom_data_out => fdom_data,
         fdom_addr_out => fdom_addr,
+
+        state_debug => state_debug,
+        dft_done_debug => dft_done,
+        recomb_done_debug => recomb_done,
 
         clk => clk,
         start => start,

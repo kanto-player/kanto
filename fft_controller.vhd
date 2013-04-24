@@ -12,6 +12,10 @@ entity fft_controller is
           fdom_data_out : out signed(31 downto 0);
           fdom_addr_out : in unsigned(7 downto 0);
 
+          state_debug : out unsigned(2 downto 0);
+          dft_done_debug : out std_logic;
+          recomb_done_debug : out std_logic;
+
           clk : in std_logic;
           start : in std_logic;
           done : out std_logic);
@@ -65,6 +69,9 @@ architecture rtl of fft_controller is
     signal recomb_write : std_logic_vector(0 to 15);
     signal recomb_done : std_logic_vector(0 to 7);
 begin
+
+    dft_done_debug <= '1' when dft_done = x"ffff" else '0';
+    recomb_done_debug <= '1' when recomb_done = x"ff" else '0';
     
     FDOM_RAM : entity work.fft_fdom_ram port map (
         writedata => fdom_writedata,
@@ -190,35 +197,41 @@ begin
         if rising_edge(clk) then
             case control_state is
                 when idle =>
+                    state_debug <= "000";
                     if start = '1' then
                         control_state <= dftcomp;
                         dft_reset <= '1';
                     end if;
                 when dftcomp =>
+                    state_debug <= "001";
                     dft_reset <= '0';
                     if dft_done = x"ffff" then
                         control_state <= recomb1;
                         recomb_reset <= '1';
                     end if;
                 when recomb1 =>
+                    state_debug <= "010";
                     recomb_reset <= '0';
                     if recomb_done = x"ff" then
                         control_state <= recomb2;
                         recomb_reset <= '1';
                     end if;
                 when recomb2 =>
+                    state_debug <= "011";
                     recomb_reset <= '0';
                     if recomb_done = x"ff" then
                         control_state <= recomb3;
                         recomb_reset <= '1';
                     end if;
                 when recomb3 =>
+                    state_debug <= "100";
                     recomb_reset <= '0';
                     if recomb_done = x"ff" then
                         control_state <= recomb4;
                         recomb_reset <= '1';
                     end if;
                 when recomb4 =>
+                    state_debug <= "101";
                     recomb_reset <= '0';
                     if recomb_done = x"ff" then
                         control_state <= idle;
