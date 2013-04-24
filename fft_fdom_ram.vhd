@@ -7,9 +7,9 @@ use work.types_pkg.all;
 
 entity fft_fdom_ram is
     port (writedata : in complex_signed_array;
+          writeaddr : in nibble_array;
           readdata : out complex_signed_array;
           readaddr : in nibble_array;
-          writeaddr : in nibble_array;
           bigdata : out signed(31 downto 0);
           bigaddr : in unsigned(7 downto 0);
           write_en : in std_logic_vector(0 to 15);
