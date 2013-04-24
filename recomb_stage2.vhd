@@ -17,7 +17,6 @@ entity recomb_stage2 is
           odd_imag_out : out signed(15 downto 0);
           writein : in std_logic;
           writeout : out std_logic;
-          doneout : out std_logic;
           addrin : in unsigned(3 downto 0);
           addrout : out unsigned(3 downto 0));
 end recomb_stage2;
@@ -29,7 +28,6 @@ architecture rtl of recomb_stage2 is
     signal even_imag_mid : signed(15 downto 0);
     signal addrmid : unsigned(3 downto 0);
     signal writemid : std_logic;
-    signal donemid : std_logic;
 begin
     MULT : entity work.complex_mult port map (
         realx => odd_real_in,
@@ -46,14 +44,10 @@ begin
         if rising_edge(clk) then
             if reset = '1' then
                 writeout <= '0';
-                doneout <= '0';
                 writemid <= '0';
-                donemid <= '0';
             else
                 writemid <= writein;
                 writeout <= writemid;
-                donemid <= not writein;
-                doneout <= donemid;
                 addrmid <= addrin;
                 addrout <= addrmid;
                 even_real_mid <= even_real_in;

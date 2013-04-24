@@ -14,7 +14,6 @@ entity recomb_stage3 is
           
           addrin : in unsigned(3 downto 0);
           writein : in std_logic;
-          donein : std_logic;
 
           low_writeaddr : out unsigned(3 downto 0);
           low_writedata : out signed(31 downto 0);
@@ -56,10 +55,9 @@ begin
     begin
         if rising_edge(clk) then
             if reset = '1' then
-                done <= '0';
                 write_en <= '0';
             else
-                done <= donein;
+                done <= not writein;
                 write_en <= writein;
                 writeaddr <= addrin;
                 low_writedata <= low_sum_real & low_sum_imag;

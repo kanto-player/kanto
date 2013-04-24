@@ -32,7 +32,11 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            writeout <= running;
+            if reset = '1' then
+                writeout <= '0';
+            else
+                writeout <= running;
+            end if;
             if running = '1' then
                 addrout <= addr;
                 rom_real <= rom_data(31 downto 16);

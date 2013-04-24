@@ -35,7 +35,8 @@ architecture rtl of fft_recomb is
     signal addr_s23 : unsigned(3 downto 0);
     signal write_s12 : std_logic;
     signal write_s23 : std_logic;
-    signal done_s23 : std_logic;
+    signal pl_done : std_logic;
+    signal done_delay : unsigned(2 downto 0);
 begin
     S1 : entity work.recomb_stage1 port map (
         clk => clk,
@@ -82,7 +83,6 @@ begin
 
         writein => write_s12,
         writeout => write_s23,
-        doneout => done_s23,
         addrin => addr_s12,
         addrout => addr_s23
     );
@@ -90,7 +90,7 @@ begin
     S3 : entity work.recomb_stage3 port map (
         clk => clk,
         reset => reset,
-        done => done,
+        done => pl_done,
 
         even_real => even_real_s23,
         even_imag => even_imag_s23,
@@ -99,7 +99,6 @@ begin
 
         addrin => addr_s23,
         writein => write_s23,
-        donein => done_s23,
 
         low_writeaddr => low_writeaddr,
         low_writedata => low_writedata,
@@ -109,4 +108,17 @@ begin
         high_writedata => high_writedata,
         high_write_en => high_write_en
     );
+
+    done <= '1' when pl_done = '1' and done_delay = "111" else '0';
+
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if reset = '1' then
+                done_delay <= "000";
+            elsif done_delay /= "111" then
+                done_delay <= done_delay + "1";
+            end if;
+        end if;
+    end process;
 end rtl;
