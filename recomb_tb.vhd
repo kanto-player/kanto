@@ -61,7 +61,7 @@ entity recomb_tb is
 end recomb_tb;
 
 architecture sim of recomb_tb is
-    signal clk : std_logic := '1';
+    signal clk : std_logic := '0';
     signal reset : std_logic;
     signal done : std_logic;
     signal rom_addr : unsigned(3 downto 0);
@@ -126,15 +126,19 @@ begin
     process
         variable i : integer range 0 to 32;
     begin
+        wait for 10 ns;
         reset <= '1';
         wait for 20 ns;
         reset <= '0';
+        assert done = '0';
         wait for 80 ns;
         wait;
         while i < 16 loop
             wait for 10 ns;
             assert low_writedata = expected(i);
             assert high_writedata = expected(i + 16);
+            assert low_write_en = '1';
+            assert high_write_en = '1';
             wait for 10 ns;
             i := i + 1;
         end loop;
