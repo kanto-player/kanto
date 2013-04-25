@@ -74,13 +74,15 @@ architecture rtl of visualizer is
   signal counter 			: integer := 0;
   signal addr_counter   : integer := 0;
   signal sum_counter    : integer := 0;	
-  signal test_ones : std_logic_vector (15 downto 0) := "1011101111111110"; 
+  signal test_ones : std_logic_vector (15 downto 0) := "1111111111111111"; 
   signal test_zeros : std_logic_vector (15 downto 0) := "0000111111111111"; 
-  signal test_half : std_logic_vector (15 downto 0) := "0011111111111000";
+  signal test_half : std_logic_vector (15 downto 0) := "0111111111111111";
   
   -- reset stuff
   signal reset        : std_logic := '0'; -- resets the screen
 --  signal reset_data_test : std_logic :='1'; -- signal that new data is available: 1 when 
+-- test changing data
+  signal change : std_logic := '0';
 
   
 begin
@@ -94,58 +96,87 @@ begin
 		case state is
 			when A =>
 				if reset_data_test = '1' then
+                    sum <= ((others=>(others =>'0')));
+                    change<=not change;
 					reset <= '0';
+                    ledr15 <= '1';
+                    ledr16 <= '1';
+                    ledr17 <= '1';
 					state := B;
 				else 
 					state:= A;
+                    ledr15 <= '1';
+                    ledr16 <= '0';
+                    ledr17 <= '1';
+                    reset<='0';
 				end if;
 			when B =>
 				if addr_counter = 0 then
 					fft_fdom_addr <= to_unsigned(addr_counter,fft_fdom_addr'length);
 					addr_counter  <= addr_counter + 1;
+                    ledr15 <= '0';
+                    ledr16 <= '0';
+                    ledr17 <= '1';
 					state := B;
 				elsif addr_counter < 256 then
-					if addr_counter <= 16 then 
-						sum(0) <= std_logic_vector(unsigned(sum(0)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
-					elsif addr_counter <= 32 then 
-						sum(1) <= std_logic_vector(unsigned(sum(1)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
+					if addr_counter <= 16 then
+                          sum(0) <= std_logic_vector(unsigned(sum(0))+unsigned(fft_fdom_data(31 downto 16)));
+--                        if change='1' then
+--                            sum(0) <= std_logic_vector(unsigned(sum(0)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+--                        else
+--                            sum(0)<= std_logic_vector(unsigned(sum(0)) + unsigned(test_half));
+--                        end if;
+					elsif addr_counter <= 32 then
+                          sum(1) <= std_logic_vector(unsigned(sum(0))+unsigned(fft_fdom_data(31 downto 16)));
+--                        if change='1' then
+--                            sum(1) <= std_logic_vector(unsigned(sum(1)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
+--                        else
+--                            sum(1)<= std_logic_vector(unsigned(sum(1)) + unsigned(test_ones));
+--                        end if;
 					elsif addr_counter <= 48 then 
-						sum(2) <= std_logic_vector(unsigned(sum(2)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(2) <= std_logic_vector(unsigned(sum(2)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 64 then 
-						sum(3) <= std_logic_vector(unsigned(sum(3)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(3) <= std_logic_vector(unsigned(sum(3)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 80 then 
-						sum(4) <= std_logic_vector(unsigned(sum(4)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(4) <= std_logic_vector(unsigned(sum(4)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 96 then 
-						sum(5) <= std_logic_vector(unsigned(sum(5)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(5) <= std_logic_vector(unsigned(sum(5)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 112 then 
-						sum(6) <= std_logic_vector(unsigned(sum(6)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(6) <= std_logic_vector(unsigned(sum(6)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 128 then 
-						sum(7) <= std_logic_vector(unsigned(sum(7)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(7) <= std_logic_vector(unsigned(sum(7)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 144 then 
-						sum(8) <= std_logic_vector(unsigned(sum(8)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(8) <= std_logic_vector(unsigned(sum(8)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 160 then 
-						sum(9) <= std_logic_vector(unsigned(sum(9)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(9) <= std_logic_vector(unsigned(sum(9)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 176 then 
-						sum(10) <= std_logic_vector(unsigned(sum(10)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(10) <= std_logic_vector(unsigned(sum(10)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 192 then 
-						sum(11) <= std_logic_vector(unsigned(sum(11)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(11) <= std_logic_vector(unsigned(sum(11)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 208 then 
-						sum(12) <= std_logic_vector(unsigned(sum(12)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(12) <= std_logic_vector(unsigned(sum(12)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 224 then 
-						sum(13) <= std_logic_vector(unsigned(sum(13)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(13) <= std_logic_vector(unsigned(sum(13)) + unsigned(fft_fdom_data(31 downto 16)));
 					elsif addr_counter <= 240 then 
-						sum(14) <= std_logic_vector(unsigned(sum(14)) + unsigned(test_ones));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(14) <= std_logic_vector(unsigned(sum(14)) + unsigned(fft_fdom_data(31 downto 16)));
 					else
-						sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(test_half));--unsigned(fft_fdom_data(31 downto 16)));
+						sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(fft_fdom_data(31 downto 16)));
 					end if;
+                    ledr15 <= '0';
+                    ledr16 <= '0';
+                    ledr17 <= '0';
 					fft_fdom_addr <= to_unsigned(addr_counter,fft_fdom_addr'length);
 					addr_counter  <= addr_counter + 1;
 					state := B;
 				else
 					addr_counter <= 0;
-					reset <='1';
+					--reset <='1';
 					sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
 					state := A;
+                    ledr15 <= '0';
+                    ledr16 <= '1';
+                    ledr17 <= '0';
+                    
 				end if;
 			end case;
 		end if;
@@ -248,97 +279,97 @@ begin
 			rectangle<='0';
 		--division 1
 		elsif Hcount >= HSYNC+HBACK_PORCH AND Hcount<=HSYNC+HBACK_PORCH+bar_w then
-			if Vcount > VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(0)(19 downto 11))) then
+			if Vcount > VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(0)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 2
 		elsif Hcount>=HSYNC+HBACK_PORCH+bar_w AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*2) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(1)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(1)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 3
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*2) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*3) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(2)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(2)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 4
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*3) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*4) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(3)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(3)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 5
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*4) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*5) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(4)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(4)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 6
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*5) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*6) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(5)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(5)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 7
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*6) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*7) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(6)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(6)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 8
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*7) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*8) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(7)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(7)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 9
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*8) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*9) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(8)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(8)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 10
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*9) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*10) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(9)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(9)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 11
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*10) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*11) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(10)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(10)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 12
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*11) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*12) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(11)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(11)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 13
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*12) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*13) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(12)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(12)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 14
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*13) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*14) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(13)(19 downto 11))) then
+        elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*12) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*14) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(13)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 15
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*14) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*15) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(14)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(14)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 16
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*15) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*16) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(15)(19 downto 11))) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(sum(15)(19 downto 12))) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;

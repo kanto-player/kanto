@@ -223,8 +223,12 @@ architecture datapath of kanto is
     signal clk25 : std_logic := '0';
 	  
     signal master_reset_n : std_logic;
-
-    signal viz_reset : std_logic;
+    signal viz_reset : std_logic; 
+    
+    
+    -- visUALIZER reset testing
+    signal one_cycle_reset : std_logic := '0';
+    signal reset_counter : integer := 0;
 
 
     component de2_i2c_av_config is
@@ -240,6 +244,18 @@ begin
     if rising_edge(CLOCK_50) then
       clk25 <= not clk25;
     end if;
+  end process;
+  
+  process (clk25)
+  begin
+    if rising_edge(CLOCK_50) then
+    if reset_counter=2 or reset_counter=500000000 or reset_counter=1000000000 then
+        one_cycle_reset <= '1';
+     else 
+        one_cycle_reset <= '0';
+     end if;
+     reset_counter<=reset_counter+1;
+     end if;
   end process;
 
     LEDG(0) <= sd_ready;
@@ -381,7 +397,7 @@ begin
 		--clk   			=> main_clk,
 		    clk => clk25,
 --		reset_data		=> fft_done,
-        reset_data_test      => '1',
+        reset_data_test      => viz_reset,
 		fft_fdom_addr 	=> fft_fdom_addr,
 		fft_fdom_data 	=> fft_fdom_data,
 		VGA_CLK        => VGA_CLK,
