@@ -25,22 +25,23 @@ begin
     bigaddr_upper <= bigaddr(7 downto 4);
     bigaddr_lower <= bigaddr(3 downto 0);
 
-    bigdata <= bigdata_opt(0) when bigaddr_upper = 0 else
-               bigdata_opt(1) when bigaddr_upper = 1 else
-               bigdata_opt(2) when bigaddr_upper = 2 else
-               bigdata_opt(3) when bigaddr_upper = 3 else
-               bigdata_opt(4) when bigaddr_upper = 4 else
-               bigdata_opt(5) when bigaddr_upper = 5 else
-               bigdata_opt(6) when bigaddr_upper = 6 else
-               bigdata_opt(7) when bigaddr_upper = 7 else
-               bigdata_opt(8) when bigaddr_upper = 8 else
-               bigdata_opt(9) when bigaddr_upper = 9 else
-               bigdata_opt(10) when bigaddr_upper = 10 else
-               bigdata_opt(11) when bigaddr_upper = 11 else
-               bigdata_opt(12) when bigaddr_upper = 12 else
-               bigdata_opt(13) when bigaddr_upper = 13 else
-               bigdata_opt(14) when bigaddr_upper = 14 else
-               bigdata_opt(15) when bigaddr_upper = 15;
+    with bigaddr_upper select bigdata <=
+        bigdata_opt(0) when x"0",
+        bigdata_opt(1) when x"1",
+        bigdata_opt(2) when x"2",
+        bigdata_opt(3) when x"3",
+        bigdata_opt(4) when x"4",
+        bigdata_opt(5) when x"5",
+        bigdata_opt(6) when x"6",
+        bigdata_opt(7) when x"7",
+        bigdata_opt(8) when x"8",
+        bigdata_opt(9) when x"9",
+        bigdata_opt(10) when x"a",
+        bigdata_opt(11) when x"b",
+        bigdata_opt(12) when x"c",
+        bigdata_opt(13) when x"d",
+        bigdata_opt(14) when x"e",
+        bigdata_opt(15) when others;
     
     LUMAP : for i in 0 to 15 generate
         ROW : entity work.fft_fdom_ram_row port map (
