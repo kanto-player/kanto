@@ -22,8 +22,9 @@ entity audio_buffer is
           writedata : in signed(15 downto 0);
           write_en : in std_logic;
 
-          readaddr : in nibble_array;
-          readdata : out real_signed_array);
+          readaddr : in nibble_half_array;
+          readdata : out real_signed_array;
+          readsel : in std_logic);
 end audio_buffer;
 
 architecture rtl of audio_buffer is
@@ -50,8 +51,8 @@ begin
         end if;
     end process;
 
-    AURDGEN : for i in 0 to 15 generate
-        rfulladdr(i) <= (not wlr) & readaddr(i) & to_unsigned(i, 4);
+    AURDGEN : for i in 0 to 7 generate
+        rfulladdr(i) <= (not wlr) & readaddr(i) & to_unsigned(i, 3) & readsel;
         readdata(i) <= audio_ram(to_integer(rfulladdr(i)));
     end generate AURDGEN;
 

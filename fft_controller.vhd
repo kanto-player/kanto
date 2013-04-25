@@ -6,8 +6,9 @@ library work;
 use work.types_pkg.all;
 
 entity fft_controller is
-    port (tdom_data_in : in real_signed_array;
-          tdom_addr_in : out nibble_array;
+    port (tdom_data : in real_signed_array;
+          tdom_addr : out nibble_array;
+          tdom_addr_sel : out std_logic;
 
           fdom_data_out : out signed(31 downto 0);
           fdom_addr_out : in unsigned(7 downto 0);
@@ -31,15 +32,14 @@ architecture rtl of fft_controller is
     signal dft_rom_addr : byte_array;
     signal dft_out_data : complex_signed_array;
     signal dft_out_addr : nibble_array;
-    signal dft_out_write : std_logic_vector(0 to 15);
-    signal dft_done : std_logic_vector(0 to 15);
+    signal dft_out_write : std_logic_vector(0 to 7);
+    signal dft_out_sel : std_logic;
+    signal dft_done : std_logic_vector(0 to 7);
     signal dft_reset : std_logic;
     signal recomb_reset : std_logic;
-    type fft_reorder_type is array(0 to 15) of integer range 0 to 15; 
+    type fft_reorder_type is array(0 to 7) of integer range 0 to 15; 
     constant fft_reorder : fft_reorder_type := (0, 8, 4, 12, 
-                                                2, 10, 6, 14,
-                                                1, 9, 5, 13,
-                                                3, 11, 7, 15);
+                                                2, 10, 6, 14);
     type rc_reorder_type is array(0 to 15) of integer range 0 to 15;
     constant rc1_out_ro : rc_reorder_type := (0, 8, 1, 9, 2, 10, 3, 11,
                                               4, 12, 5, 13, 6, 14, 7, 15);
@@ -86,8 +86,8 @@ begin
 
     DFT_GEN : for i in 0 to 15 generate
         DFT : entity work.dft_top port map (
-            tdom_data => tdom_data_in(fft_reorder(i)),
-            tdom_addr => tdom_addr_in(fft_reorder(i)),
+            tdom_data => tdom_data(fft_reorder(i)),
+            tdom_addr => tdom_addr(fft_reorder(i)),
 
             clk => clk,
             reset => dft_reset,
@@ -200,7 +200,7 @@ begin
                 when dftcomp =>
                     if last_state /= dftcomp then
                         dft_reset <= '0';
-                    elsif dft_done = x"ffff" then
+                    elsif dft_done = x"ff" then
                         control_state <= recomb1;
                         recomb_reset <= '1';
                     end if;
