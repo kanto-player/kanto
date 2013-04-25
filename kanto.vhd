@@ -346,6 +346,7 @@ begin
         
         tdom_addr => fft_tdom_addr,
         tdom_data => fft_tdom_data,
+        tdom_sel => fft_tdom_sel,
         fdom_addr_out => fft_fdom_addr,
         fdom_data_out => fft_fdom_data
     );

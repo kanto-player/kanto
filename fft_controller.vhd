@@ -7,8 +7,8 @@ use work.types_pkg.all;
 
 entity fft_controller is
     port (tdom_data : in real_signed_array;
-          tdom_addr : out nibble_array;
-          tdom_addr_sel : out std_logic;
+          tdom_addr : out nibble_half_array;
+          tdom_sel : out std_logic;
 
           fdom_data_out : out signed(31 downto 0);
           fdom_addr_out : in unsigned(7 downto 0);
@@ -19,8 +19,8 @@ entity fft_controller is
 end fft_controller;
 
 architecture rtl of fft_controller is
-    type control_state_type is (idle, dftcomp, recomb1, 
-                                recomb2, recomb3, recomb4);
+    type control_state_type is (idle, dftcomp1, dftcomp2, 
+                                recomb1, recomb2, recomb3, recomb4);
     signal control_state : control_state_type;
     signal last_state : control_state_type;
     signal fdom_writedata : complex_signed_array;
@@ -38,8 +38,8 @@ architecture rtl of fft_controller is
     signal dft_reset : std_logic;
     signal recomb_reset : std_logic;
     type fft_reorder_type is array(0 to 7) of integer range 0 to 15; 
-    constant fft_reorder : fft_reorder_type := (0, 8, 4, 12, 
-                                                2, 10, 6, 14);
+    constant fft_reorder : fft_reorder_type := (0, 4, 2, 6, 
+                                                1, 5, 3, 7);
     type rc_reorder_type is array(0 to 15) of integer range 0 to 15;
     constant rc1_out_ro : rc_reorder_type := (0, 8, 1, 9, 2, 10, 3, 11,
                                               4, 12, 5, 13, 6, 14, 7, 15);
@@ -83,8 +83,10 @@ begin
         data => dft_rom_data,
         addr => dft_rom_addr
     );
+    
+    tdom_sel <= '1' when control_state = dftcomp2 else '0';
 
-    DFT_GEN : for i in 0 to 15 generate
+    DFT_GEN : for i in 0 to 7 generate
         DFT : entity work.dft_top port map (
             tdom_data => tdom_data(fft_reorder(i)),
             tdom_addr => tdom_addr(fft_reorder(i)),
@@ -103,21 +105,21 @@ begin
         
 
         with control_state select fdom_writedata(i) <=
-            dft_out_data(i) when dftcomp,
+            dft_out_data(i) when dftcomp1,
             recomb_writedata(rc1_out_ro(i)) when recomb1,
             recomb_writedata(rc2_out_ro(i)) when recomb2,
             recomb_writedata(rc3_out_ro(i)) when recomb3,
             recomb_writedata(i) when recomb4,
             (others => '0') when others;
         with control_state select fdom_writeaddr(i) <=
-            dft_out_addr(i) when dftcomp,
+            dft_out_addr(i) when dftcomp1,
             recomb_writeaddr(rc1_out_ro(i)) when recomb1,
             recomb_writeaddr(rc2_out_ro(i)) when recomb2,
             recomb_writeaddr(rc3_out_ro(i)) when recomb3,
             recomb_writeaddr(i) when recomb4,
             (others => '0') when others;
         with control_state select fdom_write_en(i) <=
-            dft_out_write(i) when dftcomp,
+            dft_out_write(i) when dftcomp1,
             recomb_write(rc1_out_ro(i)) when recomb1,
             recomb_write(rc2_out_ro(i)) when recomb2,
             recomb_write(rc3_out_ro(i)) when recomb3,
@@ -194,11 +196,18 @@ begin
             case control_state is
                 when idle =>
                     if start = '1' then
-                        control_state <= dftcomp;
+                        control_state <= dftcomp1;
                         dft_reset <= '1';
                     end if;
-                when dftcomp =>
-                    if last_state /= dftcomp then
+                when dftcomp1 =>
+                    if last_state /= dftcomp1 then
+                        dft_reset <= '0';
+                    elsif dft_done = x"ff" then
+                        control_state <= dftcomp2;
+                        dft_reset <= '1';
+                    end if;
+                when dftcomp2 =>
+                    if last_state /= dftcomp2 then
                         dft_reset <= '0';
                     elsif dft_done = x"ff" then
                         control_state <= recomb1;

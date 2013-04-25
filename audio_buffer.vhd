@@ -35,6 +35,7 @@ architecture rtl of audio_buffer is
     
     signal wlr : std_logic := '0'; -- writes leading reads
     signal wfulladdr : unsigned(8 downto 0);
+    type aud_addr_array is array(0 to 7) of unsigned(8 downto 0);
     signal rfulladdr : aud_addr_array;
     type ram_type is array(0 to 511) of signed(15 downto 0);
     signal audio_ram : ram_type;

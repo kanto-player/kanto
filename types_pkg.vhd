@@ -5,7 +5,6 @@ package types_pkg is
     type complex_signed_array is array (0 to 15) of signed(31 downto 0);
     type real_signed_array is array(0 to 15) of signed(15 downto 0);
     type byte_array is array(0 to 15) of unsigned(7 downto 0);
-    type aud_addr_array is array(0 to 15) of unsigned(8 downto 0);
     type nibble_array is array(0 to 15) of unsigned(3 downto 0);
     type nibble_half_array is array(0 to 7) of unsigned(3 downto 0);
     type complex_signed_half_array is array (0 to 7) of signed(31 downto 0);
