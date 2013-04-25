@@ -171,7 +171,7 @@ begin
 				else
 					addr_counter <= 0;
 					--reset <='1';
-					sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(test_zeros));--unsigned(fft_fdom_data(31 downto 16)));
+					sum(15) <= std_logic_vector(unsigned(sum(15)) + unsigned(fft_fdom_data(31 downto 16)));
 					state := A;
                     ledr15 <= '0';
                     ledr16 <= '1';
