@@ -73,7 +73,7 @@ architecture rtl of visualizer is
   signal index 	        : integer := 0;
   signal sram_base      : integer := 0;
   signal counter 	: integer := 0;
-  signal addr_counter   : unsigned := 0;
+  signal addr_counter   : unsigned(7 downto 0) := x"00";
   signal sum_counter    : integer := 0;	
   signal test_ones      : std_logic_vector (15 downto 0) := "1111111111111111"; 
   signal test_zeros     : std_logic_vector (15 downto 0) := "0000111111111111"; 
@@ -108,7 +108,7 @@ begin
 			end if;
 		    when B =>
 			if addr_counter = 0 then
-			    fft_fdom_addr <= to_unsigned(addr_counter,fft_fdom_addr'length);
+			    fft_fdom_addr <= addr_counter;
 			    addr_counter  <= addr_counter + 1;
                             ledr15 <= '0';
                             ledr16 <= '0';
@@ -116,28 +116,28 @@ begin
 			    state := B;
 			elsif addr_counter < 256 then
                           if fft_fdom_data(31) = '1' then
-                             sum(to_integer((addr_counter - 1)(7 downto 4))) <= sum(to_integer((addr_counter - 1)(7 downto 4)))
+                             sum(to_integer(addr_counter(7 downto 4))) <= sum(to_integer(addr_counter(7 downto 4)))
                                 + unsigned(not fft_fdom_data(30 downto 16));
 
-                          else sum(to_integer((addr_counter - 1)(7 downto 4))) <= sum(to_integer((addr_counter - 1)(7 downto 4)))
+                          else sum(to_integer(addr_counter(7 downto 4))) <= sum(to_integer(addr_counter(7 downto 4)))
                                 + unsigned(fft_fdom_data(30 downto 16));
 
                           end if;
                     ledr15 <= '0';
                     ledr16 <= '0';
                     ledr17 <= '0';
-					fft_fdom_addr <= to_unsigned(addr_counter,fft_fdom_addr'length);
+					fft_fdom_addr <= addr_counter;
 					addr_counter  <= addr_counter + 1;
 					state := B;
 				else
-					addr_counter <= 0;
+					addr_counter <= x"00";
 					state := A;
 
                           if fft_fdom_data(31) = '1' then
-                             sum(to_integer((addr_counter - 1)(7 downto 4))) <= sum(to_integer((addr_counter - 1)(7 downto 4)))
+                             sum(to_integer(addr_counter(7 downto 4))) <= sum(to_integer(addr_counter(7 downto 4)))
                                 + unsigned(not fft_fdom_data(30 downto 16));
 
-                          else sum(to_integer((addr_counter - 1)(7 downto 4))) <= sum(to_integer((addr_counter - 1)(7 downto 4)))
+                          else sum(to_integer(addr_counter(7 downto 4))) <= sum(to_integer(addr_counter(7 downto 4)))
                                 + unsigned(fft_fdom_data(30 downto 16));
 
                           end if;
@@ -331,7 +331,7 @@ begin
 			end if;
 		--division 15
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*14) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*15) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(unsigned(19 downto 12)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(14)(19 downto 12)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
