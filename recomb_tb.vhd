@@ -4,6 +4,9 @@ use ieee.numeric_std.all;
 
 entity recomb_test_memory is
     port (clk : in std_logic;
+          tb_addr : in unsigned(3 downto 0);
+          tb_lowdata : out signed(31 downto 0);
+          tb_highdata : out signed(31 downto 0);
           rom_addr : in unsigned(3 downto 0);
           rom_data : out signed(31 downto 0);
           low_readaddr : in unsigned(3 downto 0);
@@ -39,6 +42,8 @@ begin
     rom_data <= rom_mem(to_integer(rom_addr));
     low_readdata <= low_mem(to_integer(low_readaddr));
     high_readdata <= high_mem(to_integer(high_readaddr));
+    tb_lowdata <= low_mem(to_integer(tb_addr));
+    tb_highdata <= high_mem(to_integer(tb_addr));
 
     process (clk)
     begin
@@ -61,7 +66,7 @@ entity recomb_tb is
 end recomb_tb;
 
 architecture sim of recomb_tb is
-    signal clk : std_logic := '1';
+    signal clk : std_logic := '0';
     signal reset : std_logic;
     signal done : std_logic;
     signal rom_addr : unsigned(3 downto 0);
@@ -76,6 +81,9 @@ architecture sim of recomb_tb is
     signal high_readdata : signed(31 downto 0);
     signal high_writedata : signed(31 downto 0);
     signal high_write_en : std_logic;
+    signal tb_addr : unsigned(3 downto 0);
+    signal tb_lowdata : signed(31 downto 0);
+    signal tb_highdata : signed(31 downto 0);
     type expected_type is array(0 to 31) of signed(31 downto 0);
     constant expected : expected_type := 
         (x"183a3efa", x"fa67e825", x"0922136a", x"1e621a4d", 
@@ -100,7 +108,10 @@ begin
         high_readdata => high_readdata,
         high_writeaddr => high_writeaddr,
         high_writedata => high_writedata,
-        high_write_en => high_write_en
+        high_write_en => high_write_en,
+        tb_addr => tb_addr,
+        tb_lowdata => tb_lowdata,
+        tb_highdata => tb_highdata
     );
 
     RC : entity work.fft_recomb port map (
@@ -126,18 +137,24 @@ begin
     process
         variable i : integer range 0 to 32;
     begin
+        tb_addr <= x"0";
+        wait for 10 ns;
         reset <= '1';
         wait for 20 ns;
         reset <= '0';
         wait for 80 ns;
-        wait;
+        while done = '0' loop
+            wait for 20 ns;
+        end loop;
+
+        i := 0;
         while i < 16 loop
-            wait for 10 ns;
-            assert low_writedata = expected(i);
-            assert high_writedata = expected(i + 16);
-            wait for 10 ns;
+            tb_addr <= to_unsigned(i, 4);
+            wait for 20 ns;
+            assert tb_lowdata = expected(i);
+            assert tb_highdata = expected(i + 16);
             i := i + 1;
         end loop;
-        assert done = '1';
+        wait;
     end process;
 end sim;
