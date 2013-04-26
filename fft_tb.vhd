@@ -41,6 +41,11 @@ architecture sim of fft_tb is
     signal clk : std_logic := '0';
     signal start : std_logic;
     signal done : std_logic;
+    signal state_debug : std_logic_vector(3 downto 0);
+    signal dft_done_dbg : std_logic;
+    signal rc_done_dbg : std_logic;
+    signal dft_rst_dbg : std_logic;
+    signal rc_rst_dbg : std_logic;
     type rom_type is array(0 to 255) of signed(31 downto 0);
     constant expected : rom_type := (x"047f0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffff0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"014a0000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"ffff0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"03000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"02b50000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"ffff0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"0d7f0000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"02b50000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"03000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"014b0000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"ffff0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"047f0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffff0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"014a0000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"ffff0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"03000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"02b50000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"ffff0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"0d7f0000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"02b50000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"03000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"014b0000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"00000000", x"ffff0000", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff", x"ffffffff");
 begin
@@ -57,6 +62,11 @@ begin
 
         fdom_data_out => fdom_data,
         fdom_addr_out => fdom_addr,
+        state_debug => state_debug,
+        dft_done_dbg => dft_done_dbg,
+        rc_done_dbg => rc_done_dbg,
+        dft_rst_dbg => dft_rst_dbg,
+        rc_rst_dbg => rc_rst_dbg,
 
         clk => clk,
         start => start,
