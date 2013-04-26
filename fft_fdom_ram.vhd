@@ -78,20 +78,20 @@ begin
         double_writedata(i) <= writedata(i) when sel = "00" else
                                writedata(i - 4) when sel = "11" else
                                (others => '0');
-        double_writedata(i + 8) <= writedata(i) when sel = "01" else
+        double_writedata(i + 8) <= writedata(i) when sel(0) = '1' else
                                    (others => '0');
         double_writeaddr(i) <= writeaddr(i) when sel = "00" else
                                writeaddr(i - 4) when sel = "11" else
                                (others => '0');
-        double_writeaddr(i + 8) <= writeaddr(i) when sel = "01" else
+        double_writeaddr(i + 8) <= writeaddr(i) when sel(0) = '1' else
                                    (others => '0');
         double_write_en(i) <= write_en(i) when sel = "00" else
                               write_en(i - 4) when sel = "11" else '0';
-        double_write_en(i + 8) <= write_en(i) when sel = "01" else '0';
+        double_write_en(i + 8) <= write_en(i) when sel(0) = '1' else '0';
         double_readaddr(i) <= readaddr(i) when sel = "00" else
                               readaddr(i - 4) when sel = "11" else
                               (others => '0');
-        double_readaddr(i + 8) <= readaddr(i) when sel = "01" else
+        double_readaddr(i + 8) <= readaddr(i) when sel(0) = '1' else
                                   (others => '0');
         readdata(i) <= double_readdata(i) when sel = "00" else
                        double_readdata(i + 8) when sel(0) = '1' else
