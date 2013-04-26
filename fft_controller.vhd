@@ -7,7 +7,7 @@ use work.types_pkg.all;
 
 entity fft_controller is
     port (tdom_data : in real_signed_array;
-          tdom_addr : out nibble_half_array;
+          tdom_addr : out nibble_array;
           tdom_sel : out std_logic;
 
           fdom_data_out : out signed(31 downto 0);

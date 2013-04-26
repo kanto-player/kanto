@@ -185,7 +185,7 @@ architecture datapath of kanto is
 	signal fft_addr : std_logic_vector(17 downto 0);
 	signal fft_readdata : std_logic_vector(15 downto 0);
 	signal fft_start : std_logic;
-    signal fft_tdom_addr : nibble_half_array;
+    signal fft_tdom_addr : nibble_array;
     signal fft_tdom_data : real_signed_array;
     signal fft_tdom_sel : std_logic;
     signal fft_fdom_addr : unsigned(7 downto 0);

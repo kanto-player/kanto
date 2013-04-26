@@ -22,7 +22,7 @@ entity audio_buffer is
           writedata : in signed(15 downto 0);
           write_en : in std_logic;
 
-          readaddr : in nibble_half_array;
+          readaddr : in nibble_array;
           readdata : out real_signed_array;
           readsel : in std_logic);
 end audio_buffer;
