@@ -11,7 +11,6 @@ entity recomb_rom128 is
           sel : in std_logic);
 end recomb_rom128;
 
-
 architecture rtl of recomb_rom128 is
     type rom_type is array(0 to 127) of signed(31 downto 0);
     constant rom_data : rom_type :=

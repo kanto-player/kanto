@@ -86,8 +86,7 @@ begin
         double_writeaddr(i + 8) <= writeaddr(i) when sel = "01" else
                                    (others => '0');
         double_write_en(i) <= write_en(i) when sel = "00" else
-                              write_en(i - 4) when sel = "11" else
-                              (others => '0');
+                              write_en(i - 4) when sel = "11" else '0';
         double_write_en(i + 8) <= write_en(i) when sel = "01" else '0';
         double_readaddr(i) <= readaddr(i) when sel = "00" else
                               readaddr(i - 4) when sel = "11" else
@@ -96,18 +95,19 @@ begin
                                   (others => '0');
         readdata(i) <= double_readdata(i) when sel = "00" else
                        double_readdata(i + 8) when sel(0) = '1' else
-                       double_readdata(i + 4) when sel = "10";
+                       double_readdata(i + 4) when sel = "10" else
+                       (others => '0');
     end generate DOUBGEN_HIGH; 
     
     LUMAP : for i in 0 to 15 generate
         ROW : entity work.fft_fdom_ram_row port map (
             clk => clk,
             reset => reset,
-            writedata => writedata(i),
-            writeaddr => writeaddr(i),
-            write_en => write_en(i),
-            readdata => readdata(i),
-            readaddr => readaddr(i),
+            writedata => double_writedata(i),
+            writeaddr => double_writeaddr(i),
+            write_en => double_write_en(i),
+            readdata => double_readdata(i),
+            readaddr => double_readaddr(i),
             bigdata => bigdata_opt(i),
             bigaddr => bigaddr_lower
         );

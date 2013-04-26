@@ -28,7 +28,7 @@ architecture rtl of fft_controller is
     signal fdom_readdata : complex_signed_array;
     signal fdom_readaddr : nibble_array;
     signal fdom_writeaddr : nibble_array;
-    signal fdom_write_en : std_logic_vector(0 to 15);
+    signal fdom_write_en : std_logic_vector(0 to 7);
     signal fdom_sel : std_logic_vector(1 downto 0);
     signal dft_rom_data : complex_signed_array;
     signal dft_rom_addr : byte_array;
@@ -41,7 +41,7 @@ architecture rtl of fft_controller is
     type fft_reorder_type is array(0 to 7) of integer range 0 to 7; 
     constant fft_reorder : fft_reorder_type := (0, 4, 2, 6, 
                                                 1, 5, 3, 7);
-    type rc_reorder_type is array(0 to 15) of integer range 0 to 7;
+    type rc_reorder_type is array(0 to 7) of integer range 0 to 7;
     constant rc12_out_ro : rc_reorder_type := (0, 4, 1, 5, 2, 6, 3, 7);
     constant rc34_out_ro : rc_reorder_type := (0, 1, 4, 5, 2, 3, 6, 7);
     constant rc12_in_ro : rc_reorder_type := (0, 2, 4, 6, 1, 3, 5, 7);
@@ -56,7 +56,7 @@ architecture rtl of fft_controller is
     signal recomb_writedata : complex_signed_array;
     signal recomb_readaddr : nibble_array;
     signal recomb_readdata : complex_signed_array;
-    signal recomb_write : std_logic_vector(0 to 15);
+    signal recomb_write : std_logic_vector(0 to 7);
     signal recomb_done : std_logic_vector(0 to 7);
 begin
     
@@ -69,6 +69,7 @@ begin
         writeaddr => fdom_writeaddr,
         write_en => fdom_write_en,
         reset => dft_reset,
+        sel => fdom_sel,
         clk => clk
     );
 
@@ -133,7 +134,7 @@ begin
             (others => '0') when others;
     end generate DFT_GEN;
 
-    RECOMB_GEN : for i in 0 to 7 generate
+    RECOMB_GEN : for i in 0 to 3 generate
         RECOMB : entity work.fft_recomb port map (
             clk => clk,
             reset => recomb_reset,
@@ -144,11 +145,11 @@ begin
             low_readdata => recomb_readdata(i),
             low_writedata => recomb_writedata(i),
             low_write_en => recomb_write(i),
-            high_readaddr => recomb_readaddr(i + 8),
-            high_writeaddr => recomb_writeaddr(i + 8),
-            high_readdata => recomb_readdata(i + 8),
-            high_writedata => recomb_writedata(i + 8),
-            high_write_en => recomb_write(i + 8),
+            high_readaddr => recomb_readaddr(i + 4),
+            high_writeaddr => recomb_writeaddr(i + 4),
+            high_readdata => recomb_readdata(i + 4),
+            high_writedata => recomb_writedata(i + 4),
+            high_write_en => recomb_write(i + 4),
             done => recomb_done(i)
         );
     end generate RECOMB_GEN;
