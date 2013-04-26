@@ -102,13 +102,11 @@ begin
     );
     
     tdom_sel <= '1' when control_state = dftcomp2 else '0';
-    fdom_sel <= "11" when control_state = recomb8 else
-                "10" when control_state = recomb7 else
-                "01" when control_state = recomb6 or
-                          control_state = recomb4 or
-                          control_state = recomb2 or
-                          control_state = dftcomp2 else 
-                "00";
+    with control_state select fdom_sel <=
+        "11" when recomb8,
+        "10" when recomb7,
+        "01" when recomb6 | recomb4 | recomb2 | dftcomp2,
+        "00" when others;
 
     DFT_GEN : for i in 0 to 7 generate
         DFT : entity work.dft_top port map (
