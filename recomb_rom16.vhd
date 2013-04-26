@@ -18,7 +18,7 @@ architecture rtl of recomb_rom16 is
          x"00000000", x"e7080000", x"cf050000", x"b8e40000", 
          x"a57f0000", x"95940000", x"89c00000", x"82770000");
 begin
-    READGEN : for i in 0 to 7 generate
+    READGEN : for i in 0 to 3 generate
         data(i) <= rom_data(to_integer(addr(i)));
     end generate READGEN;
 end rtl;

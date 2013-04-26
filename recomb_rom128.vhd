@@ -7,7 +7,8 @@ use work.types_pkg.all;
 
 entity recomb_rom128 is
     port (addr : in nibble_half_array;
-          data : out complex_signed_half_array);
+          data : out complex_signed_half_array;
+          sel : in std_logic);
 end recomb_rom128;
 
 
@@ -46,11 +47,11 @@ architecture rtl of recomb_rom128 is
          x"85840000", x"84a40000", x"83d70000", x"831e0000", 
          x"82770000", x"81e40000", x"81640000", x"80f80000", 
          x"809f0000", x"805a0000", x"80290000", x"800b0000");
-    type int2addr_type is array(0 to 7) of unsigned(2 downto 0);
-    signal int2addr : int2addr_type;
+    type fulladdr_type is array(0 to 3) of unsigned(6 downto 0);
+    signal fulladdr : fulladdr_type;
 begin
-    READGEN : for i in 0 to 7 generate
-        int2addr(i) <= to_unsigned(i, 3);
-        data(i) <= rom_data(to_integer(int2addr(i) & addr(i)));
+    READGEN : for i in 0 to 3 generate
+        fulladdr(i) <= sel & to_unsigned(i, 2) & addr(i);
+        data(i) <= rom_data(to_integer(fulladdr(i)));
     end generate READGEN;
 end rtl;

@@ -20,7 +20,8 @@ end fft_controller;
 
 architecture rtl of fft_controller is
     type control_state_type is (idle, dftcomp1, dftcomp2, 
-                                recomb1, recomb2, recomb3, recomb4);
+                                recomb1, recomb2, recomb3, recomb4,
+                                recomb5, recomb6, recomb7, recomb8);
     signal control_state : control_state_type;
     signal last_state : control_state_type;
     signal fdom_writedata : complex_signed_array;
@@ -28,31 +29,23 @@ architecture rtl of fft_controller is
     signal fdom_readaddr : nibble_array;
     signal fdom_writeaddr : nibble_array;
     signal fdom_write_en : std_logic_vector(0 to 15);
+    signal fdom_sel : std_logic_vector(1 downto 0);
     signal dft_rom_data : complex_signed_array;
     signal dft_rom_addr : byte_array;
     signal dft_out_data : complex_signed_array;
     signal dft_out_addr : nibble_array;
     signal dft_out_write : std_logic_vector(0 to 7);
-    signal dft_out_sel : std_logic;
     signal dft_done : std_logic_vector(0 to 7);
     signal dft_reset : std_logic;
     signal recomb_reset : std_logic;
-    type fft_reorder_type is array(0 to 7) of integer range 0 to 15; 
+    type fft_reorder_type is array(0 to 7) of integer range 0 to 7; 
     constant fft_reorder : fft_reorder_type := (0, 4, 2, 6, 
                                                 1, 5, 3, 7);
-    type rc_reorder_type is array(0 to 15) of integer range 0 to 15;
-    constant rc1_out_ro : rc_reorder_type := (0, 8, 1, 9, 2, 10, 3, 11,
-                                              4, 12, 5, 13, 6, 14, 7, 15);
-    constant rc2_out_ro : rc_reorder_type := (0, 1, 8, 9, 2, 3, 10, 11,
-                                              4, 5, 12, 13, 6, 7, 14, 15);
-    constant rc3_out_ro : rc_reorder_type := (0, 1, 2, 3, 8, 9, 10, 11,
-                                              4, 5, 6, 7, 12, 13, 14, 15);
-    constant rc1_in_ro : rc_reorder_type := (0, 2, 4, 6, 8, 10, 12, 14,
-                                             1, 3, 5, 7, 9, 11, 13, 15);
-    constant rc2_in_ro : rc_reorder_type := (0, 1, 4, 5, 8, 9, 12, 13, 
-                                             2, 3, 6, 7, 10, 11, 14, 15);
-    constant rc3_in_ro : rc_reorder_type := (0, 1, 2, 3, 8, 9, 10, 11,
-                                             4, 5, 6, 7, 12, 13, 14, 15);
+    type rc_reorder_type is array(0 to 15) of integer range 0 to 7;
+    constant rc12_out_ro : rc_reorder_type := (0, 4, 1, 5, 2, 6, 3, 7);
+    constant rc34_out_ro : rc_reorder_type := (0, 1, 4, 5, 2, 3, 6, 7);
+    constant rc12_in_ro : rc_reorder_type := (0, 2, 4, 6, 1, 3, 5, 7);
+    constant rc34_in_ro : rc_reorder_type := (0, 1, 4, 5, 2, 3, 6, 7);
     signal rcrom16_data : complex_signed_half_array;
     signal rcrom32_data : complex_signed_half_array;
     signal rcrom64_data : complex_signed_half_array;
@@ -85,6 +78,13 @@ begin
     );
     
     tdom_sel <= '1' when control_state = dftcomp2 else '0';
+    fdom_sel <= "11" when control_state = recomb8 else
+                "10" when control_state = recomb7 else
+                "01" when control_state = recomb6 or
+                          control_state = recomb4 or
+                          control_state = recomb2 or
+                          control_state = dftcomp2 else 
+                "00";
 
     DFT_GEN : for i in 0 to 7 generate
         DFT : entity work.dft_top port map (
@@ -103,39 +103,33 @@ begin
             done => dft_done(i)
         );
         
-
         with control_state select fdom_writedata(i) <=
-            dft_out_data(i) when dftcomp1,
-            recomb_writedata(rc1_out_ro(i)) when recomb1,
-            recomb_writedata(rc2_out_ro(i)) when recomb2,
-            recomb_writedata(rc3_out_ro(i)) when recomb3,
-            recomb_writedata(i) when recomb4,
+            dft_out_data(i) when dftcomp1 | dftcomp2,
+            recomb_writedata(rc12_out_ro(i)) when recomb1 | recomb2,
+            recomb_writedata(rc34_out_ro(i)) when recomb3 | recomb4,
+            recomb_writedata(i) when recomb5 | recomb6 | recomb7 | recomb8,
             (others => '0') when others;
         with control_state select fdom_writeaddr(i) <=
-            dft_out_addr(i) when dftcomp1,
-            recomb_writeaddr(rc1_out_ro(i)) when recomb1,
-            recomb_writeaddr(rc2_out_ro(i)) when recomb2,
-            recomb_writeaddr(rc3_out_ro(i)) when recomb3,
-            recomb_writeaddr(i) when recomb4,
+            dft_out_addr(i) when dftcomp1 | dftcomp2,
+            recomb_writeaddr(rc12_out_ro(i)) when recomb1 | recomb2,
+            recomb_writeaddr(rc34_out_ro(i)) when recomb3 | recomb4,
+            recomb_writeaddr(i) when recomb5 | recomb6 | recomb7 | recomb8,
             (others => '0') when others;
         with control_state select fdom_write_en(i) <=
-            dft_out_write(i) when dftcomp1,
-            recomb_write(rc1_out_ro(i)) when recomb1,
-            recomb_write(rc2_out_ro(i)) when recomb2,
-            recomb_write(rc3_out_ro(i)) when recomb3,
-            recomb_write(i) when recomb4,
+            dft_out_write(i) when dftcomp1 | dftcomp2,
+            recomb_write(rc12_out_ro(i)) when recomb1 | recomb2,
+            recomb_write(rc34_out_ro(i)) when recomb3 | recomb4,
+            recomb_write(i) when recomb5 | recomb6 | recomb7 | recomb8,
             '0' when others;
         with control_state select fdom_readaddr(i) <=
-            recomb_readaddr(rc1_out_ro(i)) when recomb1,
-            recomb_readaddr(rc2_out_ro(i)) when recomb2,
-            recomb_readaddr(rc3_out_ro(i)) when recomb3,
-            recomb_readaddr(i) when recomb4,
+            recomb_readaddr(rc12_out_ro(i)) when recomb1 | recomb2,
+            recomb_readaddr(rc34_out_ro(i)) when recomb3 | recomb4,
+            recomb_readaddr(i) when recomb5 | recomb6 | recomb7 | recomb8,
             (others => '0') when others;
         with control_state select recomb_readdata(i) <=
-            fdom_readdata(rc1_in_ro(i)) when recomb1,
-            fdom_readdata(rc2_in_ro(i)) when recomb2,
-            fdom_readdata(rc3_in_ro(i)) when recomb3,
-            fdom_readdata(i) when recomb4,
+            fdom_readdata(rc12_in_ro(i)) when recomb1 | recomb2,
+            fdom_readdata(rc34_in_ro(i)) when recomb3 | recomb4,
+            fdom_readdata(i) when recomb5 | recomb6 | recomb7 | recomb8,
             (others => '0') when others;
     end generate DFT_GEN;
 
@@ -184,7 +178,8 @@ begin
 
     RCR128 : entity work.recomb_rom128 port map (
         addr => rcromcur_addr,
-        data => rcrom128_data
+        data => rcrom128_data,
+        sel => fdom_sel(0)
     );
 
     done <= '1' when control_state = idle else '0';
@@ -236,6 +231,34 @@ begin
                     end if;
                 when recomb4 =>
                     if last_state /= recomb4 then
+                        recomb_reset <= '0';
+                    elsif recomb_done = x"ff" then
+                        control_state <= recomb5;
+                        recomb_reset <= '1';
+                    end if;
+                when recomb5 =>
+                    if last_state /= recomb5 then
+                        recomb_reset <= '0';
+                    elsif recomb_done = x"ff" then
+                        control_state <= recomb6;
+                        recomb_reset <= '1';
+                    end if;
+                when recomb6 =>
+                    if last_state /= recomb6 then
+                        recomb_reset <= '0';
+                    elsif recomb_done = x"ff" then
+                        control_state <= recomb7;
+                        recomb_reset <= '1';
+                    end if;
+                when recomb7 =>
+                    if last_state /= recomb7 then
+                        recomb_reset <= '0';
+                    elsif recomb_done = x"ff" then
+                        control_state <= recomb8;
+                        recomb_reset <= '1';
+                    end if;
+                when recomb8 =>
+                    if last_state /= recomb8 then
                         recomb_reset <= '0';
                     elsif recomb_done = x"ff" then
                         control_state <= idle;
