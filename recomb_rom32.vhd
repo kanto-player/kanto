@@ -25,7 +25,7 @@ architecture rtl of recomb_rom32 is
     signal fulladdr : fulladdr_type;
 begin
     READGEN : for i in 0 to 3 generate
-        fulladdr(i) <= to_unsigned(i, 1) & addr(i);
+        fulladdr(i) <= to_unsigned(i, 2)(0) & addr(i);
         data(i) <= rom_data(to_integer(fulladdr(i)));
     end generate READGEN;
 end rtl;
