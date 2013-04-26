@@ -12,11 +12,6 @@ entity fft_controller is
 
           fdom_data_out : out signed(31 downto 0);
           fdom_addr_out : in unsigned(7 downto 0);
-          state_debug : out std_logic_vector(3 downto 0);
-          dft_done_dbg : out std_logic;
-          rc_done_dbg : out std_logic;
-          dft_rst_dbg : out std_logic;
-          rc_rst_dbg : out std_logic;
 
           clk : in std_logic;
           start : in std_logic;
@@ -65,24 +60,6 @@ architecture rtl of fft_controller is
     signal recomb_done : std_logic_vector(0 to 3);
 begin
 
-    with control_state select state_debug <=
-        x"0" when idle,
-        x"1" when dftcomp1,
-        x"2" when dftcomp2,
-        x"3" when recomb1,
-        x"4" when recomb2,
-        x"5" when recomb3,
-        x"6" when recomb4,
-        x"7" when recomb5,
-        x"8" when recomb6,
-        x"9" when recomb7,
-        x"a" when recomb8;
-
-    dft_done_dbg <= '1' when dft_done = x"ff" else '0';
-    rc_done_dbg <= '1' when recomb_done = x"f" else '0';
-    dft_rst_dbg <= dft_reset;
-    rc_rst_dbg <= recomb_reset;
-    
     FDOM_RAM : entity work.fft_fdom_ram port map (
         writedata => fdom_writedata,
         readdata => fdom_readdata,
