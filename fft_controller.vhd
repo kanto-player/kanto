@@ -176,9 +176,9 @@ begin
     end generate RECOMB_GEN;
 
     with control_state select rcromcur_data <=
-        rcrom16_data when recomb1,
-        rcrom32_data when recomb2,
-        rcrom64_data when recomb3,
+        rcrom16_data when recomb1 | recomb2,
+        rcrom32_data when recomb3 | recomb4,
+        rcrom64_data when recomb5 | recomb6,
         rcrom128_data when others;
 
     RCR16 : entity work.recomb_rom16 port map (
