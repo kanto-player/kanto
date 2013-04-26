@@ -68,7 +68,7 @@ begin
         readaddr => fdom_readaddr,
         writeaddr => fdom_writeaddr,
         write_en => fdom_write_en,
-        reset => dft_reset,
+        reset => start,
         sel => fdom_sel,
         clk => clk
     );
@@ -212,56 +212,56 @@ begin
                 when recomb1 =>
                     if last_state /= recomb1 then
                         recomb_reset <= '0';
-                    elsif recomb_done = x"ff" then
+                    elsif recomb_done = x"f" then
                         control_state <= recomb2;
                         recomb_reset <= '1';
                     end if;
                 when recomb2 =>
                     if last_state /= recomb2 then
                         recomb_reset <= '0';
-                    elsif recomb_done = x"ff" then
+                    elsif recomb_done = x"f" then
                         control_state <= recomb3;
                         recomb_reset <= '1';
                     end if;
                 when recomb3 =>
                     if last_state /= recomb3 then
                         recomb_reset <= '0';
-                    elsif recomb_done = x"ff" then
+                    elsif recomb_done = x"f" then
                         control_state <= recomb4;
                         recomb_reset <= '1';
                     end if;
                 when recomb4 =>
                     if last_state /= recomb4 then
                         recomb_reset <= '0';
-                    elsif recomb_done = x"ff" then
+                    elsif recomb_done = x"f" then
                         control_state <= recomb5;
                         recomb_reset <= '1';
                     end if;
                 when recomb5 =>
                     if last_state /= recomb5 then
                         recomb_reset <= '0';
-                    elsif recomb_done = x"ff" then
+                    elsif recomb_done = x"f" then
                         control_state <= recomb6;
                         recomb_reset <= '1';
                     end if;
                 when recomb6 =>
                     if last_state /= recomb6 then
                         recomb_reset <= '0';
-                    elsif recomb_done = x"ff" then
+                    elsif recomb_done = x"f" then
                         control_state <= recomb7;
                         recomb_reset <= '1';
                     end if;
                 when recomb7 =>
                     if last_state /= recomb7 then
                         recomb_reset <= '0';
-                    elsif recomb_done = x"ff" then
+                    elsif recomb_done = x"f" then
                         control_state <= recomb8;
                         recomb_reset <= '1';
                     end if;
                 when recomb8 =>
                     if last_state /= recomb8 then
                         recomb_reset <= '0';
-                    elsif recomb_done = x"ff" then
+                    elsif recomb_done = x"f" then
                         control_state <= idle;
                     end if;
             end case;
