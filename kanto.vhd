@@ -225,17 +225,6 @@ architecture datapath of kanto is
               i2c_sdat : inout std_logic);
     end component;
 begin
-  process (CLOCK_50)
-  begin
-    if rising_edge(CLOCK_50) then
-    if reset_counter=2 or reset_counter=1000000000 then
-        one_cycle_reset <= '1';
-     else 
-        one_cycle_reset <= '0';
-     end if;
-     reset_counter<=reset_counter+1;
-     end if;
-  end process;
 
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
@@ -334,7 +323,7 @@ begin
 	 VISUALIZER : entity work.visualizer port map(
 		--clk   			=> main_clk,
 		clk25 => clk25,
-        clk50 => CLOCK_50,
+        clk50 => main_clk,
         sum_debug => sum_debug,
         reset_data      => viz_reset,
 		fft_fdom_addr 	=> fft_fdom_addr,
