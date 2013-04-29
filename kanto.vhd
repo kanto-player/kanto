@@ -331,6 +331,7 @@ begin
     FFT : entity work.fft_controller port map (
         clk => main_clk,
         start => fft_start,
+        done => fft_done,
         
         tdom_addr => fft_tdom_addr,
         tdom_data => fft_tdom_data,
