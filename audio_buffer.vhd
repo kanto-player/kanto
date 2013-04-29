@@ -76,7 +76,6 @@ begin
                 counter_en <= '0';
                 audio_addr <= audio_addr + 1;
             elsif force_swap = '1' then
-                swapped <= '1';
                 audio_addr <= wlr & x"00";
                 wlr <= not wlr;
             end if;
