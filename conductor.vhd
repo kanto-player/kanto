@@ -23,6 +23,7 @@ architecture rtl of conductor is
                              playing, fft_end, block_end);
     signal state : conductor_state := initial; 
     signal fft_done_last : std_logic;
+    signal viz_counter : unsigned(9 downto 0);
 begin
     process (clk)
     begin
@@ -57,6 +58,7 @@ begin
                             state <= fft_end;
                         end if;
                     when fft_end =>
+                        viz_counter <= viz_counter + 1;
                         state <= playing;
                     when block_end =>
                         state <= playing;
@@ -71,5 +73,5 @@ begin
     sd_start <= '1' when state = trigger_fw or state = block_end or
                          state = force_swap else '0';
     fft_start <= '1' when state = block_end else '0';
-    viz_reset <= '1' when state = fft_end else '0';
+    viz_reset <= '1' when state = fft_end and viz_counter = 0 else '0';
 end rtl;
