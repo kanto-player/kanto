@@ -335,6 +335,7 @@ begin
 		--clk   			=> main_clk,
 		clk25 => clk25,
         clk50 => CLOCK_50,
+        sum_debug => sum_debug,
         reset_data      => viz_reset,
 		fft_fdom_addr 	=> fft_fdom_addr,
 		fft_fdom_data 	=> fft_fdom_data,
