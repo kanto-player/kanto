@@ -239,8 +239,8 @@ begin
 
     PLL : entity work.audpll port map (
         inclk0 => CLOCK_50,
-        c0 => main_clk,
-        c1 => aud_clk,
+        c0 => aud_clk,
+        c1 => main_clk,
         c2 => clk25
     );
     
