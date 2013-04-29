@@ -194,7 +194,6 @@ architecture datapath of kanto is
 	
 	signal main_clk : std_logic;
 	signal aud_clk : std_logic;
-	signal sdram_clk : std_logic;
 	signal start : std_logic;
 	 
 	-- inserted for SDC testing
@@ -214,13 +213,13 @@ architecture datapath of kanto is
     signal viz_reset : std_logic; 
     signal cond_err : std_logic;
     signal viz_test_data : unsigned (15 downto 0) := "1101101010011101"; 
+    signal sum_debug : std_logic_vector(7 downto 0);
     
     -- visUALIZER reset testing
     signal one_cycle_reset : std_logic := '0';
     signal reset_counter : integer := 0;
     signal fft_fdom_addr_t : unsigned(7 downto 0);
     signal fft_fdom_data_t : signed(31 downto 0);
-
 
     component de2_i2c_av_config is
         port (iclk : in std_logic;
@@ -237,27 +236,6 @@ begin
     end if;
   end process;
   
-  
-  
-  
---  process (CLOCK_50)
---  begin
---    if rising_edge(CLOCK_50) then
---        if reset_counter=25000000 then
---            one_cycle_reset <= '1';
---            reset_counter <= 0;
---            viz_test_data <= not viz_test_data;
---                LEDR(13) <= viz_test_data(15);
---        else 
---            one_cycle_reset <= '0';
---            LEDR(13) <= viz_test_data(15);
---     reset_counter<=reset_counter + 1;
---
---        end if;
---    -- viz_test_data <= viz_test_data + 1;
---     end if;
---  end process;
-
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
     LEDG(2) <= ab_play;
@@ -270,7 +248,7 @@ begin
         inclk0 => CLOCK_50,
         c0 => main_clk,
         c1 => aud_clk,
-        c2 => sdram_clk
+        c2 => clk25
     );
     
     AUD_XCK <= aud_clk;
@@ -360,15 +338,15 @@ begin
     );
     
 	 VISUALIZER : entity work.visualizer port map(
-		--clk   			=> main_clk,
 		clk25 => clk25,
         clk50 => CLOCK_50,
---		reset_data		=> fft_done,
-        --reset_data_test      => viz_reset,
-     --   test_data => viz_test_data,
         reset_data_test => one_cycle_reset,
 		fft_fdom_addr 	=> fft_fdom_addr_t,
 		fft_fdom_data 	=> fft_fdom_data_t,
+        sum_debug => sum_debug,
+        --reset_data      => viz_reset,
+		--fft_fdom_addr 	=> fft_fdom_addr,
+		--fft_fdom_data 	=> fft_fdom_data,
 		VGA_CLK        => VGA_CLK,
 		VGA_HS         => VGA_HS,
 		VGA_VS         => VGA_VS,
@@ -401,11 +379,19 @@ begin
         number => sd_state_debug(7 downto 4),
         display => HEX3
     );
+    
+    SS4 : entity work.sevenseg port map (
+        number => sum_debug(3 downto 0),
+        display => HEX4
+    );
+    
+    SS5 : entity work.sevenseg port map (
+        number => sum_debug(7 downto 4),
+        display => HEX5
+    );
 	 
     HEX7 <= (others => '1');
     HEX6 <= (others => '1');
-    HEX5 <= (others => '1');
-    HEX4 <= (others => '1');
 
     LEDG(7 downto 3) <= (others => '0');
     LEDR(12 downto 2) <= (others => '0');
