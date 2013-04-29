@@ -64,6 +64,6 @@ begin
     ab_force_swap <= '1' when state = force_swap else '0';
     sd_start <= '1' when state = trigger_fw or state = block_end or
                          state = force_swap else '0';
-    fft_start <= '1' when state = block_end or state = force_swap else '0';
+    fft_start <= '1' when state = block_end else '0';
     viz_reset <= '1' when state = fft_end else '0';
 end rtl;
