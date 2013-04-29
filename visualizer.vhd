@@ -96,7 +96,7 @@ begin
 		case state is
 		    when A =>
 			if reset_data_test = '1' then
-                            sum <= ((others=>(others =>'0')));
+                    sum <= ((others=>(others =>'0')));
 		            reset <= '0';
                             ledr15 <= '1';
                             ledr16 <= '1';
@@ -104,51 +104,54 @@ begin
 			    state := B;
 			else 
 			    state:= A;
-                            ledr15 <= '1';
-                            ledr16 <= '0';
-                            ledr17 <= '1';
+--                            ledr15 <= '0';
+--                            ledr16 <= '1';
+--                            ledr17 <= '1';
                             reset<='0';
 			end if;
 		    when B =>
-			if addr_counter = 0 then
+			if addr_counter = x"00" then
 			    fft_fdom_addr <= addr_counter;
 			    addr_counter  <= addr_counter + 1;
                             ledr15 <= '0';
                             ledr16 <= '0';
                             ledr17 <= '1';
 			    state := B;
-			elsif addr_counter < 256 then
-                          if fft_fdom_data(31) = '1' then
-                             sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
-                                + unsigned(not fft_fdom_data(30 downto 16));
+			else
+                if sum_counter<x"FF" then
+                    sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
+--                    if fft_fdom_data(31) = '1' then
+--                        sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
+--                                + unsigned(not fft_fdom_data(30 downto 16));
+--                    else sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
+--                                + unsigned(fft_fdom_data(30 downto 16));
 
-                          else sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
-                                + unsigned(fft_fdom_data(30 downto 16));
-
-                          end if;
-                    ledr15 <= '0';
+                    --end if;
+                    ledr15 <= '1';
                     ledr16 <= '0';
-                    ledr17 <= '0';
+                    ledr17 <= '1';
 					fft_fdom_addr <= addr_counter;
 					addr_counter  <= addr_counter + 1;
                     sum_counter <= sum_counter+1;
 					state := B;
-				else
+                else
 					addr_counter <= x"00";
                     sum_counter <= x"00";
 					state := A;
+                    sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
 
-                          if fft_fdom_data(31) = '1' then
-                             sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
-                                + unsigned(not fft_fdom_data(30 downto 16));
-
-                          else sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
-                                + unsigned(fft_fdom_data(30 downto 16));
-
-                          end if;
+--                    if fft_fdom_data(31) = '1' then
+--                             sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
+--                                + unsigned(not fft_fdom_data(30 downto 16));
+--
+--                    else sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
+--                                + unsigned(fft_fdom_data(30 downto 16));
+--
+--                    end if;
                     ledr15 <= '0';
                     ledr16 <= '1';
                     ledr17 <= '0';
+                  end if;
                     
 				end if;
 			end case;
