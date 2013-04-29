@@ -237,9 +237,9 @@ begin
   process (CLOCK_50)
   begin
     if rising_edge(CLOCK_50) then
-    if reset_counter=2 or reset_counter=500000000 or reset_counter=1000000000 then
+    if reset_counter=2 or reset_counter=1000000000 then
         one_cycle_reset <= '1';
-        LEDR(14)<='1';
+
      else 
         one_cycle_reset <= '0';
      end if;
@@ -344,8 +344,8 @@ begin
 		clk25 => clk25,
         clk50 => CLOCK_50,
 --		reset_data		=> fft_done,
-        reset_data_test      => viz_reset,
-        --reset_data_test => one_cycle_reset,
+        --reset_data_test      => viz_reset,
+        reset_data_test => one_cycle_reset,
 		fft_fdom_addr 	=> fft_fdom_addr,
 		fft_fdom_data 	=> fft_fdom_data,
 		VGA_CLK        => VGA_CLK,
