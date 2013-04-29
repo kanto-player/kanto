@@ -23,7 +23,7 @@ architecture rtl of conductor is
                              playing, fft_end, block_end);
     signal state : conductor_state := initial; 
     signal fft_done_last : std_logic;
-    signal viz_counter : unsigned(9 downto 0);
+    signal viz_counter : unsigned(7 downto 0) := (others => '0');
 begin
     process (clk)
     begin
@@ -32,6 +32,7 @@ begin
             
             if reset_n = '0' then
                 state <= initial;
+                viz_counter <= (others => '0');
             else
                 case state is
                     when initial =>
