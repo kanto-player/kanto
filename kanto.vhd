@@ -194,7 +194,6 @@ architecture datapath of kanto is
 	
 	signal main_clk : std_logic;
 	signal aud_clk : std_logic;
-	signal sdram_clk : std_logic;
 	signal start : std_logic;
 	 
 	-- inserted for SDC testing
@@ -227,20 +226,11 @@ architecture datapath of kanto is
               i2c_sdat : inout std_logic);
     end component;
 begin
-
-  process (CLOCK_50)
-  begin
-    if rising_edge(CLOCK_50) then
-      clk25 <= not clk25;
-    end if;
-  end process;
-  
   process (CLOCK_50)
   begin
     if rising_edge(CLOCK_50) then
     if reset_counter=2 or reset_counter=1000000000 then
         one_cycle_reset <= '1';
-
      else 
         one_cycle_reset <= '0';
      end if;
@@ -260,7 +250,7 @@ begin
         inclk0 => CLOCK_50,
         c0 => main_clk,
         c1 => aud_clk,
-        c2 => sdram_clk
+        c2 => clk25
     );
     
     AUD_XCK <= aud_clk;
