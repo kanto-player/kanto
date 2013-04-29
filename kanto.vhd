@@ -340,7 +340,8 @@ begin
     
 	 VISUALIZER : entity work.visualizer port map(
 		--clk   			=> main_clk,
-		    clk => clk25,
+		    clk25 => clk25,
+            clk50 => CLOCK_50,
 --		reset_data		=> fft_done,
         reset_data_test      => viz_reset,
 		fft_fdom_addr 	=> fft_fdom_addr,

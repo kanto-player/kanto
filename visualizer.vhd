@@ -14,7 +14,8 @@ use ieee.numeric_std.all;
 entity visualizer is
   
   port (
-    clk   : in std_logic;                    -- Should be 25.125 MHz
+    clk25   : in std_logic;                    -- Should be 25.125 MHz
+    clk50 : in std_logic;
     reset_data_test: in std_logic;
     fft_fdom_addr : out unsigned(7 downto 0);
     fft_fdom_data : in signed(31 downto 0);
@@ -74,8 +75,8 @@ architecture rtl of visualizer is
   signal sram_base      : integer := 0;
   signal counter 	: integer := 0;
   signal addr_counter   : unsigned(7 downto 0) := x"00";
-  signal sum_counter    : integer := 0;	
-  signal test_ones      : std_logic_vector (15 downto 0) := "1111111111111111"; 
+  signal sum_counter    : unsigned(7 downto 0) := x"00";
+  signal test_ones      : unsigned (15 downto 0) := "1111111111111111"; 
   signal test_zeros     : std_logic_vector (15 downto 0) := "0000111111111111"; 
   signal test_half      : std_logic_vector (15 downto 0) := "0111111111111111";
   
@@ -86,10 +87,12 @@ begin
 
   -- Horizontal and vertical counters
   
-  GetData : process (clk)
+  
+  
+  GetData : process (clk50)
   variable state : states := A;
   begin
-	if rising_edge(clk) then
+	if rising_edge(clk50) then
 		case state is
 		    when A =>
 			if reset_data_test = '1' then
@@ -116,10 +119,10 @@ begin
 			    state := B;
 			elsif addr_counter < 256 then
                           if fft_fdom_data(31) = '1' then
-                             sum(to_integer(addr_counter(7 downto 4))) <= sum(to_integer(addr_counter(7 downto 4)))
+                             sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
                                 + unsigned(not fft_fdom_data(30 downto 16));
 
-                          else sum(to_integer(addr_counter(7 downto 4))) <= sum(to_integer(addr_counter(7 downto 4)))
+                          else sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
                                 + unsigned(fft_fdom_data(30 downto 16));
 
                           end if;
@@ -128,16 +131,18 @@ begin
                     ledr17 <= '0';
 					fft_fdom_addr <= addr_counter;
 					addr_counter  <= addr_counter + 1;
+                    sum_counter <= sum_counter+1;
 					state := B;
 				else
 					addr_counter <= x"00";
+                    sum_counter <= x"00";
 					state := A;
 
                           if fft_fdom_data(31) = '1' then
-                             sum(to_integer(addr_counter(7 downto 4))) <= sum(to_integer(addr_counter(7 downto 4)))
+                             sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
                                 + unsigned(not fft_fdom_data(30 downto 16));
 
-                          else sum(to_integer(addr_counter(7 downto 4))) <= sum(to_integer(addr_counter(7 downto 4)))
+                          else sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
                                 + unsigned(fft_fdom_data(30 downto 16));
 
                           end if;
@@ -151,9 +156,9 @@ begin
 	--end if;
 end process GetData;
 
-  HCounter : process (clk)
+  HCounter : process (clk25)
   begin
-    if rising_edge(clk) then
+    if rising_edge(clk25) then
 			if reset = '1' then
 			  Hcount <= (others => '0');
 			elsif EndOfLine = '1' then
@@ -166,9 +171,9 @@ end process GetData;
 
   EndOfLine <= '1' when Hcount = HTOTAL - 1 else '0';
   
-  VCounter: process (clk)
+  VCounter: process (clk25)
   begin
-    if rising_edge(clk) then
+    if rising_edge(clk25) then
 			if reset = '1' then
 			  Vcount <= (others => '0');
 			elsif EndOfLine = '1' then
@@ -186,9 +191,9 @@ end process GetData;
 
   -- State machines to generate HSYNC, VSYNC, HBLANK, and VBLANK
 
-  HSyncGen : process (clk)
+  HSyncGen : process (clk25)
   begin
-    if rising_edge(clk) then
+    if rising_edge(clk25) then
 			if reset = '1' or EndOfLine = '1' then
 			  vga_hsync <= '1';
 			elsif Hcount = HSYNC - 1 then
@@ -197,9 +202,9 @@ end process GetData;
 		end if;
   end process HSyncGen;
   
-  HBlankGen : process (clk)
+  HBlankGen : process (clk25)
   begin
-    if rising_edge(clk) then
+    if rising_edge(clk25) then
 			if reset = '1' then
 			  vga_hblank <= '1';
 			elsif Hcount = HSYNC + HBACK_PORCH then
@@ -210,9 +215,9 @@ end process GetData;
 		end if;
   end process HBlankGen;
 
-  VSyncGen : process (clk)
+  VSyncGen : process (clk25)
   begin
-    if rising_edge(clk) then
+    if rising_edge(clk25) then
 			if reset = '1' then
 			  vga_vsync <= '1';
 			elsif EndOfLine ='1' then
@@ -225,9 +230,9 @@ end process GetData;
     end if;
   end process VSyncGen;
 
-  VBlankGen : process (clk)
+  VBlankGen : process (clk25)
   begin
-    if rising_edge(clk) then   
+    if rising_edge(clk25) then   
 			if reset = '1' then
 			  vga_vblank <= '1';
 			elsif EndOfLine = '1' then
@@ -240,9 +245,9 @@ end process GetData;
     end if;
   end process VBlankGen;
 
-RectangleGen: process (clk)
+RectangleGen: process (clk25)
 begin
-	if rising_edge(clk) then
+	if rising_edge(clk25) then
 		if reset='1' then
 			rectangle<='0';
 		--division 1
@@ -349,13 +354,13 @@ end process RectangleGen;
 
   -- Registered video signals going to the video DAC
 
-  VideoOut: process (clk, reset)
+  VideoOut: process (clk25, reset)
   begin
 		 if reset = '1' then
 			VGA_R <= "0000000000";
 			VGA_G <= "1111111111";
 			VGA_B <= "0000000000";
-		 elsif clk'event and clk = '1' then
+		 elsif clk25'event and clk25 = '1' then
 			if rectangle = '1' then
 			VGA_R <= "0000000000";
 			VGA_G <= "1111111111";
@@ -372,7 +377,7 @@ end process RectangleGen;
 		 end if;
   end process VideoOut;
 
-  VGA_CLK <= clk;
+  VGA_CLK <= clk25;
   VGA_HS <= not vga_hsync;
   VGA_VS <= not vga_vsync;
   VGA_SYNC <= '0';
