@@ -228,13 +228,6 @@ architecture datapath of kanto is
               i2c_sdat : inout std_logic);
     end component;
 begin
-
-  process (CLOCK_50)
-  begin
-    if rising_edge(CLOCK_50) then
-      clk25 <= not clk25;
-    end if;
-  end process;
   
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
@@ -331,7 +324,7 @@ begin
     );
     
     VIZ_ROM_TEST : entity work.viz_test_rom port map (
-        clk50 => CLOCK_50,
+        clk50 => main_clk,
         reset_data_test => one_cycle_reset,
         fft_fdom_addr  => fft_fdom_addr_t,
         fft_fdom_data => fft_fdom_data_t
@@ -339,8 +332,8 @@ begin
     
 	 VISUALIZER : entity work.visualizer port map(
 		clk25 => clk25,
-        clk50 => CLOCK_50,
-        reset_data_test => one_cycle_reset,
+        clk50 => main_clk,
+        reset_data => one_cycle_reset,
 		fft_fdom_addr 	=> fft_fdom_addr_t,
 		fft_fdom_data 	=> fft_fdom_data_t,
         sum_debug => sum_debug,
