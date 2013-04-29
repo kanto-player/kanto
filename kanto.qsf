@@ -89,13 +89,6 @@ set_global_assignment -name EDA_TEST_BENCH_NAME fdom_ram_tb -section_id eda_simu
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id fdom_ram_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "100 ns" -section_id fdom_ram_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME fdom_ram_tb -section_id fdom_ram_tb
-set_global_assignment -name IP_TOOL_NAME ALTPLL -qip audpll.qip
-set_global_assignment -name IP_TOOL_VERSION 12.1 -qip audpll.qip
-set_global_assignment -name MISC_FILE audpll.cmp -qip audpll.qip
-set_global_assignment -name MISC_FILE audpll.ppf -qip audpll.qip
-set_global_assignment -name IP_TOOL_NAME LPM_MULT -qip mult.qip
-set_global_assignment -name IP_TOOL_VERSION 12.1 -qip mult.qip
-set_global_assignment -name MISC_FILE mult.cmp -qip mult.qip
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_location_assignment PIN_N25 -to SW[0]
