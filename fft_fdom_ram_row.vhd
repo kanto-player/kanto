@@ -27,22 +27,7 @@ begin
     begin
         if rising_edge(clk) then
             if reset = '1' then
-                ram_data(0) <= (others => '0');
-                ram_data(1) <= (others => '0');
-                ram_data(2) <= (others => '0');
-                ram_data(3) <= (others => '0');
-                ram_data(4) <= (others => '0');
-                ram_data(5) <= (others => '0');
-                ram_data(6) <= (others => '0');
-                ram_data(7) <= (others => '0');
-                ram_data(8) <= (others => '0');
-                ram_data(9) <= (others => '0');
-                ram_data(10) <= (others => '0');
-                ram_data(11) <= (others => '0');
-                ram_data(12) <= (others => '0');
-                ram_data(13) <= (others => '0');
-                ram_data(14) <= (others => '0');
-                ram_data(15) <= (others => '0');
+                ram_data <= (others => (others => '0'));
             elsif write_en = '1' then
                 ram_data(to_integer(writeaddr)) <= writedata;
             end if;
