@@ -187,6 +187,7 @@ architecture datapath of kanto is
 	signal fft_start : std_logic;
     signal fft_tdom_addr : nibble_array;
     signal fft_tdom_data : real_signed_array;
+    signal fft_tdom_sel : std_logic;
     signal fft_fdom_addr : unsigned(7 downto 0);
     signal fft_fdom_data : signed(31 downto 0);
 	signal fft_done      : std_logic;
@@ -196,10 +197,6 @@ architecture datapath of kanto is
 	signal sdram_clk : std_logic;
 	signal start : std_logic;
 	 
-	signal dft_test_reset : std_logic;
-	signal dft_test_addr : unsigned(3 downto 0);
-	signal dft_test_data : signed(31 downto 0);
-	  
 	-- inserted for SDC testing
 	signal sd_start : std_logic;
 	signal sd_ready : std_logic;
@@ -212,16 +209,7 @@ architecture datapath of kanto is
     signal sd_writeaddr : unsigned(7 downto 0);
     signal sd_write_en : std_logic;
 	  
-	-- signals for sram controller testing
-	signal sram_test_reset : std_logic;
-	signal sram_test_readdata 	: std_logic_vector(15 downto 0);
-	signal sram_test_writedata 	: std_logic_vector(15 downto 0);
-	signal sram_test_addr 			: std_logic_vector(17 downto 0);
-	signal sram_test_write 		: std_logic;
-	signal sram_test_req 			: std_logic;
-	signal sram_test_ack			: std_logic;
     signal clk25 : std_logic := '0';
-	  
     signal master_reset_n : std_logic;
     signal viz_reset : std_logic; 
     
@@ -313,7 +301,8 @@ begin
         write_en => sd_write_en,
         
         readdata => fft_tdom_data,
-        readaddr => fft_tdom_addr
+        readaddr => fft_tdom_addr,
+        readsel => fft_tdom_sel
     );
 
     SDC : entity work.sd_controller port map (
@@ -342,57 +331,13 @@ begin
         clk => main_clk,
         start => fft_start,
         
-        tdom_addr_in => fft_tdom_addr,
-        tdom_data_in => fft_tdom_data,
+        tdom_addr => fft_tdom_addr,
+        tdom_data => fft_tdom_data,
+        tdom_sel => fft_tdom_sel,
         fdom_addr_out => fft_fdom_addr,
         fdom_data_out => fft_fdom_data
     );
     
-    DFT_TEST : entity work.dft_test_setup port map (
-        clk => main_clk,
-        reset => dft_test_reset,
-        read_data => dft_test_data,
-        read_addr => dft_test_addr
-    );
-	 
-	 SRAMCTRL_TEST : entity work.sram_controller port map (
-		clk => main_clk,
-		reset => sram_test_reset,
-		SRAM_ADDR_out => SRAM_ADDR,
-		SRAM_CE_N_out => SRAM_CE_N,
-		SRAM_DQ_inout => SRAM_DQ,
-		SRAM_OE_N_out => SRAM_OE_N,
-		SRAM_WE_N_out => SRAM_WE_N,
-
-		sd_readdata => sram_test_readdata,
-		sd_writedata => sram_test_writedata,
-		sd_addr => sram_test_addr,
-		sd_write => sram_test_write,
-		sd_ack => sram_test_ack,
-		sd_req => sram_test_req,
-			
-		fft_readdata => sram_test_readdata,
-		fft_writedata => sram_test_writedata,
-		fft_addr => sram_test_addr,
-		fft_write => sram_test_write,
-		fft_ack => sram_test_ack,
-		fft_req => sram_test_req,
-		
-		ab_readdata => sram_test_readdata,
-		ab_writedata => sram_test_writedata,
-		ab_addr => sram_test_addr,
-		ab_write => sram_test_write,
-		ab_ack => sram_test_ack,
-		ab_req => sram_test_req,
-		
-		viz_readdata => sram_test_readdata,
-		viz_writedata => sram_test_writedata,
-		viz_addr => sram_test_addr,
-		viz_write => sram_test_write,
-		viz_ack => sram_test_ack,
-		viz_req => sram_test_req
-	 );
-	 
 	 VISUALIZER : entity work.visualizer port map(
 		--clk   			=> main_clk,
 		    clk => clk25,
@@ -463,6 +408,14 @@ begin
     DRAM_BA_1 <= '0';
     DRAM_CLK <= '0';
     DRAM_CKE <= '0';
+
+    SRAM_DQ <= (others => 'Z');
+    SRAM_ADDR <= (others => '0');
+    SRAM_UB_N <= '1';
+    SRAM_LB_N <= '1';
+    SRAM_CE_N <= '1';
+    SRAM_WE_N <= '1';
+    SRAM_OE_N <= '1';
 
     FL_ADDR <= (others => '0');
     FL_WE_N <= '1';

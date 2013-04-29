@@ -21,11 +21,11 @@ architecture rtl of recomb_rom32 is
          x"cf050000", x"c3aa0000", x"b8e40000", x"aecd0000", 
          x"a57f0000", x"9d0f0000", x"95940000", x"8f1f0000", 
          x"89c00000", x"85840000", x"82770000", x"809f0000");
-    type int2addr_type is array(0 to 7) of unsigned(0 downto 0);
-    signal int2addr : int2addr_type;
+    type fulladdr_type is array(0 to 3) of unsigned(4 downto 0);
+    signal fulladdr : fulladdr_type;
 begin
-    READGEN : for i in 0 to 7 generate
-        int2addr(i) <= to_unsigned(i, 3)(0 downto 0);
-        data(i) <= rom_data(to_integer(int2addr(i) & addr(i)));
+    READGEN : for i in 0 to 3 generate
+        fulladdr(i) <= to_unsigned(i, 2)(0) & addr(i);
+        data(i) <= rom_data(to_integer(fulladdr(i)));
     end generate READGEN;
 end rtl;

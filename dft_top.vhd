@@ -28,7 +28,23 @@ architecture rtl of dft_top is
     signal s2_done : std_logic;
     signal s2_res_real : signed(31 downto 0);
     signal s2_res_imag : signed(31 downto 0);
+
+    signal s3_done : std_logic;
+    signal done_delay : unsigned(2 downto 0);
 begin
+    done <= '1' when s3_done = '1' and done_delay = "111" else '0';
+    
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if reset = '1' then
+                done_delay <= "000";
+            elsif done_delay /= "111" then
+                done_delay <= done_delay + "1";
+            end if;
+        end if;
+    end process;
+   
     S1 : entity work.dft_stage1 port map (
         tdom_data => tdom_data,
         tdom_addr => tdom_addr,
@@ -74,7 +90,7 @@ begin
         reset => reset,
 
         indone => s2_done,
-        outdone => done,
+        outdone => s3_done,
         inwrite => s2_write,
         outwrite => fdom_write,
         k => s2_k,

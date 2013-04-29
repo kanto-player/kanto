@@ -7,7 +7,8 @@ use work.types_pkg.all;
 
 entity fft_tdom_test_rom is
     port (tdom_addr : in nibble_array;
-          tdom_data : out real_signed_array);
+          tdom_data : out real_signed_array;
+          tdom_sel : in std_logic);
 end fft_tdom_test_rom;
 
 architecture rtl of fft_tdom_test_rom is
@@ -15,8 +16,8 @@ architecture rtl of fft_tdom_test_rom is
     constant rom_data : rom_type := (x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000", x"7fff", x"0000", x"8001", x"0000");
     signal full_addr : byte_array;
 begin
-    ADDRGEN : for i in 0 to 15 generate
-        full_addr(i) <= tdom_addr(i) & to_unsigned(i, 4);
+    ADDRGEN : for i in 0 to 7 generate
+        full_addr(i) <= tdom_addr(i) & to_unsigned(i, 3) & tdom_sel;
         tdom_data(i) <= rom_data(to_integer(full_addr(i)));
     end generate ADDRGEN;
 end rtl;
@@ -34,6 +35,7 @@ end fft_tb;
 architecture sim of fft_tb is
     signal tdom_addr : nibble_array;
     signal tdom_data : real_signed_array;
+    signal tdom_sel : std_logic;
     signal fdom_addr : unsigned(7 downto 0);
     signal fdom_data : signed(31 downto 0);
     signal clk : std_logic := '0';
@@ -44,12 +46,14 @@ architecture sim of fft_tb is
 begin
     TESTROM : entity work.fft_tdom_test_rom port map (
         tdom_addr => tdom_addr,
-        tdom_data => tdom_data
+        tdom_data => tdom_data,
+        tdom_sel => tdom_sel
     );
 
     FFT : entity work.fft_controller port map (
-        tdom_data_in => tdom_data,
-        tdom_addr_in => tdom_addr,
+        tdom_data => tdom_data,
+        tdom_addr => tdom_addr,
+        tdom_sel => tdom_sel,
 
         fdom_data_out => fdom_data,
         fdom_addr_out => fdom_addr,

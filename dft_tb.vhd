@@ -47,6 +47,12 @@ begin
             wait for 10 ns;
             i := i + 1;
         end loop;
+
+        reset <= '1';
+        wait for 20 ns;
+        reset <= '0';
+        wait for 20 ns;
+        assert done = '0';
         wait;
     end process;
 end sim;
