@@ -19,6 +19,7 @@ entity visualizer is
     reset_data_test: in std_logic;
     fft_fdom_addr : out unsigned(7 downto 0);
     fft_fdom_data : in signed(31 downto 0);
+    test_data     :   in unsigned (15 downto 0); 
 	 
     ledr17 : out std_logic;
     ledr16 : out std_logic;
@@ -119,7 +120,8 @@ begin
 			    state := B;
 			else
                 if sum_counter<x"FF" then
-                    sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
+                    sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_data;
+--                    sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
 --                    if fft_fdom_data(31) = '1' then
 --                        sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))
 --                                + unsigned(not fft_fdom_data(30 downto 16));
@@ -138,7 +140,7 @@ begin
 					addr_counter <= x"00";
                     sum_counter <= x"00";
 					state := A;
-                    sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
+                    sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_data;
 
 --                    if fft_fdom_data(31) = '1' then
 --                             sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4)))

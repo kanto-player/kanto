@@ -213,7 +213,7 @@ architecture datapath of kanto is
     signal master_reset_n : std_logic;
     signal viz_reset : std_logic; 
     signal cond_err : std_logic;
-    
+    signal viz_test_data : unsigned (15 downto 0) := (others =>'0'); 
     
     -- visUALIZER reset testing
     signal one_cycle_reset : std_logic := '0';
@@ -235,16 +235,24 @@ begin
     end if;
   end process;
   
+  
+  
+  
   process (CLOCK_50)
   begin
     if rising_edge(CLOCK_50) then
-    if reset_counter=2 or reset_counter=1000000000 then
-        one_cycle_reset <= '1';
+        if reset_counter=125000000 then
+            one_cycle_reset <= '1';
+            reset_counter <= 0;
+            viz_test_data <= not viz_test_data;
+                LEDR(13) <= viz_test_data(15);
+        else 
+            one_cycle_reset <= '0';
+            LEDR(13) <= viz_test_data(15);
+     reset_counter<=reset_counter + 1;
 
-     else 
-        one_cycle_reset <= '0';
-     end if;
-     reset_counter<=reset_counter+1;
+        end if;
+    -- viz_test_data <= viz_test_data + 1;
      end if;
   end process;
 
@@ -348,6 +356,7 @@ begin
         clk50 => CLOCK_50,
 --		reset_data		=> fft_done,
         --reset_data_test      => viz_reset,
+        test_data => viz_test_data,
         reset_data_test => one_cycle_reset,
 		fft_fdom_addr 	=> fft_fdom_addr,
 		fft_fdom_data 	=> fft_fdom_data,
@@ -390,7 +399,7 @@ begin
     HEX4 <= (others => '1');
 
     LEDG(7 downto 3) <= (others => '0');
-    LEDR(13 downto 2) <= (others => '0');
+    LEDR(12 downto 2) <= (others => '0');
     
     LCD_ON   <= '1';
     LCD_BLON <= '1';
