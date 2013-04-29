@@ -234,11 +234,12 @@ begin
     end if;
   end process;
   
-  process (clk25)
+  process (CLOCK_50)
   begin
     if rising_edge(CLOCK_50) then
     if reset_counter=2 or reset_counter=500000000 or reset_counter=1000000000 then
         one_cycle_reset <= '1';
+        LEDR(14)<='1';
      else 
         one_cycle_reset <= '0';
      end if;
@@ -340,10 +341,11 @@ begin
     
 	 VISUALIZER : entity work.visualizer port map(
 		--clk   			=> main_clk,
-		    clk25 => clk25,
-            clk50 => CLOCK_50,
+		clk25 => clk25,
+        clk50 => CLOCK_50,
 --		reset_data		=> fft_done,
         reset_data_test      => viz_reset,
+        --reset_data_test => one_cycle_reset,
 		fft_fdom_addr 	=> fft_fdom_addr,
 		fft_fdom_data 	=> fft_fdom_data,
 		VGA_CLK        => VGA_CLK,
@@ -385,7 +387,7 @@ begin
     HEX4 <= (others => '1');
 
     LEDG(7 downto 3) <= (others => '0');
-    LEDR(14 downto 2) <= (others => '0');
+    LEDR(13 downto 2) <= (others => '0');
     
     LCD_ON   <= '1';
     LCD_BLON <= '1';
