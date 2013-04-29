@@ -45,10 +45,10 @@ begin
                     when force_swap =>
                         state <= playing;
                     when playing =>
-                        if fft_done_last = '0' and fft_done = '1' then
-                            state <= fft_end;
-                        elsif ab_swapped = '1' then
+                        if ab_swapped = '1' then
                             state <= block_end;
+                        elsif fft_done_last = '0' and fft_done = '1' then
+                            state <= fft_end;
                         end if;
                     when fft_end =>
                         state <= playing;
