@@ -213,11 +213,13 @@ architecture datapath of kanto is
     signal master_reset_n : std_logic;
     signal viz_reset : std_logic; 
     signal cond_err : std_logic;
-    signal viz_test_data : unsigned (15 downto 0) := (others =>'0'); 
+    signal viz_test_data : unsigned (15 downto 0) := "1101101010011101"; 
     
     -- visUALIZER reset testing
     signal one_cycle_reset : std_logic := '0';
     signal reset_counter : integer := 0;
+    signal fft_fdom_addr_t : unsigned(7 downto 0);
+    signal fft_fdom_data_t : signed(31 downto 0);
 
 
     component de2_i2c_av_config is
@@ -238,23 +240,23 @@ begin
   
   
   
-  process (CLOCK_50)
-  begin
-    if rising_edge(CLOCK_50) then
-        if reset_counter=125000000 then
-            one_cycle_reset <= '1';
-            reset_counter <= 0;
-            viz_test_data <= not viz_test_data;
-                LEDR(13) <= viz_test_data(15);
-        else 
-            one_cycle_reset <= '0';
-            LEDR(13) <= viz_test_data(15);
-     reset_counter<=reset_counter + 1;
-
-        end if;
-    -- viz_test_data <= viz_test_data + 1;
-     end if;
-  end process;
+--  process (CLOCK_50)
+--  begin
+--    if rising_edge(CLOCK_50) then
+--        if reset_counter=25000000 then
+--            one_cycle_reset <= '1';
+--            reset_counter <= 0;
+--            viz_test_data <= not viz_test_data;
+--                LEDR(13) <= viz_test_data(15);
+--        else 
+--            one_cycle_reset <= '0';
+--            LEDR(13) <= viz_test_data(15);
+--     reset_counter<=reset_counter + 1;
+--
+--        end if;
+--    -- viz_test_data <= viz_test_data + 1;
+--     end if;
+--  end process;
 
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
@@ -350,16 +352,23 @@ begin
         fdom_data_out => fft_fdom_data
     );
     
+    VIZ_ROM_TEST : entity work.viz_test_rom port map (
+        clk50 => CLOCK_50,
+        reset_data_test => one_cycle_reset,
+        fft_fdom_addr  => fft_fdom_addr_t,
+        fft_fdom_data => fft_fdom_data_t
+    );
+    
 	 VISUALIZER : entity work.visualizer port map(
 		--clk   			=> main_clk,
 		clk25 => clk25,
         clk50 => CLOCK_50,
 --		reset_data		=> fft_done,
         --reset_data_test      => viz_reset,
-        test_data => viz_test_data,
+     --   test_data => viz_test_data,
         reset_data_test => one_cycle_reset,
-		fft_fdom_addr 	=> fft_fdom_addr,
-		fft_fdom_data 	=> fft_fdom_data,
+		fft_fdom_addr 	=> fft_fdom_addr_t,
+		fft_fdom_data 	=> fft_fdom_data_t,
 		VGA_CLK        => VGA_CLK,
 		VGA_HS         => VGA_HS,
 		VGA_VS         => VGA_VS,
