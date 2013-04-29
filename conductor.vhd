@@ -20,7 +20,7 @@ end conductor;
 
 architecture rtl of conductor is
     type conductor_state is (initial, trigger_fw, first_write, force_swap,
-                             playing, fft_end, block_end, err);
+                             playing, fft_end, block_end);
     signal state : conductor_state := initial; 
     signal fft_done_last : std_logic;
 begin
@@ -48,10 +48,11 @@ begin
                     when playing =>
                         if ab_swapped = '1' then
                             if sd_ready = '0' or fft_done = '0' then
-                                state <= err;
+                                cond_err <= '1';
                             else
-                                state <= block_end;
+                                cond_err <= '0';
                             end if;
+                            state <= block_end;
                         elsif fft_done_last = '0' and fft_done = '1' then
                             state <= fft_end;
                         end if;
@@ -59,8 +60,6 @@ begin
                         state <= playing;
                     when block_end =>
                         state <= playing;
-                    when err =>
-                        state <= err;
                 end case;
             end if;
         end if;
@@ -73,5 +72,4 @@ begin
                          state = force_swap else '0';
     fft_start <= '1' when state = block_end else '0';
     viz_reset <= '1' when state = fft_end else '0';
-    cond_err <= '1' when state = err else '0';
 end rtl;
