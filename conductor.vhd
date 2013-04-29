@@ -25,8 +25,9 @@ architecture rtl of conductor is
 begin
     process (clk)
     begin
-        fft_done_last <= fft_done;
         if rising_edge(clk) then
+            fft_done_last <= fft_done;
+            
             if reset_n = '0' then
                 state <= initial;
             else
