@@ -212,6 +212,7 @@ architecture datapath of kanto is
     signal clk25 : std_logic := '0';
     signal master_reset_n : std_logic;
     signal viz_reset : std_logic; 
+    signal cond_err : std_logic;
     
     
     -- visUALIZER reset testing
@@ -251,7 +252,7 @@ begin
     LEDG(1) <= sd_ccs;
     LEDG(2) <= ab_play;
     LEDR(0) <= sd_err;
-    LEDR(1) <= sd_waiting;
+    LEDR(1) <= cond_err;
     ab_play <= SW(17) and ab_audio_ok;
     master_reset_n <= KEY(0);
 
@@ -281,6 +282,7 @@ begin
         sd_ready => sd_ready,
         fft_start => fft_start,
         fft_done => fft_done,
+        cond_err => cond_err,
         viz_reset => viz_reset
     );
 

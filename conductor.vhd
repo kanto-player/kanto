@@ -11,6 +11,7 @@ entity conductor is
 
           sd_start : out std_logic;
           sd_ready : in std_logic;
+          cond_err : out std_logic;
 
           fft_start : out std_logic;
           fft_done : in std_logic;
@@ -19,7 +20,7 @@ end conductor;
 
 architecture rtl of conductor is
     type conductor_state is (initial, trigger_fw, first_write, force_swap,
-                             playing, fft_end, block_end);
+                             playing, fft_end, block_end, err);
     signal state : conductor_state := initial; 
     signal fft_done_last : std_logic;
 begin
@@ -46,7 +47,11 @@ begin
                         state <= playing;
                     when playing =>
                         if ab_swapped = '1' then
-                            state <= block_end;
+                            if sd_ready = '0' or fft_done = '0' then
+                                state <= err;
+                            else
+                                state <= block_end;
+                            end if;
                         elsif fft_done_last = '0' and fft_done = '1' then
                             state <= fft_end;
                         end if;
@@ -54,6 +59,8 @@ begin
                         state <= playing;
                     when block_end =>
                         state <= playing;
+                    when err =>
+                        state <= err;
                 end case;
             end if;
         end if;
@@ -66,4 +73,5 @@ begin
                          state = force_swap else '0';
     fft_start <= '1' when state = block_end else '0';
     viz_reset <= '1' when state = fft_end else '0';
+    cond_err <= '1' when state = err else '0';
 end rtl;
