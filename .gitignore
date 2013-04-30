@@ -28,3 +28,4 @@
 *.map
 *.objdump
 obj
+*.swp
