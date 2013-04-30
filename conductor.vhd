@@ -23,7 +23,7 @@ architecture rtl of conductor is
                              playing, fft_end, block_end);
     signal state : conductor_state := initial; 
     signal fft_done_last : std_logic;
-    signal viz_counter : unsigned(7 downto 0) := (others => '0');
+    signal viz_counter : unsigned(1 downto 0) := (others => '0');
 begin
     process (clk)
     begin
