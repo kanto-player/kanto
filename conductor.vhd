@@ -23,7 +23,7 @@ architecture rtl of conductor is
                              playing, fft_end, block_end);
     signal state : conductor_state := initial; 
     signal fft_done_last : std_logic;
-    signal viz_counter : unsigned(1 downto 0) := (others => '0');
+    signal fft_counter : unsigned(1 downto 0) := (others => '0');
 begin
     process (clk)
     begin
@@ -32,7 +32,7 @@ begin
             
             if reset_n = '0' then
                 state <= initial;
-                viz_counter <= (others => '0');
+                fft_counter <= (others => '0');
             else
                 case state is
                     when initial =>
@@ -54,12 +54,12 @@ begin
                             else
                                 cond_err <= '0';
                             end if;
+                            fft_counter <= fft_counter + 1;
                             state <= block_end;
                         elsif fft_done_last = '0' and fft_done = '1' then
                             state <= fft_end;
                         end if;
                     when fft_end =>
-                        viz_counter <= viz_counter + 1;
                         state <= playing;
                     when block_end =>
                         state <= playing;
@@ -73,6 +73,6 @@ begin
     ab_force_swap <= '1' when state = force_swap else '0';
     sd_start <= '1' when state = trigger_fw or state = block_end or
                          state = force_swap else '0';
-    fft_start <= '1' when state = block_end else '0';
-    viz_reset <= '1' when state = fft_end and viz_counter = 0 else '0';
+    fft_start <= '1' when state = block_end and fft_counter = 0 else '0';
+    viz_reset <= '1' when state = fft_end else '0';
 end rtl;
