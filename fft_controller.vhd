@@ -238,6 +238,7 @@ begin
             case control_state is
                 when idle =>
                     recomb_stage <= "11";
+                    comp_step <= "111";
                     if start = '1' then
                         control_state <= dftsetup;
                     end if;
