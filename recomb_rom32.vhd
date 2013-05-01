@@ -2,12 +2,10 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.types_pkg.all;
-
 entity recomb_rom32 is
-    port (addr : in nibble_half_array;
-          data : out complex_signed_half_array);
+    port (addr : in unsigned(3 downto 0);
+          data : out signed(31 downto 0);
+          sel : in std_logic);
 end recomb_rom32;
 
 architecture rtl of recomb_rom32 is
@@ -21,11 +19,8 @@ architecture rtl of recomb_rom32 is
          x"cf050000", x"c3aa0000", x"b8e40000", x"aecd0000", 
          x"a57f0000", x"9d0f0000", x"95940000", x"8f1f0000", 
          x"89c00000", x"85840000", x"82770000", x"809f0000");
-    type fulladdr_type is array(0 to 3) of unsigned(4 downto 0);
-    signal fulladdr : fulladdr_type;
+    signal fulladdr : unsigned(4 downto 0);
 begin
-    READGEN : for i in 0 to 3 generate
-        fulladdr(i) <= to_unsigned(i, 2)(0) & addr(i);
-        data(i) <= rom_data(to_integer(fulladdr(i)));
-    end generate READGEN;
+    fulladdr <= sel & addr;
+    data <= rom_data(to_integer(fulladdr));
 end rtl;

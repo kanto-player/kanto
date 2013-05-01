@@ -12,9 +12,7 @@ entity fft_fdom_ram_row is
           writeaddr : in unsigned(3 downto 0);
           write_en : std_logic;
           readdata : out signed(31 downto 0);
-          readaddr : in unsigned(3 downto 0);
-          bigdata : out signed(31 downto 0);
-          bigaddr : in unsigned(3 downto 0));
+          readaddr : in unsigned(3 downto 0));
 end fft_fdom_ram_row;
 
 architecture rtl of fft_fdom_ram_row is
@@ -22,7 +20,6 @@ architecture rtl of fft_fdom_ram_row is
     signal ram_data : ram_type;
 begin
     readdata <= ram_data(to_integer(readaddr));
-    bigdata <= ram_data(to_integer(bigaddr));
     process (clk)
     begin
         if rising_edge(clk) then

@@ -11,9 +11,6 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-library work;
-use work.types_pkg.all;
-
 entity kanto is
     port(
         -- Clocks
@@ -185,9 +182,11 @@ architecture datapath of kanto is
 	signal fft_addr : std_logic_vector(17 downto 0);
 	signal fft_readdata : std_logic_vector(15 downto 0);
 	signal fft_start : std_logic;
-    signal fft_tdom_addr : nibble_array;
-    signal fft_tdom_data : real_signed_array;
-    signal fft_tdom_sel : std_logic;
+    signal fft_tdom_addr_even : unsigned(3 downto 0);
+    signal fft_tdom_data_even : signed(15 downto 0);
+    signal fft_tdom_addr_odd : unsigned(3 downto 0);
+    signal fft_tdom_data_odd : signed(15 downto 0);
+    signal fft_tdom_sel : unsigned(2 downto 0);
     signal fft_fdom_addr : unsigned(7 downto 0);
     signal fft_fdom_data : signed(31 downto 0);
 	signal fft_done      : std_logic;
@@ -281,8 +280,10 @@ begin
         writedata => sd_writedata,
         write_en => sd_write_en,
         
-        readdata => fft_tdom_data,
-        readaddr => fft_tdom_addr,
+        readdata_even => fft_tdom_data_even,
+        readaddr_even => fft_tdom_addr_even,
+        readdata_odd => fft_tdom_data_odd,
+        readaddr_odd => fft_tdom_addr_odd,
         readsel => fft_tdom_sel
     );
 
@@ -313,8 +314,10 @@ begin
         start => fft_start,
         done => fft_done,
         
-        tdom_addr => fft_tdom_addr,
-        tdom_data => fft_tdom_data,
+        tdom_addr_even => fft_tdom_addr_even,
+        tdom_data_even => fft_tdom_data_even,
+        tdom_addr_odd => fft_tdom_addr_odd,
+        tdom_data_odd => fft_tdom_data_odd,
         tdom_sel => fft_tdom_sel,
         fdom_addr_out => fft_fdom_addr,
         fdom_data_out => fft_fdom_data

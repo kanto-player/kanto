@@ -2,12 +2,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.types_pkg.all;
-
 entity recomb_rom16 is
-    port (addr : in nibble_half_array;
-          data : out complex_signed_half_array);
+    port (addr : in unsigned(3 downto 0);
+          data : out signed(31 downto 0));
 end recomb_rom16;
 
 architecture rtl of recomb_rom16 is
@@ -18,7 +15,5 @@ architecture rtl of recomb_rom16 is
          x"00000000", x"e7080000", x"cf050000", x"b8e40000", 
          x"a57f0000", x"95940000", x"89c00000", x"82770000");
 begin
-    READGEN : for i in 0 to 3 generate
-        data(i) <= rom_data(to_integer(addr(i)));
-    end generate READGEN;
+    data <= rom_data(to_integer(addr));
 end rtl;
