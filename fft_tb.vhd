@@ -73,13 +73,13 @@ begin
     begin
         start <= '1';
         fdom_addr <= x"00";
-        wait for 20 ns;
+        wait for 20 ns; -- 20 ns
         start <= '0';
-        wait for 10 ns;
+        wait for 10 ns; -- 30 ns
 
-        while done = '0' loop
-            wait for 20 ns;
-        end loop;
+        wait for 55840 ns; -- 55870 ns
+
+        assert done = '1';
 
         i := 0;
         while i < 256 loop
