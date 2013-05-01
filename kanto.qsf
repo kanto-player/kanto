@@ -50,7 +50,7 @@ set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_RO
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
-set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH conductor_tb -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH fft_tb -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_NAME audio_buffer_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id audio_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "227 us" -section_id audio_buffer_tb
@@ -83,7 +83,7 @@ set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME visualizer_tb -section_id
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id fft_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME fft_tb -section_id fft_tb
 set_global_assignment -name EDA_TEST_BENCH_NAME fft_tb -section_id eda_simulation
-set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "22 us" -section_id fft_tb
+set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "60 us" -section_id fft_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "500 ns" -section_id recomb_tb
 set_global_assignment -name EDA_TEST_BENCH_NAME fdom_ram_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id fdom_ram_tb
@@ -548,11 +548,11 @@ set_location_assignment PIN_V24 -to GPIO_1[32]
 set_location_assignment PIN_V23 -to GPIO_1[33]
 set_location_assignment PIN_W25 -to GPIO_1[34]
 set_location_assignment PIN_W23 -to GPIO_1[35]
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name EDA_TEST_BENCH_NAME conductor_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id conductor_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "280 ns" -section_id conductor_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME conductor_tb -section_id conductor_tb
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name EDA_TEST_BENCH_FILE audio_buffer_tb.vhd -section_id audio_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE i2c_tb.vhd -section_id i2c_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE codec_tb.vhd -section_id codec_tb
