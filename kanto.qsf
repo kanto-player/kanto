@@ -83,7 +83,7 @@ set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME visualizer_tb -section_id
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id fft_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME fft_tb -section_id fft_tb
 set_global_assignment -name EDA_TEST_BENCH_NAME fft_tb -section_id eda_simulation
-set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "60 us" -section_id fft_tb
+set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "70 us" -section_id fft_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "500 ns" -section_id recomb_tb
 set_global_assignment -name EDA_TEST_BENCH_NAME fdom_ram_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id fdom_ram_tb
