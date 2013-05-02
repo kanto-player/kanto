@@ -37,6 +37,8 @@ begin
     fulladdr <= sel & addr;
     process (clk)
     begin
-        data <= rom_data(to_integer(fulladdr));
+        if rising_edge(clk) then
+            data <= rom_data(to_integer(fulladdr));
+        end if;
     end process;
 end rtl;
