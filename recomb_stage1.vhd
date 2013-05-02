@@ -22,7 +22,7 @@ entity recomb_stage1 is
 end recomb_stage1;
 
 architecture rtl of recomb_stage1 is
-    signal running : std_logic;
+    signal running : std_logic := '0';
     signal addr : unsigned(3 downto 0);
 begin
     rom_addr <= addr;
