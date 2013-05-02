@@ -39,19 +39,9 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            if reset = '1' then
-                writeout <= '0';
-                addrout <= (others => '0');
-            else
-                writeout <= running;
-                addrout <= addr;
-            end if;
-        end if;
-    end process;
-
-    process (clk)
-    begin
-        if rising_edge(clk) then
+            writeout <= running;
+            addrout <= addr;
+            
             if reset = '1' then
                 running <= '1';
                 addr <= x"0";
