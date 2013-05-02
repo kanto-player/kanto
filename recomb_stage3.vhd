@@ -4,7 +4,6 @@ use ieee.numeric_std.all;
 
 entity recomb_stage3 is
     port (clk : in std_logic;
-          reset : in std_logic;
           done : out std_logic;
           
           even_real : in signed(15 downto 0);
@@ -54,15 +53,11 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            if reset = '1' then
-                write_en <= '0';
-            else
-                done <= not writein;
-                write_en <= writein;
-                writeaddr <= addrin;
-                low_writedata <= low_sum_real & low_sum_imag;
-                high_writedata <= high_diff_real & high_diff_imag;
-            end if;
+            done <= not writein;
+            write_en <= writein;
+            writeaddr <= addrin;
+            low_writedata <= low_sum_real & low_sum_imag;
+            high_writedata <= high_diff_real & high_diff_imag;
         end if;
     end process;
 end rtl;
