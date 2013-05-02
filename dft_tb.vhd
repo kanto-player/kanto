@@ -34,7 +34,12 @@ architecture sim of dft_tb is
 begin
     clk <= not clk after 10 ns;
 
-    tdom_data <= tdom_rom(to_integer(tdom_addr));
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            tdom_data <= tdom_rom(to_integer(tdom_addr));
+        end if;
+    end process;
 
     DFT : entity work.dft_top port map (
         clk => clk,
@@ -50,6 +55,7 @@ begin
     );
 
     COEFF_ROM : entity work.dft_coeff_rom port map (
+        clk => clk,
         data_low => rom_data,
         addr_low => rom_addr,
         addr_high => (others => '0')

@@ -42,19 +42,18 @@ architecture rtl of audio_buffer is
     signal counter_en : std_logic := '0';
 begin
     wfulladdr <= wlr & writeaddr;
+    rfulladdr_even <= (not wlr) & readaddr_even & readsel & '0';
+    rfulladdr_odd <= (not wlr) & readaddr_odd & readsel & '1';
     process (clk)
     begin
         if rising_edge(clk) then
             if write_en = '1' then
                 audio_ram(to_integer(wfulladdr)) <= writedata;
             end if;
+            readdata_even <= audio_ram(to_integer(rfulladdr_even));
+            readdata_odd <= audio_ram(to_integer(rfulladdr_odd));
         end if;
     end process;
-
-    rfulladdr_even <= (not wlr) & readaddr_even & readsel & '0';
-    rfulladdr_odd <= (not wlr) & readaddr_odd & readsel & '1';
-    readdata_even <= audio_ram(to_integer(rfulladdr_even));
-    readdata_odd <= audio_ram(to_integer(rfulladdr_odd));
 
     audio_data <= audio_ram(to_integer(audio_addr)) 
                         when play = '1' else (others => '0');

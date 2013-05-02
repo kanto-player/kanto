@@ -89,6 +89,7 @@ begin
     );
 
     COEFF_ROM : entity work.dft_coeff_rom port map (
+        clk => clk,
         data_low => dft_rom_data_low,
         addr_low => dft_rom_addr_low,
         data_high => dft_rom_data_high,
