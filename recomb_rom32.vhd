@@ -5,6 +5,7 @@ use ieee.numeric_std.all;
 entity recomb_rom32 is
     port (addr : in unsigned(3 downto 0);
           data : out signed(31 downto 0);
+          clk : in std_logic;
           sel : in std_logic);
 end recomb_rom32;
 
@@ -22,5 +23,8 @@ architecture rtl of recomb_rom32 is
     signal fulladdr : unsigned(4 downto 0);
 begin
     fulladdr <= sel & addr;
-    data <= rom_data(to_integer(fulladdr));
+    process (clk)
+    begin
+        data <= rom_data(to_integer(fulladdr));
+    end process;
 end rtl;

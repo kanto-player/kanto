@@ -4,7 +4,8 @@ use ieee.numeric_std.all;
 
 entity recomb_rom16 is
     port (addr : in unsigned(3 downto 0);
-          data : out signed(31 downto 0));
+          data : out signed(31 downto 0);
+          clk : in std_logic);
 end recomb_rom16;
 
 architecture rtl of recomb_rom16 is
@@ -15,5 +16,10 @@ architecture rtl of recomb_rom16 is
          x"00000000", x"e7080000", x"cf050000", x"b8e40000", 
          x"a57f0000", x"95940000", x"89c00000", x"82770000");
 begin
-    data <= rom_data(to_integer(addr));
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            data <= rom_data(to_integer(addr));
+        end if;
+    end process;
 end rtl;

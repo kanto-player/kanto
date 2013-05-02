@@ -84,7 +84,7 @@ begin
         i := 0;
         while i < 256 loop
             fdom_addr <= to_unsigned(i, 8);
-            wait for 20 ns;
+            wait for 40 ns;
             assert fdom_data = expected(i);
             i := i + 1;
         end loop;

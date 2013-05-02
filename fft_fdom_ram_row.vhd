@@ -19,7 +19,6 @@ architecture rtl of fft_fdom_ram_row is
     type ram_type is array(0 to 15) of signed(31 downto 0);
     signal ram_data : ram_type;
 begin
-    readdata <= ram_data(to_integer(readaddr));
     process (clk)
     begin
         if rising_edge(clk) then
@@ -28,6 +27,7 @@ begin
             elsif write_en = '1' then
                 ram_data(to_integer(writeaddr)) <= writedata;
             end if;
+            readdata <= ram_data(to_integer(readaddr));
         end if;
     end process;
 end rtl;

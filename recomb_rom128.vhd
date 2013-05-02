@@ -8,6 +8,7 @@ use work.types_pkg.all;
 entity recomb_rom128 is
     port (addr : in unsigned(3 downto 0);
           data : out signed(31 downto 0);
+          clk : in std_logic;
           sel : in unsigned(2 downto 0));
 end recomb_rom128;
 
@@ -49,5 +50,8 @@ architecture rtl of recomb_rom128 is
     signal fulladdr : unsigned(6 downto 0);
 begin
     fulladdr <= sel & addr;
-    data <= rom_data(to_integer(fulladdr));
+    process (clk)
+    begin
+        data <= rom_data(to_integer(fulladdr));
+    end process;
 end rtl;

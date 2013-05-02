@@ -28,23 +28,23 @@ begin
     rom_addr <= addr;
     low_readaddr <= addr;
     high_readaddr <= addr;
+    
+    rom_real <= rom_data(31 downto 16);
+    rom_imag <= rom_data(15 downto 0);
+    even_real <= low_readdata(31 downto 16);
+    even_imag <= low_readdata(15 downto 0);
+    odd_real <= high_readdata(31 downto 16);
+    odd_imag <= high_readdata(15 downto 0);
 
     process (clk)
     begin
         if rising_edge(clk) then
             if reset = '1' then
                 writeout <= '0';
+                addrout <= (others => '0');
             else
                 writeout <= running;
-            end if;
-            if running = '1' then
                 addrout <= addr;
-                rom_real <= rom_data(31 downto 16);
-                rom_imag <= rom_data(15 downto 0);
-                even_real <= low_readdata(31 downto 16);
-                even_imag <= low_readdata(15 downto 0);
-                odd_real <= high_readdata(31 downto 16);
-                odd_imag <= high_readdata(15 downto 0);
             end if;
         end if;
     end process;

@@ -204,12 +204,14 @@ begin
 
     RCR16 : entity work.recomb_rom16 port map (
         addr => rcromcur_addr,
-        data => rcrom16_data
+        data => rcrom16_data,
+        clk => clk
     );
 
     RCR32 : entity work.recomb_rom32 port map (
         addr => rcromcur_addr,
         data => rcrom32_data,
+        clk => clk,
         sel => comp_step(0)
     );
 
@@ -217,6 +219,7 @@ begin
     RCR64 : entity work.recomb_rom64 port map (
         addr => rcromcur_addr,
         data => rcrom64_data,
+        clk => clk,
         sel => comp_step(1 downto 0)
     );
 
@@ -224,6 +227,7 @@ begin
     RCR128 : entity work.recomb_rom128 port map (
         addr => rcromcur_addr,
         data => rcrom128_data,
+        clk => clk,
         sel => comp_step
     );
 

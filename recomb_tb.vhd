@@ -39,15 +39,15 @@ architecture rtl of recomb_test_memory is
          x"d87a7236", x"e1bc27e1", x"c19c3b48", x"4301716c", 
          x"8db55085", x"c590beaa", x"5e2cb01d", x"9641db23");
 begin
-    rom_data <= rom_mem(to_integer(rom_addr));
-    low_readdata <= low_mem(to_integer(low_readaddr));
-    high_readdata <= high_mem(to_integer(high_readaddr));
-    tb_lowdata <= low_mem(to_integer(tb_addr));
-    tb_highdata <= high_mem(to_integer(tb_addr));
 
     process (clk)
     begin
         if rising_edge(clk) then
+            rom_data <= rom_mem(to_integer(rom_addr));
+            low_readdata <= low_mem(to_integer(low_readaddr));
+            high_readdata <= high_mem(to_integer(high_readaddr));
+            tb_lowdata <= low_mem(to_integer(tb_addr));
+            tb_highdata <= high_mem(to_integer(tb_addr));
             if low_write_en = '1' then
                 low_mem(to_integer(low_writeaddr)) <= low_writedata;
             end if;
@@ -150,7 +150,7 @@ begin
         i := 0;
         while i < 16 loop
             tb_addr <= to_unsigned(i, 4);
-            wait for 20 ns;
+            wait for 40 ns;
             assert tb_lowdata = expected(i);
             assert tb_highdata = expected(i + 16);
             i := i + 1;
