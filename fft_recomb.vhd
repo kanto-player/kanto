@@ -107,6 +107,8 @@ begin
         high_write_en => high_write_en
     );
 
+    -- make sure done goes low right after reset
+    -- hold it there until first input propagates through pipeline
     done <= '1' when pl_done = '1' and done_delay = "111" else '0';
 
     process (clk)

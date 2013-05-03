@@ -47,17 +47,25 @@ begin
     readdata_high <= row_readdata(to_integer(highsel));
 
     with stage select lowsel <=
-        step & '0' when "00",
-        step(2 downto 1) & '0' & step(0) when "01",
-        step(2) & '0' & step(1 downto 0) when "10",
-        '0' & step(2 downto 0) when "11",
+        -- every even indexed row
+        step & '0' when "00", 
+        -- top two rows of every group of four
+        step(2 downto 1) & '0' & step(0) when "01", 
+        -- top four rows of every group of eight
+        step(2) & '0' & step(1 downto 0) when "10", 
+        -- top 8 rows
+        '0' & step when "11", 
         "0000" when others;
     
     with stage select highsel <=
-        step & '1' when "00",
-        step(2 downto 1) & '1' & step(0) when "01",
+        -- every odd indexed row
+        step & '1' when "00", 
+        -- bottom two rows of every group of four
+        step(2 downto 1) & '1' & step(0) when "01", 
+        -- bottom four rows of every group of eight
         step(2) & '1' & step(1 downto 0) when "10",
-        '1' & step(2 downto 0) when "11",
+        -- bottom eight rows
+        '1' & step when "11",
         "1111" when others;
     
     LUMAP : for i in 0 to 15 generate

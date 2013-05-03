@@ -32,6 +32,7 @@ architecture rtl of sd_controller is
     constant cmd0  : std_logic_vector(47 downto 0) := x"400000000095";
     constant cmd8  : std_logic_vector(47 downto 0) := x"48000001AA87";
     constant cmd55 : std_logic_vector(47 downto 0) := x"770000000065";
+    -- IMPORTANT!!! HCS bit must be set in ACMD41, contrary to embed_lab9
     constant cmd41 : std_logic_vector(47 downto 0) := x"694000000077";
     constant cmd58 : std_logic_vector(47 downto 0) := x"7a00000000fd";
     signal command : std_logic_vector(47 downto 0);
@@ -130,6 +131,7 @@ begin
                 sclk_sig <= not sclk_sig;
             end if;
 
+        -- make sure reset was successful
         when check_cmd0 =>
             if response(7 downto 0) = x"01" then
                 command <= cmd8;
@@ -141,6 +143,7 @@ begin
                 state <= cmd_err;
             end if;
 
+        -- make sure card supports v2 of protocol
         when check_cmd8_head =>
             if response(2) = '0' then
                 counter <= to_unsigned(31, 8);
@@ -150,6 +153,7 @@ begin
                 state <= cmd_err;
             end if;
 
+        -- make sure voltage is OK
         when check_cmd8_extra =>
             if response(11 downto 0) = "000110101010" then
                 command <= cmd55;
@@ -161,6 +165,7 @@ begin
                 state <= cmd_err;
             end if;
 
+        -- make sure cmd58 is OK, then check CCS
         when check_cmd58_head =>
             if response(2) = '1' then
                 state_indicator <= x"58";
@@ -171,12 +176,14 @@ begin
                 state <= recv_resp;
             end if;
 
+        -- is this standard or high capacity card?
         when check_cmd58_ccs =>
             hc <= response(14);
             counter <= to_unsigned(15, 8);
             state <= recv_resp;
             return_state <= cmd_done;
 
+        -- make sure application commands are OK
         when check_cmd55 =>
             if response(7 downto 0) = x"01" then
                 command <= cmd41;
@@ -188,18 +195,22 @@ begin
                 state <= cmd_err;
             end if;
 
+        -- is SD card ready for I/O yet?
         when check_cmd41 =>
             if response(7 downto 0) = x"00" then
+                -- if so, check what type of card this is
                 command <= cmd58;
                 return_state <= check_cmd58_head;
                 state_indicator <= x"58";
                 state <= clear_input;
             elsif response(7 downto 0) = x"01" then
+                -- still not ready? read another byte of response
                 state <= recv_resp;
                 counter <= to_unsigned(7, 8);
                 state_indicator <= x"41";
                 return_state <= check_cmd41;
             elsif response(7 downto 0) = x"ff" then
+                -- response has ended but we're still not ready, send ACMD41 again
                 state <= clear_input;
                 command <= cmd55;
                 return_state <= check_cmd55;
@@ -209,6 +220,7 @@ begin
                 state <= cmd_err;
             end if;
 
+        -- send all 48 bits of the command
         when send_cmd =>
             if sclk_sig = '1' then
                 if counter = x"00" then
@@ -220,15 +232,19 @@ begin
                 end if;
             end if;
             sclk_sig <= not sclk_sig;
-
+        
+        -- SD card could take a few clock cycles to respond a MISO
         when wait_resp =>
             if sclk_sig = '1' and miso = '0' then
+                -- We've already gotten the first bit
+                -- so only need to ready 7 more
                 counter <= to_unsigned(6, 8);
                 state <= recv_resp;
                 response <= (others => '0');
             end if;
             sclk_sig <= not sclk_sig;
-
+        
+        -- Read bits from MISO
         when recv_resp =>
             if sclk_sig = '1' then
                 response <= response(14 downto 0) & miso;
@@ -241,6 +257,8 @@ begin
             end if;
             sclk_sig <= not sclk_sig;
 
+        -- always deselect chip for 8 clock cycles and wait
+        -- for miso to clear up before sending next command
         when clear_input =>
             if sclk_sig = '1' then
                 clearbuf <= clearbuf(6 downto 0) & miso;
@@ -253,6 +271,7 @@ begin
             end if;
             sclk_sig <= not sclk_sig;
         
+        -- input is clear if we get byte of all 1s
         when check_clear =>
             if clearbuf = x"ff" then
                 state <= send_cmd;
@@ -261,13 +280,17 @@ begin
                 state <= clear_input;
             end if;
 
+        -- the idle state
         when cmd_done =>
             if hold_start = '1' then
+                -- send the read block command (cmd17)
                 counter <= to_unsigned(47, 8);
                 command <= x"51" & std_logic_vector(blockaddr) & x"ff";
                 if hc = '1' then
+                    -- HC cards are block addressed
                     blockaddr <= blockaddr + 1;
                 else
+                    -- SC cards are byte addressed
                     blockaddr <= blockaddr + 512;
                 end if;
                 return_state <= check_cmd17;
@@ -286,9 +309,10 @@ begin
                 state <= cmd_err;
             end if;
 
+        -- wait for beginning of block
         when wait_block_start =>
+            -- block starts once we get the byte "fe"
             if response(7 downto 0) = x"fe" then
-                -- block has started, proceed with reading
                 counter <= to_unsigned(15, 8);
                 return_state <= write_word;
                 state <= recv_resp;
@@ -302,6 +326,7 @@ begin
             writedata <= signed(response);
             writeaddr <= word_count;
             
+            -- if this is the last block
             if word_count = x"ff" then
                 -- read the CRC (last 2 bytes) and ignore it
                 counter <= to_unsigned(15, 8);

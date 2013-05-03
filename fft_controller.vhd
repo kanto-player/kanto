@@ -51,6 +51,11 @@ architecture rtl of fft_controller is
     signal dft_done : std_logic_vector(1 downto 0);
     signal dft_reset : std_logic;
     signal recomb_reset : std_logic;
+    -- This helps us map the DFT inputs to the DFT outputs
+    -- The mappings are (0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15)
+    -- We do the even and odd mappings simultaneously
+    -- Thus, mapping(i) = 2 * fft_reorder(i) for even
+    -- and mapping(i) = 2 * fft_reorder(i) + 1 for odd
     type fft_reorder_type is array(0 to 7) of unsigned(2 downto 0);
     constant fft_reorder : fft_reorder_type := ("000", "100", "010", "110", 
                                                 "001", "101", "011", "111");
@@ -149,6 +154,7 @@ begin
         done => dft_done(1)
     );
 
+    -- Multiplex between dft and recomb units for the fdom ram
     with control_state select fdom_writedata_low <=
         dft_out_data_low when dftsetup | dftcomp,
         recomb_writedata_low when recomb_setup | recomb_comp,
@@ -193,8 +199,12 @@ begin
 
     recomb_readdata_high <= fdom_readdata_high;
 
+    -- highest bit of fdom address determines which half of the RAM
+    -- the data is pulled out of
     fdom_data_out <= fdom_readdata_high when fdom_addr_out(7) = '1' else
                      fdom_readdata_low;
+    -- when idle, allow the fdom read address to select the step
+    -- when computing, let comp_step determine it
     fdom_step <= fdom_addr_out(6 downto 4) when 
                     control_state = idle else comp_step;
 
@@ -216,6 +226,7 @@ begin
         done => recomb_done
     );
 
+    -- select which recomb rom to use based on recomb_stage
     with recomb_stage select rcromcur_data <=
         rcrom16_data when "00",
         rcrom32_data when "01",
@@ -259,13 +270,19 @@ begin
             last_state <= control_state;
             case control_state is
                 when idle =>
+                    -- reads in the idle state must be done with
+                    -- recomb_stage at "11" so that low and high
+                    -- split the ram into two contiguous chunks
                     recomb_stage <= "11";
                     comp_step <= "111";
                     if start = '1' then
                         control_state <= dftsetup;
                     end if;
                 when dftsetup =>
+                    -- same thing goes for dft
+                    -- recomb_stage set to "11"
                     recomb_stage <= "11";
+                    -- first time in dftcomp will see comp_step = 0
                     comp_step <= comp_step + 1;
                     control_state <= dftcomp;
                 when dftcomp =>
@@ -277,6 +294,7 @@ begin
                         end if;
                     end if;
                 when recomb_setup =>
+                    -- go through steps and then through stages
                     if comp_step = "111" then
                         recomb_stage <= recomb_stage + 1;
                         comp_step <= "000";
