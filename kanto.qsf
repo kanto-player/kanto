@@ -520,6 +520,19 @@ set_global_assignment -name EDA_TEST_BENCH_NAME conductor_tb -section_id eda_sim
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id conductor_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "280 ns" -section_id conductor_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME conductor_tb -section_id conductor_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE audio_buffer_tb.vhd -section_id audio_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE i2c_tb.vhd -section_id i2c_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE codec_tb.vhd -section_id codec_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE audio_test_tb.vhd -section_id audio_test_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE dft_tb.vhd -section_id dft_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE recomb_tb.vhd -section_id recomb_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE visualizer_tb.vhd -section_id visualizer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE fft_tb.vhd -section_id fft_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE fdom_ram_tb.vhd -section_id fdom_ram_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE conductor_tb.vhd -section_id conductor_tb
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name VHDL_FILE nios_system.vhd
 set_global_assignment -name VHDL_FILE fft_tdom_ram.vhd
 set_global_assignment -name VHDL_FILE conductor.vhd
 set_global_assignment -name VHDL_FILE sevenseg.vhd
@@ -540,7 +553,6 @@ set_global_assignment -name VHDL_FILE de2_wm8731_audio.vhd
 set_global_assignment -name VERILOG_FILE de2_i2c_controller.v
 set_global_assignment -name VERILOG_FILE de2_i2c_av_config.v
 set_global_assignment -name VHDL_FILE audio_buffer.vhd
-set_global_assignment -name VHDL_FILE kanto.vhd
 set_global_assignment -name QIP_FILE audpll.qip
 set_global_assignment -name QIP_FILE mult.qip
 set_global_assignment -name QIP_FILE fdom_row.qip
@@ -551,14 +563,6 @@ set_global_assignment -name QIP_FILE rcrom128.qip
 set_global_assignment -name QIP_FILE dft_lut.qip
 set_global_assignment -name QIP_FILE tdom_half_ram.qip
 set_global_assignment -name QIP_FILE tdom_double_ram.qip
-set_global_assignment -name EDA_TEST_BENCH_FILE audio_buffer_tb.vhd -section_id audio_buffer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE i2c_tb.vhd -section_id i2c_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE codec_tb.vhd -section_id codec_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE audio_test_tb.vhd -section_id audio_test_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE dft_tb.vhd -section_id dft_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE recomb_tb.vhd -section_id recomb_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE visualizer_tb.vhd -section_id visualizer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE fft_tb.vhd -section_id fft_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE fdom_ram_tb.vhd -section_id fdom_ram_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE conductor_tb.vhd -section_id conductor_tb
+set_global_assignment -name QIP_FILE nios_system.qip
+set_global_assignment -name VHDL_FILE kanto.vhd
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

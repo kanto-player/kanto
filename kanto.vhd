@@ -213,6 +213,9 @@ architecture datapath of kanto is
     -- visUALIZER reset testing
     signal one_cycle_reset : std_logic := '0';
     signal reset_counter : integer := 0;
+    
+    signal nios_reset_n : std_logic;
+    signal nios_counter : unsigned(15 downto 0);
 
     component de2_i2c_av_config is
         port (iclk : in std_logic;
@@ -222,6 +225,20 @@ architecture datapath of kanto is
     end component;
 begin
 
+    process(CLOCK_50)
+    begin
+    
+        if rising_edge(CLOCK_50) then
+            if nios_counter = x"ffff" then  
+                nios_reset_n <= '1';
+            else
+                nios_reset_n <= '0';
+                nios_counter <= nios_counter + 1;
+            end if;
+        end if;
+        
+    end process;
+
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
     LEDG(2) <= ab_play;
@@ -229,6 +246,20 @@ begin
     LEDR(1) <= cond_err;
     ab_play <= SW(17) and ab_audio_ok;
     master_reset_n <= KEY(0);
+    
+    NIOS : entity work.nios_system port map (
+        clk_0 => CLOCK_50,
+        reset_n => nios_reset_n,
+        --leds are not hooked up
+        --leds_from_the_leds => LEDR(15 downto 0),
+        SRAM_ADDR_from_the_sram => SRAM_ADDR,
+        SRAM_CE_N_from_the_sram => SRAM_CE_N,
+        SRAM_DQ_to_and_from_the_sram => SRAM_DQ,
+        SRAM_LB_N_from_the_sram => SRAM_LB_N,
+        SRAM_OE_N_from_the_sram => SRAM_OE_N,
+        SRAM_UB_N_from_the_sram => SRAM_UB_N,
+        SRAM_WE_N_from_the_sram => SRAM_WE_N
+    );
 
     PLL : entity work.audpll port map (
         inclk0 => CLOCK_50,
@@ -396,13 +427,13 @@ begin
     DRAM_CLK <= '0';
     DRAM_CKE <= '0';
 
-    SRAM_DQ <= (others => 'Z');
-    SRAM_ADDR <= (others => '0');
-    SRAM_UB_N <= '1';
-    SRAM_LB_N <= '1';
-    SRAM_CE_N <= '1';
-    SRAM_WE_N <= '1';
-    SRAM_OE_N <= '1';
+--    SRAM_DQ <= (others => 'Z');
+--    SRAM_ADDR <= (others => '0');
+--    SRAM_UB_N <= '1';
+--    SRAM_LB_N <= '1';
+--    SRAM_CE_N <= '1';
+--    SRAM_WE_N <= '1';
+--    SRAM_OE_N <= '1';
 
     FL_ADDR <= (others => '0');
     FL_WE_N <= '1';
