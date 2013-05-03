@@ -56,6 +56,9 @@ architecture rtl of visualizer is
   constant bar_w : integer := 40;
   
   type states is (A,B);
+  type rectgenstates is (blreset, bl0x0, bl0x1, bl0x2, bl0x3, bl0x4, bl0x5, bl0x6,
+                         bl0x7, bl0x8, bl0x9, bl0xa, bl0xb, bl0xc, bl0xd, bl0xe,
+                         bl0xf);
   
   -- Signals for the video controller
   signal Hcount : unsigned(9 downto 0);  -- Horizontal position (0-800)
@@ -252,109 +255,178 @@ end process GetData;
   -- block0x
   
 RectangleGen: process (clk25)
+variable bar : rectgenstates := blreset;
 begin
 	if rising_edge(clk25) then
-		if reset='1' then
-			rectangle<='0';
-		--division 1
-		elsif Hcount >= HSYNC+HBACK_PORCH AND Hcount<=HSYNC+HBACK_PORCH+bar_w then
-			if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(0)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 2
-		elsif Hcount>=HSYNC+HBACK_PORCH+bar_w AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*2) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(1)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 3
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*2) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*3) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(2)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 4
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*3) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*4) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(3)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 5
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*4) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*5) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(4)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 6
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*5) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*6) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(5)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 7
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*6) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*7) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(6)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 8
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*7) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*8) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(7)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 9
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*8) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*9) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(8)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 10
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*9) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*10) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(9)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 11
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*10) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*11) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(10)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 12
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*11) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*12) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(11)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 13
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*12) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*13) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(12)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 14
-        elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*12) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*14) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(13)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 15
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*14) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*15) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(14)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 16
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*15) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*16) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(15)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		else
-			rectangle<='0';
-			end if;
+        case bar is
+            when blreset =>
+                rectangle<='0';
+                if Hcount<=HSYNC+HBACK_PORCH AND Hcount >= HSYNC+HBACK_PORCH+HACTIVE then
+                    bar:=blreset;
+                else
+                    bar:=bl0x0;
+                end if;
+            --division 0
+            when bl0x0=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(0)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+bar_w then
+                    bar:=bl0x1;
+                else bar:=bl0x0;
+                end if;
+            --division 1
+            when bl0x1=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(1)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*2) then
+                    bar:=bl0x2;
+                else bar:=bl0x1;
+                end if;
+            --division 2
+            when bl0x2=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(2)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*3) then
+                    bar:=bl0x3;
+                else bar:=bl0x2;
+                end if;
+            --division 3
+            when bl0x3=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(3)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*4) then
+                    bar:=bl0x4;
+                else bar:=bl0x3;
+                end if;
+            --division 4
+            when bl0x4=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(4)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*5) then
+                    bar:=bl0x5;
+                else bar:=bl0x4;
+                end if;
+            --division 5
+            when bl0x5=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(5)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*6) then
+                    bar:=bl0x6;
+                else bar:=bl0x5;
+                end if;
+            --division 6
+            when bl0x6=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(6)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*7) then
+                    bar:=bl0x7;
+                else bar:=bl0x6;
+                end if;
+            --division 7
+            when bl0x7=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(7)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*8) then
+                    bar:=bl0x8;
+                else bar:=bl0x7;
+                end if;
+            --division 8
+            when bl0x8=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(8)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*9) then
+                    bar:=bl0x9;
+                else bar:=bl0x8;
+                end if;
+            --division 9
+            when bl0x9=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(9)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*10) then
+                    bar:=bl0xa;
+                else bar:=bl0x9;
+                end if;
+            --division 10
+            when bl0xa=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(10)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*11) then
+                    bar:=bl0xb;
+                else bar:=bl0xa;
+                end if;
+            --division 11
+            when bl0xb=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(11)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*12) then
+                    bar:=bl0xc;
+                else bar:=bl0xb;
+                end if;
+             --division 12
+            when bl0xc=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(12)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*13) then
+                    bar:=bl0xd;
+                else bar:=bl0xc;
+                end if;
+            --division 13
+            when bl0xd=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(13)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*14) then
+                    bar:=bl0xe;
+                else bar:=bl0xd;
+                end if;
+            --division 14
+            when bl0xe=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(14)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*15) then
+                    bar:=bl0xf;
+                else bar:=bl0xe;
+                end if;
+            --division 15
+            when bl0xf=>
+                if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(15)(9 downto 2)) then
+                    rectangle<='1';
+                else rectangle <='0';
+                end if;
+                if Hcount >= HSYNC+HBACK_PORCH+(bar_w*16) then
+                    bar:=blreset;
+                else bar:=bl0xf;
+                end if;
+            end case;
 	end if;
 end process RectangleGen;
 
