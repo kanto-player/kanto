@@ -50,7 +50,7 @@ set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_RO
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
-set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH conductor_tb -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH recomb_tb -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_NAME audio_buffer_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id audio_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "227 us" -section_id audio_buffer_tb
@@ -89,8 +89,61 @@ set_global_assignment -name EDA_TEST_BENCH_NAME fdom_ram_tb -section_id eda_simu
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id fdom_ram_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "100 ns" -section_id fdom_ram_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME fdom_ram_tb -section_id fdom_ram_tb
+<<<<<<< Updated upstream
+=======
+set_global_assignment -name VHDL_FILE fft_fdom_ram_row.vhd
+set_global_assignment -name VHDL_FILE conductor.vhd
+set_global_assignment -name VHDL_FILE sevenseg.vhd
+set_global_assignment -name VHDL_FILE visualizer.vhd
+set_global_assignment -name VHDL_FILE complex_mult.vhd
+set_global_assignment -name VHDL_FILE recomb_stage3.vhd
+set_global_assignment -name VHDL_FILE recomb_stage2.vhd
+set_global_assignment -name VHDL_FILE recomb_stage1.vhd
+set_global_assignment -name VHDL_FILE fft_recomb.vhd
+set_global_assignment -name VHDL_FILE recomb_rom128.vhd
+set_global_assignment -name VHDL_FILE recomb_rom64.vhd
+set_global_assignment -name VHDL_FILE recomb_rom32.vhd
+set_global_assignment -name VHDL_FILE recomb_rom16.vhd
+set_global_assignment -name VHDL_FILE dft_coeff_rom.vhd
+set_global_assignment -name VHDL_FILE types_pkg.vhd
+set_global_assignment -name VHDL_FILE fft_fdom_ram.vhd
+set_global_assignment -name VHDL_FILE fft_controller.vhd
+set_global_assignment -name VHDL_FILE dft_top.vhd
+set_global_assignment -name VHDL_FILE dft_stage3.vhd
+set_global_assignment -name VHDL_FILE dft_stage2.vhd
+set_global_assignment -name VHDL_FILE dft_stage1.vhd
+set_global_assignment -name VHDL_FILE sd_controller.vhd
+set_global_assignment -name VHDL_FILE de2_wm8731_audio.vhd
+set_global_assignment -name VERILOG_FILE de2_i2c_controller.v
+set_global_assignment -name VERILOG_FILE de2_i2c_av_config.v
+set_global_assignment -name VHDL_FILE audio_test.vhd
+set_global_assignment -name VHDL_FILE ab_middleman.vhd
+set_global_assignment -name VHDL_FILE ab_counter.vhd
+set_global_assignment -name VHDL_FILE audio_buffer.vhd
+set_global_assignment -name VHDL_FILE kanto.vhd
+set_global_assignment -name QIP_FILE audpll.qip
+set_global_assignment -name IP_TOOL_NAME ALTPLL -qip audpll.qip
+set_global_assignment -name IP_TOOL_VERSION 12.1 -qip audpll.qip
+set_global_assignment -name VHDL_FILE audpll.vhd -qip audpll.qip
+set_global_assignment -name MISC_FILE audpll.cmp -qip audpll.qip
+set_global_assignment -name MISC_FILE audpll.ppf -qip audpll.qip
+set_global_assignment -name QIP_FILE mult.qip
+set_global_assignment -name IP_TOOL_NAME LPM_MULT -qip mult.qip
+set_global_assignment -name IP_TOOL_VERSION 12.1 -qip mult.qip
+set_global_assignment -name VHDL_FILE mult.vhd -qip mult.qip
+set_global_assignment -name MISC_FILE mult.cmp -qip mult.qip
+>>>>>>> Stashed changes
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name EDA_TEST_BENCH_FILE audio_buffer_tb.vhd -section_id audio_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE i2c_tb.vhd -section_id i2c_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE codec_tb.vhd -section_id codec_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE audio_test_tb.vhd -section_id audio_test_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE dft_tb.vhd -section_id dft_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE recomb_tb.vhd -section_id recomb_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE visualizer_tb.vhd -section_id visualizer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE fft_tb.vhd -section_id fft_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE fdom_ram_tb.vhd -section_id fdom_ram_tb
 set_location_assignment PIN_N25 -to SW[0]
 set_location_assignment PIN_N26 -to SW[1]
 set_location_assignment PIN_P25 -to SW[2]
@@ -516,6 +569,7 @@ set_location_assignment PIN_V24 -to GPIO_1[32]
 set_location_assignment PIN_V23 -to GPIO_1[33]
 set_location_assignment PIN_W25 -to GPIO_1[34]
 set_location_assignment PIN_W23 -to GPIO_1[35]
+<<<<<<< Updated upstream
 set_global_assignment -name EDA_TEST_BENCH_NAME conductor_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id conductor_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "280 ns" -section_id conductor_tb
