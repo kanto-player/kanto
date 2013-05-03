@@ -19,7 +19,6 @@
 /.sopc_builder
 /sopc_builder_log.txt
 /nios_system_log.txt
-*.mif
 *.html
 *.bsf
 *.ptf.*
