@@ -183,6 +183,7 @@ architecture datapath of kanto is
 	signal fft_readdata : std_logic_vector(15 downto 0);
 	signal fft_start : std_logic;
     signal fft_allow_write : std_logic;
+    signal fft_tdom_write : std_logic;
     signal fft_fdom_addr : unsigned(7 downto 0);
     signal fft_fdom_data : signed(31 downto 0);
 	signal fft_done      : std_logic;
@@ -300,6 +301,8 @@ begin
         write_en => sd_write_en
     );
 
+    fft_tdom_write <= fft_allow_write and sd_write_en;
+
     FFT : entity work.fft_controller port map (
         clk => main_clk,
         start => fft_start,
@@ -307,7 +310,7 @@ begin
 
         tdom_addr_in => sd_writeaddr,
         tdom_data_in => sd_writedata,
-        tdom_write => (fft_allow_write and sd_write_en),
+        tdom_write => fft_tdom_write,
         
         fdom_addr_out => fft_fdom_addr,
         fdom_data_out => fft_fdom_data
