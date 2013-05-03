@@ -90,12 +90,12 @@ begin
         clk => clk
     );
 
-    COEFF_ROM : entity work.dft_coeff_rom port map (
-        clk => clk,
-        data_low => dft_rom_data_low,
-        addr_low => dft_rom_addr_low,
-        data_high => dft_rom_data_high,
-        addr_high => dft_rom_addr_high
+    COEFF_ROM : entity work.dft_lut port map (
+        clock => clk,
+        address_a => std_logic_vector(dft_rom_addr_low),
+        address_b => std_logic_vector(dft_rom_addr_high),
+        signed(q_a) => dft_rom_data_low,
+        signed(q_b) => dft_rom_data_high
     );
     
     tdom_sel <= fft_reorder(to_integer(comp_step));

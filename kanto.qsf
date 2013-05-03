@@ -565,4 +565,5 @@ set_global_assignment -name QIP_FILE rcrom16.qip
 set_global_assignment -name QIP_FILE rcrom32.qip
 set_global_assignment -name QIP_FILE rcrom64.qip
 set_global_assignment -name QIP_FILE rcrom128.qip
+set_global_assignment -name QIP_FILE dft_lut.qip
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
