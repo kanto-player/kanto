@@ -540,7 +540,6 @@ set_global_assignment -name VHDL_FILE sd_controller.vhd
 set_global_assignment -name VHDL_FILE de2_wm8731_audio.vhd
 set_global_assignment -name VERILOG_FILE de2_i2c_controller.v
 set_global_assignment -name VERILOG_FILE de2_i2c_av_config.v
-set_global_assignment -name VHDL_FILE audio_test.vhd
 set_global_assignment -name VHDL_FILE audio_buffer.vhd
 set_global_assignment -name VHDL_FILE kanto.vhd
 set_global_assignment -name QIP_FILE audpll.qip
