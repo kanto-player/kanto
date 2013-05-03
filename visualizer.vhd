@@ -76,7 +76,7 @@ architecture rtl of visualizer is
   signal sram_base      : integer := 0;
   signal counter 	: integer := 0;
   signal addr_counter   : unsigned(7 downto 0) := x"00";
-  signal sum_counter    : unsigned(7 downto 0) := x"00";
+  signal sum_counter    : unsigned(4 downto 0) := "00000";
   signal test_ones      : unsigned (15 downto 0) := "1111111111111111"; 
   signal test_zeros     : std_logic_vector (15 downto 0) := "0000111111111111"; 
   signal test_half      : std_logic_vector (15 downto 0) := "0111111111111111";
@@ -91,7 +91,7 @@ begin
   -- Horizontal and vertical counters
   
   fft_fdom_addr <= addr_counter;
-  oldsum <= sum(to_integer(sum_counter(7 downto 4)));
+  oldsum <= sum(to_integer(sum_counter(4 downto 1)));
   sum_debug <= std_logic_vector(oldsum(9 downto 2));
   
   GetData : process (clk50)
@@ -118,18 +118,18 @@ begin
                 reset<='0';
 			end if;
 		    when B =>
-            if sum_counter = x"FF" then
+            if sum_counter = x"1F" then -- count up to 31
                 addr_counter <= x"00";
-                sum_counter <= x"00";
+                sum_counter <= "00000";
                 state := A;
                 --sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
 
                 if last_fdom_data(15) = '1' then
-                         sum(to_integer(sum_counter(7 downto 4))) <= oldsum 
+                         sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
                                 + unsigned(not last_fdom_data(14 downto 0));
 
                 else 
-                    sum(to_integer(sum_counter(7 downto 4))) <= oldsum 
+                    sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
                                 + unsigned(last_fdom_data(14 downto 0));
                 end if;
                 ledr15 <= '0';
@@ -138,18 +138,18 @@ begin
             else
                 --sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
                 if last_fdom_data(15) = '1' then
-                         sum(to_integer(sum_counter(7 downto 4))) <= oldsum 
+                         sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
                                 + unsigned(not last_fdom_data(14 downto 0));
 
                 else 
-                    sum(to_integer(sum_counter(7 downto 4))) <= oldsum 
+                    sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
                                 + unsigned(last_fdom_data(14 downto 0));
                 end if;
                 ledr15 <= '1';
                 ledr16 <= '0';
                 ledr17 <= '1';
                 addr_counter  <= addr_counter + 1;
-                sum_counter <= addr_counter;
+                sum_counter <= addr_counter(4 downto 0);
                 last_fdom_data <= fft_fdom_data(31 downto 16);
                 
                 state := B;
@@ -249,6 +249,8 @@ end process GetData;
     end if;
   end process VBlankGen;
 
+  -- block0x
+  
 RectangleGen: process (clk25)
 begin
 	if rising_edge(clk25) then
