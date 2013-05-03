@@ -39,31 +39,31 @@ architecture rtl of audio_buffer is
     type ram_type is array(0 to 511) of signed(15 downto 0);
     signal audio_ram : ram_type;
 
-    signal counter_en : std_logic := '0';
 begin
     wfulladdr <= wlr & writeaddr;
     rfulladdr_even <= (not wlr) & readaddr_even & readsel & '0';
     rfulladdr_odd <= (not wlr) & readaddr_odd & readsel & '1';
+    
     process (clk)
+        variable counter_en : std_logic := '0';
     begin
         if rising_edge(clk) then
             if write_en = '1' then
                 audio_ram(to_integer(wfulladdr)) <= writedata;
             end if;
+            
             readdata_even <= audio_ram(to_integer(rfulladdr_even));
             readdata_odd <= audio_ram(to_integer(rfulladdr_odd));
-        end if;
-    end process;
+            
+            if play = '1' then
+                audio_data <= audio_ram(to_integer(audio_addr));
+            else
+                audio_data <= (others => '0');
+            end if;
 
-    audio_data <= audio_ram(to_integer(audio_addr)) 
-                        when play = '1' else (others => '0');
-
-    process (clk) -- assert mm_en one clock behind counter_en
-    begin
-        if rising_edge(clk) then
             swapped <= '0';
             last_audio_request <= audio_request;
-            counter_en <= audio_request and (not last_audio_request);
+            counter_en := audio_request and (not last_audio_request);
 
             if counter_en = '1' then
                 -- swap when audio address reaches 255 or 511
@@ -71,7 +71,6 @@ begin
                     wlr <= audio_addr(8);
                     swapped <= '1';
                 end if;
-                counter_en <= '0';
                 audio_addr <= audio_addr + 1;
             elsif force_swap = '1' then
                 audio_addr <= wlr & x"00";
