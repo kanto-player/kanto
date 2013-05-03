@@ -57,6 +57,9 @@ architecture rtl of fft_controller is
     signal rcrom128_data : signed(31 downto 0);
     signal rcromcur_addr : unsigned(3 downto 0);
     signal rcromcur_data : signed(31 downto 0);
+    signal rcrom32_addr : unsigned(4 downto 0);
+    signal rcrom64_addr : unsigned(5 downto 0);
+    signal rcrom128_addr : unsigned(6 downto 0);
     
     signal recomb_writeaddr_low : unsigned(3 downto 0);
     signal recomb_writedata_low : signed(31 downto 0);
@@ -202,33 +205,31 @@ begin
         rcrom64_data when "10",
         rcrom128_data when others;
 
-    RCR16 : entity work.recomb_rom16 port map (
-        addr => rcromcur_addr,
-        data => rcrom16_data,
-        clk => clk
+    RCR16 : entity work.rcrom16 port map (
+        address => std_logic_vector(rcromcur_addr),
+        signed(q) => rcrom16_data,
+        clock => clk
     );
 
-    RCR32 : entity work.recomb_rom32 port map (
-        addr => rcromcur_addr,
-        data => rcrom32_data,
-        clk => clk,
-        sel => comp_step(0)
+    rcrom32_addr <= comp_step(0) & rcromcur_addr;
+    RCR32 : entity work.rcrom32 port map (
+        address => std_logic_vector(rcrom32_addr),
+        signed(q) => rcrom32_data,
+        clock => clk
     );
 
-
-    RCR64 : entity work.recomb_rom64 port map (
-        addr => rcromcur_addr,
-        data => rcrom64_data,
-        clk => clk,
-        sel => comp_step(1 downto 0)
+    rcrom64_addr <= comp_step(1 downto 0) & rcromcur_addr;
+    RCR64 : entity work.rcrom64 port map (
+        address => std_logic_vector(rcrom64_addr),
+        signed(q) => rcrom64_data,
+        clock => clk
     );
 
-
-    RCR128 : entity work.recomb_rom128 port map (
-        addr => rcromcur_addr,
-        data => rcrom128_data,
-        clk => clk,
-        sel => comp_step
+    rcrom128_addr <= comp_step & rcromcur_addr;
+    RCR128 : entity work.rcrom128 port map (
+        address => std_logic_vector(rcrom128_addr),
+        signed(q) => rcrom128_data,
+        clock => clk
     );
 
     done <= '1' when control_state = idle else '0';
