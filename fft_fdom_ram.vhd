@@ -4,7 +4,6 @@ use ieee.numeric_std.all;
 
 entity fft_fdom_ram is
     port (clk : std_logic;
-          reset : std_logic;
           writedata_low : in signed(31 downto 0);
           writeaddr_low : in unsigned(3 downto 0);
           readdata_low : out signed(31 downto 0);
@@ -62,14 +61,13 @@ begin
         "1111" when others;
     
     LUMAP : for i in 0 to 15 generate
-        ROW : entity work.fft_fdom_ram_row port map (
-            clk => clk,
-            reset => reset,
-            writedata => row_writedata(i),
-            writeaddr => row_writeaddr(i),
-            write_en => row_write_en(i),
-            readdata => row_readdata(i),
-            readaddr => row_readaddr(i)
+        ROW : entity work.fdom_row port map (
+            clock => clk,
+            data => std_logic_vector(row_writedata(i)),
+            wraddress => std_logic_vector(row_writeaddr(i)),
+            wren => row_write_en(i),
+            signed(q) => row_readdata(i),
+            rdaddress => std_logic_vector(row_readaddr(i))
         );
     end generate LUMAP;
 end rtl;

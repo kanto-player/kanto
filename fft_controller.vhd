@@ -82,7 +82,6 @@ begin
         writedata_high => fdom_writedata_high,
         writeaddr_high => fdom_writeaddr_high,
         write_en_high => fdom_write_en_high,
-        reset => start,
         stage => recomb_stage,
         step => fdom_step,
         clk => clk
