@@ -182,11 +182,7 @@ architecture datapath of kanto is
 	signal fft_addr : std_logic_vector(17 downto 0);
 	signal fft_readdata : std_logic_vector(15 downto 0);
 	signal fft_start : std_logic;
-    signal fft_tdom_addr_even : unsigned(3 downto 0);
-    signal fft_tdom_data_even : signed(15 downto 0);
-    signal fft_tdom_addr_odd : unsigned(3 downto 0);
-    signal fft_tdom_data_odd : signed(15 downto 0);
-    signal fft_tdom_sel : unsigned(2 downto 0);
+    signal fft_allow_write : std_logic;
     signal fft_fdom_addr : unsigned(7 downto 0);
     signal fft_fdom_data : signed(31 downto 0);
 	signal fft_done      : std_logic;
@@ -259,6 +255,7 @@ begin
         sd_ready => sd_ready,
         fft_start => fft_start,
         fft_done => fft_done,
+        fft_allow_write => fft_allow_write,
         cond_err => cond_err,
         viz_reset => viz_reset
     );
@@ -278,13 +275,7 @@ begin
         
         writeaddr => sd_writeaddr,
         writedata => sd_writedata,
-        write_en => sd_write_en,
-        
-        readdata_even => fft_tdom_data_even,
-        readaddr_even => fft_tdom_addr_even,
-        readdata_odd => fft_tdom_data_odd,
-        readaddr_odd => fft_tdom_addr_odd,
-        readsel => fft_tdom_sel
+        write_en => sd_write_en
     );
 
     SDC : entity work.sd_controller port map (
@@ -313,12 +304,11 @@ begin
         clk => main_clk,
         start => fft_start,
         done => fft_done,
+
+        tdom_addr_in => sd_writeaddr,
+        tdom_data_in => sd_writedata,
+        tdom_write => (fft_allow_write and sd_write_en),
         
-        tdom_addr_even => fft_tdom_addr_even,
-        tdom_data_even => fft_tdom_data_even,
-        tdom_addr_odd => fft_tdom_addr_odd,
-        tdom_data_odd => fft_tdom_data_odd,
-        tdom_sel => fft_tdom_sel,
         fdom_addr_out => fft_fdom_addr,
         fdom_data_out => fft_fdom_data
     );

@@ -3,23 +3,26 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity fft_controller is
-    port (tdom_data_even : in signed(15 downto 0);
-          tdom_addr_even : out unsigned(3 downto 0);
-          tdom_data_odd : in signed(15 downto 0);
-          tdom_addr_odd : out unsigned(3 downto 0);
-          tdom_sel : out unsigned(2 downto 0);
+    port (clk : in std_logic;
+          start : in std_logic;
+          done : out std_logic;
+
+          tdom_data_in : in signed(15 downto 0);
+          tdom_addr_in : in unsigned(7 downto 0);
+          tdom_write   : in std_logic;
 
           fdom_data_out : out signed(31 downto 0);
-          fdom_addr_out : in unsigned(7 downto 0);
-
-          clk : in std_logic;
-          start : in std_logic;
-          done : out std_logic);
+          fdom_addr_out : in unsigned(7 downto 0));
 end fft_controller;
 
 architecture rtl of fft_controller is
     type control_state_type is (idle, dftsetup, dftcomp,
                                 recomb_setup, recomb_comp);
+    signal tdom_addr_even : unsigned(3 downto 0);
+    signal tdom_data_even : signed(15 downto 0);
+    signal tdom_addr_odd : unsigned(3 downto 0);
+    signal tdom_data_odd : signed(15 downto 0);
+    signal tdom_sel : unsigned(2 downto 0);
     signal control_state : control_state_type;
     signal last_state : control_state_type;
     signal fdom_writedata_low : signed(31 downto 0);
@@ -73,6 +76,20 @@ architecture rtl of fft_controller is
     signal recomb_write_high : std_logic;
     signal recomb_done : std_logic;
 begin
+    
+    TDOM_RAM : entity work.fft_tdom_ram port map (
+        clk => clk,
+
+        readaddr_even => tdom_addr_even,
+        readdata_even => tdom_data_even,
+        readaddr_odd => tdom_addr_odd,
+        readdata_odd => tdom_data_odd,
+        readsel => tdom_sel,
+
+        writeaddr => tdom_addr_in,
+        writedata => tdom_data_in,
+        write_en => tdom_write
+    );
 
     FDOM_RAM : entity work.fft_fdom_ram port map (
         readdata_low => fdom_readdata_low,

@@ -8,6 +8,7 @@ entity conductor is
           ab_audio_ok : out std_logic;
           ab_swapped : in std_logic;
           ab_force_swap : out std_logic;
+          fft_allow_write : out std_logic;
 
           sd_start : out std_logic;
           sd_ready : in std_logic;
@@ -32,7 +33,7 @@ begin
             
             if reset_n = '0' then
                 state <= initial;
-                fft_counter <= (others => '0');
+                fft_counter <= "11";
             else
                 case state is
                     when initial =>
@@ -47,6 +48,7 @@ begin
                         end if;
                     when force_swap =>
                         state <= playing;
+                        fft_counter <= "00";
                     when playing =>
                         if ab_swapped = '1' then
                             if sd_ready = '0' or fft_done = '0' then
@@ -75,4 +77,6 @@ begin
                          state = force_swap else '0';
     fft_start <= '1' when state = block_end and fft_counter = 0 else '0';
     viz_reset <= '1' when state = fft_end else '0';
+
+    fft_allow_write <= '1' when fft_counter = "11" else '0';
 end rtl;
