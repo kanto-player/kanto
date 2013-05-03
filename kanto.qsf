@@ -521,7 +521,6 @@ set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id conductor_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "280 ns" -section_id conductor_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME conductor_tb -section_id conductor_tb
 set_global_assignment -name VHDL_FILE fft_tdom_ram.vhd
-set_global_assignment -name VHDL_FILE fft_fdom_ram_row.vhd
 set_global_assignment -name VHDL_FILE conductor.vhd
 set_global_assignment -name VHDL_FILE sevenseg.vhd
 set_global_assignment -name VHDL_FILE visualizer.vhd
