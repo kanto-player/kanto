@@ -259,7 +259,6 @@ RectangleGen: process (clk25)
 variable bar : rectgenstates := blreset;
 begin
 	if rising_edge(clk25) then
-<<<<<<< HEAD
 		if reset='1' then
 			rectangle<='0';
 		--division 1
