@@ -213,11 +213,6 @@ architecture datapath of kanto is
     signal viz_reset : std_logic; 
     signal cond_err : std_logic;
     
-    -- visUALIZER reset testing
-    signal viz_reset1 : std_logic := '0';
-    signal fft_fdom_addr1 : unsigned(7 downto 0);
-    signal fft_fdom_data1 : signed(31 downto 0);
-
     component de2_i2c_av_config is
         port (iclk : in std_logic;
               irst_n : in std_logic;
@@ -320,20 +315,12 @@ begin
         fdom_data_out => fft_fdom_data
     );
     
-<<<<<<< HEAD
-    VIZ_DUM : entity work.viz_dummy port map (
-        clk50 => main_clk,
-        viz_reset => viz_reset1,
-        fft_fdom_addr => fft_fdom_addr1,
-        fft_fdom_data => fft_fdom_data1
-    );
-    
 	 VISUALIZER : entity work.visualizer port map(
 		clk25 => clk25,
         clk50 => main_clk,
-        reset_data      => viz_reset1,
-		fft_fdom_addr 	=> fft_fdom_addr1,
-		fft_fdom_data 	=> fft_fdom_data1,
+        reset_data      => viz_reset,
+		fft_fdom_addr 	=> fft_fdom_addr,
+		fft_fdom_data 	=> fft_fdom_data,
 		VGA_CLK        => VGA_CLK,
 		VGA_HS         => VGA_HS,
 		VGA_VS         => VGA_VS,
