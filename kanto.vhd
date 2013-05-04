@@ -215,8 +215,9 @@ architecture datapath of kanto is
     signal sum_debug : std_logic_vector(7 downto 0);
     
     -- visUALIZER reset testing
-    signal one_cycle_reset : std_logic := '0';
-    signal reset_counter : integer := 0;
+    signal viz_reset1 : std_logic := '0';
+    signal fft_fdom_addr1 : unsigned(7 downto 0);
+    signal fft_fdom_data1 : signed(31 downto 0);
 
     component de2_i2c_av_config is
         port (iclk : in std_logic;
@@ -320,14 +321,22 @@ begin
         fdom_data_out => fft_fdom_data
     );
     
+    VIZ_DUM : entity work.viz_dummy port map (
+        clk50 => main_clk,
+        viz_reset => viz_reset1,
+        fft_fdom_addr => fft_fdom_addr1,
+        fft_fdom_data => fft_fdom_data1
+
+    );
+    
 	 VISUALIZER : entity work.visualizer port map(
 		--clk   			=> main_clk,
 		clk25 => clk25,
         clk50 => main_clk,
         sum_debug => sum_debug,
-        reset_data      => viz_reset,
-		fft_fdom_addr 	=> fft_fdom_addr,
-		fft_fdom_data 	=> fft_fdom_data,
+        reset_data      => viz_reset1,
+		fft_fdom_addr 	=> fft_fdom_addr1,
+		fft_fdom_data 	=> fft_fdom_data1,
 		VGA_CLK        => VGA_CLK,
 		VGA_HS         => VGA_HS,
 		VGA_VS         => VGA_VS,
@@ -338,7 +347,10 @@ begin
 		VGA_B 			=> VGA_B,
 		ledr17				=> LEDR(17),
 		ledr16				=> LEDR(16),
-		ledr15				=> LEDR(15)
+		ledr15				=> LEDR(15),
+        sw_r            => SW(2),
+        sw_g            => SW(1),
+        sw_b            => SW(0)
 	 );
      
     SS0 : entity work.sevenseg port map (

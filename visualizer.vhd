@@ -24,6 +24,10 @@ entity visualizer is
     ledr17 : out std_logic;
     ledr16 : out std_logic;
     ledr15 : out std_logic;
+    
+    sw_r : in std_logic;
+    sw_g : in std_logic;
+    sw_b : in std_logic;
 	 
     VGA_CLK,                         -- Clock
     VGA_HS,                          -- H_SYNC
@@ -368,17 +372,22 @@ end process RectangleGen;
 			VGA_B <= "0000000000";
 		 elsif clk25'event and clk25 = '1' then
 			if rectangle = '1' then
-			VGA_R <= "0000000000";
-			VGA_G <= "1111111111";
-			VGA_B <= "1110011111";
-			elsif vga_hblank = '0' and vga_vblank ='0' then
-			  VGA_R <= "0000000011";
-			  VGA_G <= "0000000011";
-			  VGA_B <= "0000000011";
+                if sw_r = '1' then
+                   VGA_R <= "1111111111";
+                else VGA_R <= "0000000000";
+                end if;
+                if sw_g = '1' then
+                   VGA_G <= "1111111111";
+                else VGA_G <= "0000000000";
+                end if;
+                if sw_b = '1' then
+                   VGA_B <= "1111111111";
+                else VGA_B <= "0000000000";
+                end if;
 			else
-			  VGA_R <= "0000000011";
-			  VGA_G <= "0000000011";
-			  VGA_B <= "0000000011";    
+                VGA_R <= "1001100110";
+                VGA_G <= "1001100110";
+                VGA_B <= "1001100110";    
 			end if;
 		 end if;
   end process VideoOut;
