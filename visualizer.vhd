@@ -58,7 +58,14 @@ architecture rtl of visualizer is
   
   constant bar_w : integer := 40;
   
+<<<<<<< HEAD
   type states is (initializing, reading_data);
+=======
+  type states is (A,B);
+  type rectgenstates is (blreset, bl0x0, bl0x1, bl0x2, bl0x3, bl0x4, bl0x5, bl0x6,
+                         bl0x7, bl0x8, bl0x9, bl0xa, bl0xb, bl0xc, bl0xd, bl0xe,
+                         bl0xf);
+>>>>>>> 575b55077d60dbe0c56d68bc455fa9b2c2e571d4
   
   -- Signals for the video controller
   signal Hcount : unsigned(9 downto 0);  -- Horizontal position (0-800)
@@ -249,8 +256,10 @@ end process GetData;
   end process VBlankGen;
   
 RectangleGen: process (clk25)
+variable bar : rectgenstates := blreset;
 begin
 	if rising_edge(clk25) then
+<<<<<<< HEAD
 		if reset='1' then
 			rectangle<='0';
 		--division 1

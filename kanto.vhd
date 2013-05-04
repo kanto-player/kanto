@@ -320,16 +320,15 @@ begin
         fdom_data_out => fft_fdom_data
     );
     
+<<<<<<< HEAD
     VIZ_DUM : entity work.viz_dummy port map (
         clk50 => main_clk,
         viz_reset => viz_reset1,
         fft_fdom_addr => fft_fdom_addr1,
         fft_fdom_data => fft_fdom_data1
-
     );
     
 	 VISUALIZER : entity work.visualizer port map(
-		--clk   			=> main_clk,
 		clk25 => clk25,
         clk50 => main_clk,
         reset_data      => viz_reset1,
