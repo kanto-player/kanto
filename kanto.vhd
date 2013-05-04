@@ -212,7 +212,6 @@ architecture datapath of kanto is
     signal master_reset_n : std_logic;
     signal viz_reset : std_logic; 
     signal cond_err : std_logic;
-    signal sum_debug : std_logic_vector(7 downto 0);
     
     -- visUALIZER reset testing
     signal viz_reset1 : std_logic := '0';
@@ -333,7 +332,6 @@ begin
 		--clk   			=> main_clk,
 		clk25 => clk25,
         clk50 => main_clk,
-        sum_debug => sum_debug,
         reset_data      => viz_reset1,
 		fft_fdom_addr 	=> fft_fdom_addr1,
 		fft_fdom_data 	=> fft_fdom_data1,
@@ -373,16 +371,6 @@ begin
         display => HEX3
     );
     
-    SS4 : entity work.sevenseg port map (
-        number => sum_debug(3 downto 0),
-        display => HEX4
-    );
-    
-    SS5 : entity work.sevenseg port map (
-        number => sum_debug(7 downto 4),
-        display => HEX5
-    );
-	 
     HEX7 <= (others => '1');
     HEX6 <= (others => '1');
 

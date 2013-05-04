@@ -19,7 +19,6 @@ entity visualizer is
     reset_data: in std_logic;
     fft_fdom_addr : out unsigned(7 downto 0);
     fft_fdom_data : in signed(31 downto 0);
-    sum_debug : out std_logic_vector(7 downto 0);
 	 
     ledr17 : out std_logic;
     ledr16 : out std_logic;
@@ -59,7 +58,7 @@ architecture rtl of visualizer is
   
   constant bar_w : integer := 40;
   
-  type states is (A,B);
+  type states is (initializing, reading_data);
   
   -- Signals for the video controller
   signal Hcount : unsigned(9 downto 0);  -- Horizontal position (0-800)
@@ -73,7 +72,8 @@ architecture rtl of visualizer is
  
   type ram_type is array (0 to 15) of unsigned(19 downto 0);
   
-  signal sum : ram_type := ((others=>(others =>'0')));
+  signal current_sum : ram_type := ((others=>(others =>'0')));
+  signal next_sum : ram_type := ((others=>(others =>'0')));
   
   signal address_r      : integer := 512;
   signal index 	        : integer := 0;
@@ -95,45 +95,39 @@ begin
   -- Horizontal and vertical counters
   
   fft_fdom_addr <= addr_counter;
-  oldsum <= sum(to_integer(sum_counter(4 downto 1)));
-  sum_debug <= std_logic_vector(oldsum(9 downto 2));
+  oldsum <= next_sum(to_integer(sum_counter(4 downto 1)));
   
   GetData : process (clk50)
-  variable state : states := A;
+  variable state : states := initializing;
   begin
 	if rising_edge(clk50) then
 		case state is
-		    when A =>
+		    when initializing =>
 			if reset_data = '1' then
-                sum <= ((others=>(others =>'0')));
+                next_sum <= ((others=>(others =>'0')));
                 last_fdom_data <= (others => '0');
                 sum_counter <= (others => '0');
                 addr_counter <= (others => '0');
                 reset <= '0';
-                ledr15 <= '1';
-                ledr16 <= '1';
-                ledr17 <= '1';
-			    state := B;
+
+			    state := reading_data;
 			else 
-			    state:= A;
-                ledr15 <= '0';
-                ledr16 <= '1';
-                ledr17 <= '1';
+			    state:= initializing;
                 reset<='0';
 			end if;
-		    when B =>
+		    when reading_data =>
             if sum_counter = x"1F" then -- count up to 31
                 addr_counter <= x"00";
                 sum_counter <= "00000";
-                state := A;
+                state := initializing;
                 --sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
 
                 if last_fdom_data(15) = '1' then
-                         sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
+                         next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
                                 + unsigned(not last_fdom_data(14 downto 0));
 
                 else 
-                    sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
+                    next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
                                 + unsigned(last_fdom_data(14 downto 0));
                 end if;
                 ledr15 <= '0';
@@ -142,11 +136,11 @@ begin
             else
                 --sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
                 if last_fdom_data(15) = '1' then
-                         sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
+                         next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
                                 + unsigned(not last_fdom_data(14 downto 0));
 
                 else 
-                    sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
+                    next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
                                 + unsigned(last_fdom_data(14 downto 0));
                 end if;
                 ledr15 <= '1';
@@ -155,8 +149,8 @@ begin
                 addr_counter  <= addr_counter + 1;
                 sum_counter <= addr_counter(4 downto 0);
                 last_fdom_data <= fft_fdom_data(31 downto 16);
-                
-                state := B;
+
+                state := reading_data;
 
             end if;
 			end case;
@@ -164,96 +158,95 @@ begin
 	--end if;
 end process GetData;
 
+  -- Horizontal and vertical counters
+
   HCounter : process (clk25)
   begin
-    if rising_edge(clk25) then
-			if reset = '1' then
-			  Hcount <= (others => '0');
-			elsif EndOfLine = '1' then
-			  Hcount <= (others => '0');
-			else
-			  Hcount <= Hcount + 1;
-			end if;      
-	end if;
+    if rising_edge(clk25) then      
+      if reset = '1' then
+        Hcount <= (others => '0');
+      elsif EndOfLine = '1' then
+        Hcount <= (others => '0');
+      else
+        Hcount <= Hcount + 1;
+      end if;      
+    end if;
   end process HCounter;
 
   EndOfLine <= '1' when Hcount = HTOTAL - 1 else '0';
   
   VCounter: process (clk25)
   begin
-    if rising_edge(clk25) then
-			if reset = '1' then
-			  Vcount <= (others => '0');
-			elsif EndOfLine = '1' then
-			  if EndOfField = '1' then
-				 Vcount <= (others => '0');
-			  else
-				 Vcount <= Vcount + 1;
-			  end if;
-			end if;
+    if rising_edge(clk25) then      
+      if reset = '1' then
+        Vcount <= (others => '0');
+      elsif EndOfLine = '1' then
+        if EndOfField = '1' then
+          Vcount <= (others => '0');
+        else
+          Vcount <= Vcount + 1;
+        end if;
+      end if;
     end if;
   end process VCounter;
 
   EndOfField <= '1' when Vcount = VTOTAL - 1 else '0';
-  
 
   -- State machines to generate HSYNC, VSYNC, HBLANK, and VBLANK
 
   HSyncGen : process (clk25)
   begin
-    if rising_edge(clk25) then
-			if reset = '1' or EndOfLine = '1' then
-			  vga_hsync <= '1';
-			elsif Hcount = HSYNC - 1 then
-			  vga_hsync <= '0';
-			end if;
-		end if;
+    if rising_edge(clk25) then     
+      if reset = '1' or EndOfLine = '1' then
+        vga_hsync <= '1';
+      elsif Hcount = HSYNC - 1 then
+        vga_hsync <= '0';
+      end if;
+    end if;
   end process HSyncGen;
   
   HBlankGen : process (clk25)
   begin
     if rising_edge(clk25) then
-			if reset = '1' then
-			  vga_hblank <= '1';
-			elsif Hcount = HSYNC + HBACK_PORCH then
-			  vga_hblank <= '0';
-			elsif Hcount = HSYNC + HBACK_PORCH + HACTIVE then
-			  vga_hblank <= '1';
-			end if;      
-		end if;
+      if reset = '1' then
+        vga_hblank <= '1';
+      elsif Hcount = HSYNC + HBACK_PORCH then
+        vga_hblank <= '0';
+      elsif Hcount = HSYNC + HBACK_PORCH + HACTIVE then
+        vga_hblank <= '1';
+      end if;      
+    end if;
   end process HBlankGen;
-
+  
   VSyncGen : process (clk25)
   begin
     if rising_edge(clk25) then
-			if reset = '1' then
-			  vga_vsync <= '1';
-			elsif EndOfLine ='1' then
-			  if EndOfField = '1' then
-				 vga_vsync <= '1';
-			  elsif Vcount = VSYNC - 1 then
-				 vga_vsync <= '0';
-			  end if;
-			end if;
+      if reset = '1' then
+        vga_vsync <= '1';
+      elsif EndOfLine ='1' then
+        if EndOfField = '1' then
+          vga_vsync <= '1';
+        elsif Vcount = VSYNC - 1 then
+          vga_vsync <= '0';
+        end if;
+      end if;      
     end if;
   end process VSyncGen;
 
   VBlankGen : process (clk25)
   begin
-    if rising_edge(clk25) then   
-			if reset = '1' then
-			  vga_vblank <= '1';
-			elsif EndOfLine = '1' then
-			  if Vcount = VSYNC + VBACK_PORCH - 1 then
-				 vga_vblank <= '0';
-			  elsif Vcount = VSYNC + VBACK_PORCH + VACTIVE - 1 then
-				 vga_vblank <= '1';
-			  end if;
-		end if;
+    if rising_edge(clk25) then    
+      if reset = '1' then
+        vga_vblank <= '1';
+      elsif EndOfLine = '1' then
+        if Vcount = VSYNC + VBACK_PORCH - 1 then
+          vga_vblank <= '0';
+        elsif Vcount = VSYNC + VBACK_PORCH + VACTIVE - 1 then
+          vga_vblank <= '1';
+        end if;
+      end if;
     end if;
   end process VBlankGen;
-
-  -- block0x
   
 RectangleGen: process (clk25)
 begin
@@ -262,134 +255,144 @@ begin
 			rectangle<='0';
 		--division 1
 		elsif Hcount >= HSYNC+HBACK_PORCH AND Hcount<=HSYNC+HBACK_PORCH+bar_w then
-			if Vcount > VTOTAL-VFRONT_PORCH-to_integer(sum(0)(9 downto 2)) then
+			if Vcount > VTOTAL-VFRONT_PORCH-to_integer(current_sum(0)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 2
 		elsif Hcount>=HSYNC+HBACK_PORCH+bar_w AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*2) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(1)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(1)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 3
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*2) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*3) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(2)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(2)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 4
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*3) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*4) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(3)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(3)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 5
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*4) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*5) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(4)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(4)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 6
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*5) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*6) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(5)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(5)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 7
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*6) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*7) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(6)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(6)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 8
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*7) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*8) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(7)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(7)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 9
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*8) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*9) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(8)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(8)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 10
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*9) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*10) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(9)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(9)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 11
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*10) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*11) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(10)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(10)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 12
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*11) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*12) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(11)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(11)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 13
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*12) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*13) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(12)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(12)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 14
         elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*12) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*14) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(13)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(13)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 15
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*14) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*15) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(14)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(14)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		--division 16
 		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*15) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*16) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(sum(15)(9 downto 2)) then
+			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(15)(9 downto 2)) then
 				rectangle<='1';
 			else rectangle <='0';
 			end if;
 		else
 			rectangle<='0';
-			end if;
+		end if;
 	end if;
+    if vga_hblank = '1' and vga_vblank = '1' then
+        current_sum <= next_sum;
+    end if;
+
 end process RectangleGen;
 
   -- Registered video signals going to the video DAC
 
   VideoOut: process (clk25, reset)
   begin
-		 if reset = '1' then
-			VGA_R <= "0000000000";
-			VGA_G <= "1111111111";
-			VGA_B <= "0000000000";
-		 elsif clk25'event and clk25 = '1' then
-			if rectangle = '1' then
-                if sw_r = '1' then
-                   VGA_R <= "1111111111";
-                else VGA_R <= "0000000000";
-                end if;
-                if sw_g = '1' then
-                   VGA_G <= "1111111111";
-                else VGA_G <= "0000000000";
-                end if;
-                if sw_b = '1' then
-                   VGA_B <= "1111111111";
-                else VGA_B <= "0000000000";
-                end if;
-			else
-                VGA_R <= "1001100110";
-                VGA_G <= "1001100110";
-                VGA_B <= "1001100110";    
-			end if;
-		 end if;
+    if reset = '1' then
+      VGA_R <= "0000000000";
+      VGA_G <= "0000000000";
+      VGA_B <= "0000000000";
+    elsif clk25'event and clk25 = '1' then
+      if rectangle = '1' then
+        if sw_r = '1' then
+            VGA_R <= "0000000000";
+         else VGA_R <= "1111111111";
+         end if;
+                
+        if sw_g = '1' then
+           VGA_G <= "0000000000";
+        else VGA_G <= "1111111111";
+        end if;
+            
+        if sw_b = '1' then
+           VGA_B <= "0000000000";
+        else VGA_B <= "1111111111";
+        end if;
+    elsif vga_hblank = '0' and vga_vblank ='0' then
+        VGA_R <= "0000000000";
+        VGA_G <= "0000000000";
+        VGA_B <= "0000000000";
+    else
+        VGA_R <= "0000000000";
+        VGA_G <= "0000000000";
+        VGA_B <= "0000000000";    
+    end if;
+  end if;
   end process VideoOut;
 
   VGA_CLK <= clk25;
