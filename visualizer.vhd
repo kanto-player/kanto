@@ -249,114 +249,67 @@ end process GetData;
   end process VBlankGen;
   
 RectangleGen: process (clk25)
+    variable hpos : integer range -144 to 800;
+    variable vpos : integer range -10 to 525;
+    variable height : unsigned(7 downto 0);
+    variable sum_index : integer range 0 to 15;
 begin
 	if rising_edge(clk25) then
+        hpos := to_integer(Hcount) - (HSYNC + HBACK_PORCH);
+        vpos := VTOTAL - VFRONT_PORCH - to_integer(Vcount);
 		if reset='1' then
 			rectangle<='0';
-		--division 1
-		elsif Hcount >= HSYNC+HBACK_PORCH AND Hcount<=HSYNC+HBACK_PORCH+bar_w then
-			if Vcount > VTOTAL-VFRONT_PORCH-to_integer(current_sum(0)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 2
-		elsif Hcount>=HSYNC+HBACK_PORCH+bar_w AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*2) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(1)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 3
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*2) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*3) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(2)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 4
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*3) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*4) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(3)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 5
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*4) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*5) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(4)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 6
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*5) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*6) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(5)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 7
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*6) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*7) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(6)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 8
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*7) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*8) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(7)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 9
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*8) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*9) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(8)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 10
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*9) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*10) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(9)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 11
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*10) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*11) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(10)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 12
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*11) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*12) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(11)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 13
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*12) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*13) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(12)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 14
-        elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*12) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*14) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(13)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 15
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*14) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*15) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(14)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
-		--division 16
-		elsif Hcount>=HSYNC+HBACK_PORCH+(bar_w*15) AND Hcount<=HSYNC+HBACK_PORCH+(bar_w*16) then
-			if Vcount>VTOTAL-VFRONT_PORCH-to_integer(current_sum(15)(9 downto 2)) then
-				rectangle<='1';
-			else rectangle <='0';
-			end if;
+        -- is it inside the drawable region
+        elsif hpos >= 0 and hpos <= 16 * bar_w then
+            if hpos <= bar_w then
+                sum_index := 0;
+            elsif hpos <= 2 * bar_w then
+                sum_index := 1;
+            elsif hpos <= 3 * bar_w then
+                sum_index := 2;
+            elsif hpos <= 4 * bar_w then
+                sum_index := 3;
+            elsif hpos <= 5 * bar_w then
+                sum_index := 4;
+            elsif hpos <= 6 * bar_w then
+                sum_index := 5;
+            elsif hpos <= 7 * bar_w then
+                sum_index := 6;
+            elsif hpos <= 8 * bar_w then
+                sum_index := 7;
+            elsif hpos <= 9 * bar_w then
+                sum_index := 8;
+            elsif hpos <= 10 * bar_w then
+                sum_index := 9;
+            elsif hpos <= 11 * bar_w then
+                sum_index := 10;
+            elsif hpos <= 12 * bar_w then
+                sum_index := 11;
+            elsif hpos <= 13 * bar_w then
+                sum_index := 12;
+            elsif hpos <= 14 * bar_w then
+                sum_index := 13;
+            elsif hpos <= 15 * bar_w then
+                sum_index := 14;
+            else
+                sum_index := 15;
+            end if;
+
+            height := current_sum(sum_index)(8 downto 1);
+
+            if vpos < height then
+                rectangle <= '1';
+            else
+                rectangle <= '0';
+            end if;
 		else
 			rectangle<='0';
 		end if;
+        
+        if vga_hblank = '1' and vga_vblank = '1' then
+            current_sum <= next_sum;
+        end if;
 	end if;
-    if vga_hblank = '1' and vga_vblank = '1' then
-        current_sum <= next_sum;
-    end if;
-
 end process RectangleGen;
 
   -- Registered video signals going to the video DAC
