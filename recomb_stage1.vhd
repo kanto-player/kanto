@@ -22,36 +22,26 @@ entity recomb_stage1 is
 end recomb_stage1;
 
 architecture rtl of recomb_stage1 is
-    signal running : std_logic;
+    signal running : std_logic := '0';
     signal addr : unsigned(3 downto 0);
 begin
     rom_addr <= addr;
     low_readaddr <= addr;
     high_readaddr <= addr;
+    
+    rom_real <= rom_data(31 downto 16);
+    rom_imag <= rom_data(15 downto 0);
+    even_real <= low_readdata(31 downto 16);
+    even_imag <= low_readdata(15 downto 0);
+    odd_real <= high_readdata(31 downto 16);
+    odd_imag <= high_readdata(15 downto 0);
 
     process (clk)
     begin
         if rising_edge(clk) then
-            if reset = '1' then
-                writeout <= '0';
-            else
-                writeout <= running;
-            end if;
-            if running = '1' then
-                addrout <= addr;
-                rom_real <= rom_data(31 downto 16);
-                rom_imag <= rom_data(15 downto 0);
-                even_real <= low_readdata(31 downto 16);
-                even_imag <= low_readdata(15 downto 0);
-                odd_real <= high_readdata(31 downto 16);
-                odd_imag <= high_readdata(15 downto 0);
-            end if;
-        end if;
-    end process;
-
-    process (clk)
-    begin
-        if rising_edge(clk) then
+            writeout <= running;
+            addrout <= addr;
+            
             if reset = '1' then
                 running <= '1';
                 addr <= x"0";

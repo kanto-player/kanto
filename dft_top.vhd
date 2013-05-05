@@ -32,6 +32,8 @@ architecture rtl of dft_top is
     signal s3_done : std_logic;
     signal done_delay : unsigned(2 downto 0);
 begin
+    -- make sure done goes low right after reset
+    -- hold it there until first input propagates through pipeline
     done <= '1' when s3_done = '1' and done_delay = "111" else '0';
     
     process (clk)

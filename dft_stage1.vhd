@@ -29,13 +29,14 @@ architecture rtl of dft_stage1 is
 begin
     rom_addr <= k & n;
     tdom_addr <= n;
+            
+    rom_real <= rom_data(31 downto 16);
+    rom_imag <= rom_data(15 downto 0);
+    tdom_real <= tdom_data;
 
     process (clk)
     begin
         if rising_edge(clk) then
-            rom_real <= rom_data(31 downto 16);
-            rom_imag <= rom_data(15 downto 0);
-            tdom_real <= tdom_data;
             done <= done_intern;
             write <= write_intern;
             outk <= prevk;

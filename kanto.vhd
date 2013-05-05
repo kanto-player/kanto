@@ -11,9 +11,6 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-library work;
-use work.types_pkg.all;
-
 entity kanto is
     port(
         -- Clocks
@@ -185,9 +182,8 @@ architecture datapath of kanto is
 	signal fft_addr : std_logic_vector(17 downto 0);
 	signal fft_readdata : std_logic_vector(15 downto 0);
 	signal fft_start : std_logic;
-    signal fft_tdom_addr : nibble_array;
-    signal fft_tdom_data : real_signed_array;
-    signal fft_tdom_sel : std_logic;
+    signal fft_allow_write : std_logic;
+    signal fft_tdom_write : std_logic;
     signal fft_fdom_addr : unsigned(7 downto 0);
     signal fft_fdom_data : signed(31 downto 0);
 	signal fft_done      : std_logic;
@@ -255,6 +251,7 @@ begin
         sd_ready => sd_ready,
         fft_start => fft_start,
         fft_done => fft_done,
+        fft_allow_write => fft_allow_write,
         cond_err => cond_err,
         viz_reset => viz_reset
     );
@@ -274,11 +271,7 @@ begin
         
         writeaddr => sd_writeaddr,
         writedata => sd_writedata,
-        write_en => sd_write_en,
-        
-        readdata => fft_tdom_data,
-        readaddr => fft_tdom_addr,
-        readsel => fft_tdom_sel
+        write_en => sd_write_en
     );
 
     SDC : entity work.sd_controller port map (
@@ -303,14 +296,17 @@ begin
         write_en => sd_write_en
     );
 
+    fft_tdom_write <= fft_allow_write and sd_write_en;
+
     FFT : entity work.fft_controller port map (
         clk => main_clk,
         start => fft_start,
         done => fft_done,
+
+        tdom_addr_in => sd_writeaddr,
+        tdom_data_in => sd_writedata,
+        tdom_write => fft_tdom_write,
         
-        tdom_addr => fft_tdom_addr,
-        tdom_data => fft_tdom_data,
-        tdom_sel => fft_tdom_sel,
         fdom_addr_out => fft_fdom_addr,
         fdom_data_out => fft_fdom_data
     );

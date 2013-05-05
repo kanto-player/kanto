@@ -64,7 +64,6 @@ begin
 
     S2 : entity work.recomb_stage2 port map (
         clk => clk,
-        reset => reset,
 
         rom_real => rom_real,
         rom_imag => rom_imag,
@@ -89,7 +88,6 @@ begin
 
     S3 : entity work.recomb_stage3 port map (
         clk => clk,
-        reset => reset,
         done => pl_done,
 
         even_real => even_real_s23,
@@ -109,6 +107,8 @@ begin
         high_write_en => high_write_en
     );
 
+    -- make sure done goes low right after reset
+    -- hold it there until first input propagates through pipeline
     done <= '1' when pl_done = '1' and done_delay = "111" else '0';
 
     process (clk)

@@ -4,7 +4,6 @@ use ieee.numeric_std.all;
 
 entity recomb_stage2 is
     port (clk : in std_logic;
-          reset : in std_logic;
           rom_real : in signed(15 downto 0);
           rom_imag : in signed(15 downto 0);
           even_real_in : in signed(15 downto 0);
@@ -42,21 +41,16 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            if reset = '1' then
-                writeout <= '0';
-                writemid <= '0';
-            else
-                writemid <= writein;
-                writeout <= writemid;
-                addrmid <= addrin;
-                addrout <= addrmid;
-                even_real_mid <= even_real_in;
-                even_imag_mid <= even_imag_in;
-                even_real_out <= even_real_mid;
-                even_imag_out <= even_imag_mid;
-                odd_real_out <= odd_real_mid(31 downto 16);
-                odd_imag_out <= odd_imag_mid(31 downto 16);
-            end if;
+            writemid <= writein;
+            writeout <= writemid;
+            addrmid <= addrin;
+            addrout <= addrmid;
+            even_real_mid <= even_real_in;
+            even_imag_mid <= even_imag_in;
+            even_real_out <= even_real_mid;
+            even_imag_out <= even_imag_mid;
+            odd_real_out <= odd_real_mid(31 downto 16);
+            odd_imag_out <= odd_imag_mid(31 downto 16);
         end if;
     end process;
 end rtl;

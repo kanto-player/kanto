@@ -2,186 +2,267 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.types_pkg.all;
-
 entity fft_controller is
-    port (tdom_data : in real_signed_array;
-          tdom_addr : out nibble_array;
-          tdom_sel : out std_logic;
+    port (clk : in std_logic;
+          start : in std_logic;
+          done : out std_logic;
+
+          tdom_data_in : in signed(15 downto 0);
+          tdom_addr_in : in unsigned(7 downto 0);
+          tdom_write   : in std_logic;
 
           fdom_data_out : out signed(31 downto 0);
-          fdom_addr_out : in unsigned(7 downto 0);
-
-          clk : in std_logic;
-          start : in std_logic;
-          done : out std_logic);
+          fdom_addr_out : in unsigned(7 downto 0));
 end fft_controller;
 
 architecture rtl of fft_controller is
-    type control_state_type is (idle, dftcomp1, dftcomp2, 
-                                recomb1, recomb2, recomb3, recomb4,
-                                recomb5, recomb6, recomb7, recomb8);
+    type control_state_type is (idle, dftsetup, dftcomp,
+                                recomb_setup, recomb_comp);
+    signal tdom_addr_even : unsigned(3 downto 0);
+    signal tdom_data_even : signed(15 downto 0);
+    signal tdom_addr_odd : unsigned(3 downto 0);
+    signal tdom_data_odd : signed(15 downto 0);
+    signal tdom_sel : unsigned(2 downto 0);
     signal control_state : control_state_type;
     signal last_state : control_state_type;
-    signal fdom_writedata : complex_signed_array;
-    signal fdom_readdata : complex_signed_array;
-    signal fdom_readaddr : nibble_array;
-    signal fdom_writeaddr : nibble_array;
-    signal fdom_write_en : std_logic_vector(0 to 7);
-    signal fdom_sel : std_logic_vector(1 downto 0);
-    signal dft_rom_data : complex_signed_array;
-    signal dft_rom_addr : byte_array;
-    signal dft_out_data : complex_signed_array;
-    signal dft_out_addr : nibble_array;
-    signal dft_out_write : std_logic_vector(0 to 7);
-    signal dft_done : std_logic_vector(0 to 7);
+    signal fdom_writedata_low : signed(31 downto 0);
+    signal fdom_readdata_low : signed(31 downto 0);
+    signal fdom_readaddr_low : unsigned(3 downto 0);
+    signal fdom_writeaddr_low : unsigned(3 downto 0);
+    signal fdom_write_en_low : std_logic;
+    signal fdom_writedata_high : signed(31 downto 0);
+    signal fdom_readdata_high : signed(31 downto 0);
+    signal fdom_readaddr_high : unsigned(3 downto 0);
+    signal fdom_writeaddr_high : unsigned(3 downto 0);
+    signal fdom_write_en_high : std_logic;
+    signal recomb_stage : unsigned(1 downto 0);
+    signal comp_step : unsigned(2 downto 0);
+    signal fdom_step : unsigned(2 downto 0);
+    signal dft_rom_data_low : signed(31 downto 0);
+    signal dft_rom_addr_low : unsigned(7 downto 0);
+    signal dft_out_data_low : signed(31 downto 0);
+    signal dft_out_addr_low : unsigned(3 downto 0);
+    signal dft_out_write_low : std_logic;
+    signal dft_rom_data_high : signed(31 downto 0);
+    signal dft_rom_addr_high : unsigned(7 downto 0);
+    signal dft_out_data_high : signed(31 downto 0);
+    signal dft_out_addr_high : unsigned(3 downto 0);
+    signal dft_out_write_high : std_logic;
+    signal dft_done : std_logic_vector(1 downto 0);
     signal dft_reset : std_logic;
     signal recomb_reset : std_logic;
-    type fft_reorder_type is array(0 to 7) of integer range 0 to 7; 
-    constant fft_reorder : fft_reorder_type := (0, 4, 2, 6, 
-                                                1, 5, 3, 7);
-    type rc_reorder_type is array(0 to 7) of integer range 0 to 7;
-    constant rc12_out_ro : rc_reorder_type := (0, 4, 1, 5, 2, 6, 3, 7);
-    constant rc34_out_ro : rc_reorder_type := (0, 1, 4, 5, 2, 3, 6, 7);
-    constant rc12_in_ro : rc_reorder_type := (0, 2, 4, 6, 1, 3, 5, 7);
-    constant rc34_in_ro : rc_reorder_type := (0, 1, 4, 5, 2, 3, 6, 7);
-    signal rcrom16_data : complex_signed_half_array;
-    signal rcrom32_data : complex_signed_half_array;
-    signal rcrom64_data : complex_signed_half_array;
-    signal rcrom128_data : complex_signed_half_array;
-    signal rcromcur_addr : nibble_half_array;
-    signal rcromcur_data : complex_signed_half_array;
-    signal recomb_writeaddr : nibble_array;
-    signal recomb_writedata : complex_signed_array;
-    signal recomb_readaddr : nibble_array;
-    signal recomb_readdata : complex_signed_array;
-    signal recomb_write : std_logic_vector(0 to 7);
-    signal recomb_done : std_logic_vector(0 to 3);
+    -- This helps us map the DFT inputs to the DFT outputs
+    -- The mappings are (0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15)
+    -- We do the even and odd mappings simultaneously
+    -- Thus, mapping(i) = 2 * fft_reorder(i) for even
+    -- and mapping(i) = 2 * fft_reorder(i) + 1 for odd
+    type fft_reorder_type is array(0 to 7) of unsigned(2 downto 0);
+    constant fft_reorder : fft_reorder_type := ("000", "100", "010", "110", 
+                                                "001", "101", "011", "111");
+    signal rcrom16_data : signed(31 downto 0);
+    signal rcrom32_data : signed(31 downto 0);
+    signal rcrom64_data : signed(31 downto 0);
+    signal rcrom128_data : signed(31 downto 0);
+    signal rcromcur_addr : unsigned(3 downto 0);
+    signal rcromcur_data : signed(31 downto 0);
+    signal rcrom32_addr : unsigned(4 downto 0);
+    signal rcrom64_addr : unsigned(5 downto 0);
+    signal rcrom128_addr : unsigned(6 downto 0);
+    
+    signal recomb_writeaddr_low : unsigned(3 downto 0);
+    signal recomb_writedata_low : signed(31 downto 0);
+    signal recomb_readaddr_low : unsigned(3 downto 0);
+    signal recomb_readdata_low : signed(31 downto 0);
+    signal recomb_write_low : std_logic;
+    signal recomb_writeaddr_high : unsigned(3 downto 0);
+    signal recomb_writedata_high : signed(31 downto 0);
+    signal recomb_readaddr_high : unsigned(3 downto 0);
+    signal recomb_readdata_high : signed(31 downto 0);
+    signal recomb_write_high : std_logic;
+    signal recomb_done : std_logic;
 begin
+    
+    TDOM_RAM : entity work.fft_tdom_ram port map (
+        clk => clk,
+
+        readaddr_even => tdom_addr_even,
+        readdata_even => tdom_data_even,
+        readaddr_odd => tdom_addr_odd,
+        readdata_odd => tdom_data_odd,
+        readsel => tdom_sel,
+
+        writeaddr => tdom_addr_in,
+        writedata => tdom_data_in,
+        write_en => tdom_write
+    );
 
     FDOM_RAM : entity work.fft_fdom_ram port map (
-        writedata => fdom_writedata,
-        readdata => fdom_readdata,
-        bigdata => fdom_data_out,
-        bigaddr => fdom_addr_out,
-        readaddr => fdom_readaddr,
-        writeaddr => fdom_writeaddr,
-        write_en => fdom_write_en,
-        reset => start,
-        sel => fdom_sel,
+        readdata_low => fdom_readdata_low,
+        readaddr_low => fdom_readaddr_low,
+        writedata_low => fdom_writedata_low,
+        writeaddr_low => fdom_writeaddr_low,
+        write_en_low => fdom_write_en_low,
+        readdata_high => fdom_readdata_high,
+        readaddr_high => fdom_readaddr_high,
+        writedata_high => fdom_writedata_high,
+        writeaddr_high => fdom_writeaddr_high,
+        write_en_high => fdom_write_en_high,
+        stage => recomb_stage,
+        step => fdom_step,
         clk => clk
     );
 
-    COEFF_ROM : entity work.dft_coeff_rom port map (
-        data => dft_rom_data,
-        addr => dft_rom_addr
+    COEFF_ROM : entity work.dft_lut port map (
+        clock => clk,
+        address_a => std_logic_vector(dft_rom_addr_low),
+        address_b => std_logic_vector(dft_rom_addr_high),
+        signed(q_a) => dft_rom_data_low,
+        signed(q_b) => dft_rom_data_high
     );
     
-    tdom_sel <= '1' when control_state = dftcomp2 else '0';
-    with control_state select fdom_sel <=
-        "11" when recomb8,
-        "10" when recomb7,
-        "01" when recomb6 | recomb4 | recomb2 | dftcomp2,
-        "00" when others;
+    tdom_sel <= fft_reorder(to_integer(comp_step));
 
-    DFT_GEN : for i in 0 to 7 generate
-        DFT : entity work.dft_top port map (
-            tdom_data => tdom_data(fft_reorder(i)),
-            tdom_addr => tdom_addr(fft_reorder(i)),
+    DFT_EVEN : entity work.dft_top port map (
+        tdom_data => tdom_data_even,
+        tdom_addr => tdom_addr_even,
 
-            clk => clk,
-            reset => dft_reset,
+        clk => clk,
+        reset => dft_reset,
 
-            rom_data => dft_rom_data(i),
-            rom_addr => dft_rom_addr(i),
+        rom_data => dft_rom_data_low,
+        rom_addr => dft_rom_addr_low,
 
-            fdom_data => dft_out_data(i),
-            fdom_addr => dft_out_addr(i),
-            fdom_write => dft_out_write(i),
-            done => dft_done(i)
-        );
-        
-        with control_state select fdom_writedata(i) <=
-            dft_out_data(i) when dftcomp1 | dftcomp2,
-            recomb_writedata(rc12_out_ro(i)) when recomb1 | recomb2,
-            recomb_writedata(rc34_out_ro(i)) when recomb3 | recomb4,
-            recomb_writedata(i) when recomb5 | recomb6 | recomb7 | recomb8,
-            (others => '0') when others;
-        with control_state select fdom_writeaddr(i) <=
-            dft_out_addr(i) when dftcomp1 | dftcomp2,
-            recomb_writeaddr(rc12_out_ro(i)) when recomb1 | recomb2,
-            recomb_writeaddr(rc34_out_ro(i)) when recomb3 | recomb4,
-            recomb_writeaddr(i) when recomb5 | recomb6 | recomb7 | recomb8,
-            (others => '0') when others;
-        with control_state select fdom_write_en(i) <=
-            dft_out_write(i) when dftcomp1 | dftcomp2,
-            recomb_write(rc12_out_ro(i)) when recomb1 | recomb2,
-            recomb_write(rc34_out_ro(i)) when recomb3 | recomb4,
-            recomb_write(i) when recomb5 | recomb6 | recomb7 | recomb8,
-            '0' when others;
-        with control_state select fdom_readaddr(i) <=
-            recomb_readaddr(rc12_out_ro(i)) when recomb1 | recomb2,
-            recomb_readaddr(rc34_out_ro(i)) when recomb3 | recomb4,
-            recomb_readaddr(i) when recomb5 | recomb6 | recomb7 | recomb8,
-            (others => '0') when others;
-        with control_state select recomb_readdata(i) <=
-            fdom_readdata(rc12_in_ro(i)) when recomb1 | recomb2,
-            fdom_readdata(rc34_in_ro(i)) when recomb3 | recomb4,
-            fdom_readdata(i) when recomb5 | recomb6 | recomb7 | recomb8,
-            (others => '0') when others;
-    end generate DFT_GEN;
+        fdom_data => dft_out_data_low,
+        fdom_addr => dft_out_addr_low,
+        fdom_write => dft_out_write_low,
+        done => dft_done(0)
+    );
+    
+    DFT_ODD : entity work.dft_top port map (
+        tdom_data => tdom_data_odd,
+        tdom_addr => tdom_addr_odd,
 
-    RECOMB_GEN : for i in 0 to 3 generate
-        RECOMB : entity work.fft_recomb port map (
-            clk => clk,
-            reset => recomb_reset,
-            rom_addr => rcromcur_addr(i),
-            rom_data => rcromcur_data(i),
-            low_readaddr => recomb_readaddr(i),
-            low_writeaddr => recomb_writeaddr(i),
-            low_readdata => recomb_readdata(i),
-            low_writedata => recomb_writedata(i),
-            low_write_en => recomb_write(i),
-            high_readaddr => recomb_readaddr(i + 4),
-            high_writeaddr => recomb_writeaddr(i + 4),
-            high_readdata => recomb_readdata(i + 4),
-            high_writedata => recomb_writedata(i + 4),
-            high_write_en => recomb_write(i + 4),
-            done => recomb_done(i)
-        );
-    end generate RECOMB_GEN;
+        clk => clk,
+        reset => dft_reset,
 
-    with control_state select rcromcur_data <=
-        rcrom16_data when recomb1 | recomb2,
-        rcrom32_data when recomb3 | recomb4,
-        rcrom64_data when recomb5 | recomb6,
+        rom_data => dft_rom_data_high,
+        rom_addr => dft_rom_addr_high,
+
+        fdom_data => dft_out_data_high,
+        fdom_addr => dft_out_addr_high,
+        fdom_write => dft_out_write_high,
+        done => dft_done(1)
+    );
+
+    -- Multiplex between dft and recomb units for the fdom ram
+    with control_state select fdom_writedata_low <=
+        dft_out_data_low when dftsetup | dftcomp,
+        recomb_writedata_low when recomb_setup | recomb_comp,
+        (others => '0') when others;
+    
+    with control_state select fdom_writeaddr_low <=
+        dft_out_addr_low when dftsetup | dftcomp,
+        recomb_writeaddr_low when recomb_setup | recomb_comp,
+        (others => '0') when others;
+    
+    with control_state select fdom_write_en_low <=
+        dft_out_write_low when dftsetup | dftcomp,
+        recomb_write_low when recomb_setup | recomb_comp,
+        '0' when others;
+    
+    with control_state select fdom_readaddr_low <=
+        recomb_readaddr_low when recomb_setup | recomb_comp,
+        fdom_addr_out(3 downto 0) when idle,
+        (others => '0') when others;
+
+    recomb_readdata_low <= fdom_readdata_low;
+
+    with control_state select fdom_writedata_high <=
+        dft_out_data_high when dftsetup | dftcomp,
+        recomb_writedata_high when recomb_setup | recomb_comp,
+        (others => '0') when others;
+    
+    with control_state select fdom_writeaddr_high <=
+        dft_out_addr_high when dftsetup | dftcomp,
+        recomb_writeaddr_high when recomb_setup | recomb_comp,
+        (others => '0') when others;
+    
+    with control_state select fdom_write_en_high <=
+        dft_out_write_high when dftsetup | dftcomp,
+        recomb_write_high when recomb_setup | recomb_comp,
+        '0' when others;
+    
+    with control_state select fdom_readaddr_high <=
+        recomb_readaddr_high when recomb_setup | recomb_comp,
+        fdom_addr_out(3 downto 0) when idle,
+        (others => '0') when others;
+
+    recomb_readdata_high <= fdom_readdata_high;
+
+    -- highest bit of fdom address determines which half of the RAM
+    -- the data is pulled out of
+    fdom_data_out <= fdom_readdata_high when fdom_addr_out(7) = '1' else
+                     fdom_readdata_low;
+    -- when idle, allow the fdom read address to select the step
+    -- when computing, let comp_step determine it
+    fdom_step <= fdom_addr_out(6 downto 4) when 
+                    control_state = idle else comp_step;
+
+    RECOMB : entity work.fft_recomb port map (
+        clk => clk,
+        reset => recomb_reset,
+        rom_addr => rcromcur_addr,
+        rom_data => rcromcur_data,
+        low_readaddr => recomb_readaddr_low,
+        low_writeaddr => recomb_writeaddr_low,
+        low_readdata => recomb_readdata_low,
+        low_writedata => recomb_writedata_low,
+        low_write_en => recomb_write_low,
+        high_readaddr => recomb_readaddr_high,
+        high_writeaddr => recomb_writeaddr_high,
+        high_readdata => recomb_readdata_high,
+        high_writedata => recomb_writedata_high,
+        high_write_en => recomb_write_high,
+        done => recomb_done
+    );
+
+    -- select which recomb rom to use based on recomb_stage
+    with recomb_stage select rcromcur_data <=
+        rcrom16_data when "00",
+        rcrom32_data when "01",
+        rcrom64_data when "10",
         rcrom128_data when others;
 
-    RCR16 : entity work.recomb_rom16 port map (
-        addr => rcromcur_addr,
-        data => rcrom16_data
+    RCR16 : entity work.rcrom16 port map (
+        address => std_logic_vector(rcromcur_addr),
+        signed(q) => rcrom16_data,
+        clock => clk
     );
 
-    RCR32 : entity work.recomb_rom32 port map (
-        addr => rcromcur_addr,
-        data => rcrom32_data
+    rcrom32_addr <= comp_step(0) & rcromcur_addr;
+    RCR32 : entity work.rcrom32 port map (
+        address => std_logic_vector(rcrom32_addr),
+        signed(q) => rcrom32_data,
+        clock => clk
     );
 
-
-    RCR64 : entity work.recomb_rom64 port map (
-        addr => rcromcur_addr,
-        data => rcrom64_data
+    rcrom64_addr <= comp_step(1 downto 0) & rcromcur_addr;
+    RCR64 : entity work.rcrom64 port map (
+        address => std_logic_vector(rcrom64_addr),
+        signed(q) => rcrom64_data,
+        clock => clk
     );
 
-
-    RCR128 : entity work.recomb_rom128 port map (
-        addr => rcromcur_addr,
-        data => rcrom128_data,
-        sel => fdom_sel(0)
+    rcrom128_addr <= comp_step & rcromcur_addr;
+    RCR128 : entity work.rcrom128 port map (
+        address => std_logic_vector(rcrom128_addr),
+        signed(q) => rcrom128_data,
+        clock => clk
     );
 
     done <= '1' when control_state = idle else '0';
+    dft_reset <= '1' when control_state = dftsetup else '0';
+    recomb_reset <= '1' when control_state = recomb_setup else '0';
     
     process (clk)
     begin
@@ -189,78 +270,45 @@ begin
             last_state <= control_state;
             case control_state is
                 when idle =>
+                    -- reads in the idle state must be done with
+                    -- recomb_stage at "11" so that low and high
+                    -- split the ram into two contiguous chunks
+                    recomb_stage <= "11";
+                    comp_step <= "111";
                     if start = '1' then
-                        control_state <= dftcomp1;
-                        dft_reset <= '1';
+                        control_state <= dftsetup;
                     end if;
-                when dftcomp1 =>
-                    if last_state /= dftcomp1 then
-                        dft_reset <= '0';
-                    elsif dft_done = x"ff" then
-                        control_state <= dftcomp2;
-                        dft_reset <= '1';
+                when dftsetup =>
+                    -- same thing goes for dft
+                    -- recomb_stage set to "11"
+                    recomb_stage <= "11";
+                    -- first time in dftcomp will see comp_step = 0
+                    comp_step <= comp_step + 1;
+                    control_state <= dftcomp;
+                when dftcomp =>
+                    if dft_done = "11" then
+                        if comp_step = "111" then
+                            control_state <= recomb_setup;
+                        else
+                            control_state <= dftsetup;
+                        end if;
                     end if;
-                when dftcomp2 =>
-                    if last_state /= dftcomp2 then
-                        dft_reset <= '0';
-                    elsif dft_done = x"ff" then
-                        control_state <= recomb1;
-                        recomb_reset <= '1';
+                when recomb_setup =>
+                    -- go through steps and then through stages
+                    if comp_step = "111" then
+                        recomb_stage <= recomb_stage + 1;
+                        comp_step <= "000";
+                    else
+                        comp_step <= comp_step + 1;
                     end if;
-                when recomb1 =>
-                    if last_state /= recomb1 then
-                        recomb_reset <= '0';
-                    elsif recomb_done = x"f" then
-                        control_state <= recomb2;
-                        recomb_reset <= '1';
-                    end if;
-                when recomb2 =>
-                    if last_state /= recomb2 then
-                        recomb_reset <= '0';
-                    elsif recomb_done = x"f" then
-                        control_state <= recomb3;
-                        recomb_reset <= '1';
-                    end if;
-                when recomb3 =>
-                    if last_state /= recomb3 then
-                        recomb_reset <= '0';
-                    elsif recomb_done = x"f" then
-                        control_state <= recomb4;
-                        recomb_reset <= '1';
-                    end if;
-                when recomb4 =>
-                    if last_state /= recomb4 then
-                        recomb_reset <= '0';
-                    elsif recomb_done = x"f" then
-                        control_state <= recomb5;
-                        recomb_reset <= '1';
-                    end if;
-                when recomb5 =>
-                    if last_state /= recomb5 then
-                        recomb_reset <= '0';
-                    elsif recomb_done = x"f" then
-                        control_state <= recomb6;
-                        recomb_reset <= '1';
-                    end if;
-                when recomb6 =>
-                    if last_state /= recomb6 then
-                        recomb_reset <= '0';
-                    elsif recomb_done = x"f" then
-                        control_state <= recomb7;
-                        recomb_reset <= '1';
-                    end if;
-                when recomb7 =>
-                    if last_state /= recomb7 then
-                        recomb_reset <= '0';
-                    elsif recomb_done = x"f" then
-                        control_state <= recomb8;
-                        recomb_reset <= '1';
-                    end if;
-                when recomb8 =>
-                    if last_state /= recomb8 then
-                        recomb_reset <= '0';
-                    elsif recomb_done = x"f" then
-                        control_state <= idle;
+                    control_state <= recomb_comp;
+                when recomb_comp =>
+                    if recomb_done = '1' then
+                        if comp_step = "111" and recomb_stage = "11" then
+                            control_state <= idle;
+                        else
+                            control_state <= recomb_setup;
+                        end if;
                     end if;
             end case;
         end if;
