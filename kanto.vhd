@@ -209,6 +209,13 @@ architecture datapath of kanto is
     signal master_reset_n : std_logic;
     signal viz_reset : std_logic; 
     signal cond_err : std_logic;
+
+    -- control and status signals for NIOS
+    signal nios_addr : unsigned(31 downto 0);
+    signal nios_readblock : std_logic;
+    signal nios_play : std_logic;
+    signal nios_done : std_logic;
+    signal nios_stop : std_logic;
     
     component de2_i2c_av_config is
         port (iclk : in std_logic;
@@ -219,7 +226,7 @@ architecture datapath of kanto is
 begin
 
     LEDG(0) <= sd_ready;
-    LEDG(1) <= sd_ccs;
+    LEDG(1) <= ab_audio_ok;
     LEDG(2) <= ab_play;
     LEDR(0) <= sd_err;
     LEDR(1) <= cond_err;
@@ -263,12 +270,17 @@ begin
         sd_start => sd_start,
         sd_ready => sd_ready,
         sd_ccs => sd_ccs,
-        sd_address => sd_blockaddr,
+        sd_addr => sd_blockaddr,
         fft_start => fft_start,
         fft_done => fft_done,
         fft_allow_write => fft_allow_write,
         cond_err => cond_err,
-        viz_reset => viz_reset
+        viz_reset => viz_reset,
+        nios_addr => nios_addr,
+        nios_readblock => nios_readblock,
+        nios_play => nios_play,
+        nios_done => nios_done,
+        nios_stop => nios_stop
     );
 
     AB : entity work.audio_buffer port map (
