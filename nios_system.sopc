@@ -6,7 +6,15 @@
    {
       datum baseAddress
       {
-         value = "1052736";
+         value = "1052704";
+         type = "String";
+      }
+   }
+   element kanto_ctrl.avalon_slave_0
+   {
+      datum baseAddress
+      {
+         value = "1052672";
          type = "String";
       }
    }
@@ -15,14 +23,6 @@
       datum baseAddress
       {
          value = "524288";
-         type = "String";
-      }
-   }
-   element leds.avalon_slave_0
-   {
-      datum baseAddress
-      {
-         value = "1052672";
          type = "String";
       }
    }
@@ -59,17 +59,20 @@
    {
       datum _sortIndex
       {
+         value = "3";
+         type = "int";
+      }
+   }
+   element kanto_ctrl
+   {
+      datum _sortIndex
+      {
          value = "4";
          type = "int";
       }
    }
-   element leds
+   element nios_system
    {
-      datum _sortIndex
-      {
-         value = "3";
-         type = "int";
-      }
    }
    element sram
    {
@@ -91,10 +94,10 @@
  <parameter name="globalResetBus" value="true" />
  <parameter name="hdlLanguage" value="VHDL" />
  <parameter name="maxAdditionalLatency" value="0" />
- <parameter name="projectName" value="kanto" />
+ <parameter name="projectName" value="kanto.qpf" />
  <parameter name="sopcBorderPoints" value="true" />
- <parameter name="systemHash" value="-15630790964" />
- <parameter name="timeStamp" value="1367605045975" />
+ <parameter name="systemHash" value="-18178084095" />
+ <parameter name="timeStamp" value="1367866391106" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <module kind="clock_source" version="12.1" enabled="1" name="clk_0">
   <parameter name="clockFrequency" value="50000000" />
@@ -195,7 +198,7 @@
   <parameter name="dcache_numTCDM" value="_0" />
   <parameter name="dcache_lineSize" value="_32" />
   <parameter name="dcache_bursts" value="false" />
-  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='sram.avalon_slave_0' start='0x80000' end='0x100000' /><slave name='cpu_0.jtag_debug_module' start='0x100800' end='0x101000' /><slave name='leds.avalon_slave_0' start='0x101000' end='0x101040' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0x101040' end='0x101048' /></address-map>]]></parameter>
+  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='sram.avalon_slave_0' start='0x80000' end='0x100000' /><slave name='cpu_0.jtag_debug_module' start='0x100800' end='0x101000' /><slave name='kanto_ctrl.avalon_slave_0' start='0x101000' end='0x101020' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0x101020' end='0x101028' /></address-map>]]></parameter>
   <parameter name="dataAddrWidth" value="21" />
   <parameter name="customInstSlavesSystemInfo" value="&lt;info/&gt;" />
   <parameter name="cpuReset" value="false" />
@@ -205,7 +208,6 @@
   <parameter name="breakOffset" value="32" />
  </module>
  <module kind="de2_sram_controller" version="1.0" enabled="1" name="sram" />
- <module kind="de2_led_flasher" version="1.0" enabled="1" name="leds" />
  <module
    kind="altera_avalon_jtag_uart"
    version="12.1"
@@ -223,6 +225,9 @@
   <parameter name="useRelativePathForSimFile" value="false" />
   <parameter name="writeBufferDepth" value="64" />
   <parameter name="writeIRQThreshold" value="8" />
+ </module>
+ <module kind="de2_kanto_ctrl" version="1.0" enabled="1" name="kanto_ctrl">
+  <parameter name="AUTO_CLOCK_CLOCK_RATE" value="50000000" />
  </module>
  <connection kind="clock" version="12.1" start="clk_0.clk" end="cpu_0.clk" />
  <connection
@@ -257,15 +262,6 @@
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x00080000" />
  </connection>
- <connection kind="clock" version="12.1" start="clk_0.clk" end="leds.clock" />
- <connection
-   kind="avalon"
-   version="12.1"
-   start="cpu_0.data_master"
-   end="leds.avalon_slave_0">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x00101000" />
- </connection>
  <connection kind="clock" version="12.1" start="clk_0.clk" end="jtag_uart_0.clk" />
  <connection
    kind="avalon"
@@ -273,7 +269,7 @@
    start="cpu_0.data_master"
    end="jtag_uart_0.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x00101040" />
+  <parameter name="baseAddress" value="0x00101020" />
  </connection>
  <connection
    kind="interrupt"
@@ -281,5 +277,14 @@
    start="cpu_0.d_irq"
    end="jtag_uart_0.irq">
   <parameter name="irqNumber" value="0" />
+ </connection>
+ <connection kind="clock" version="12.1" start="clk_0.clk" end="kanto_ctrl.clock" />
+ <connection
+   kind="avalon"
+   version="12.1"
+   start="cpu_0.data_master"
+   end="kanto_ctrl.avalon_slave_0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x00101000" />
  </connection>
 </system>

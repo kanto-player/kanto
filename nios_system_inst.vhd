@@ -8,9 +8,14 @@
       SRAM_OE_N_from_the_sram => SRAM_OE_N_from_the_sram,
       SRAM_UB_N_from_the_sram => SRAM_UB_N_from_the_sram,
       SRAM_WE_N_from_the_sram => SRAM_WE_N_from_the_sram,
-      leds_from_the_leds => leds_from_the_leds,
+      nios_addr_from_the_kanto_ctrl => nios_addr_from_the_kanto_ctrl,
+      nios_play_from_the_kanto_ctrl => nios_play_from_the_kanto_ctrl,
+      nios_readblock_from_the_kanto_ctrl => nios_readblock_from_the_kanto_ctrl,
+      nios_stop_from_the_kanto_ctrl => nios_stop_from_the_kanto_ctrl,
       clk_0 => clk_0,
-      reset_n => reset_n
+      nios_done_to_the_kanto_ctrl => nios_done_to_the_kanto_ctrl,
+      reset_n => reset_n,
+      sd_blockaddr_to_the_kanto_ctrl => sd_blockaddr_to_the_kanto_ctrl
     );
 
 

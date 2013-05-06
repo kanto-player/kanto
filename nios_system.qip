@@ -5,15 +5,15 @@ set_global_assignment -name SOURCE_FILE [file join $::quartus(qip_path) "cpu_0.o
 # sram
 set_global_assignment -name TCL_FILE [file join $::quartus(qip_path) "de2_sram_controller_hw.tcl"]
 set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "de2_sram_controller.vhd"]
-set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "sram.v"]
-# leds
-set_global_assignment -name TCL_FILE [file join $::quartus(qip_path) "de2_led_flasher_hw.tcl"]
-set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "de2_led_flasher.vhd"]
-set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "leds.v"]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "sram.vhd"]
 # jtag_uart_0
+# kanto_ctrl
+set_global_assignment -name TCL_FILE [file join $::quartus(qip_path) "de2_kanto_ctrl_hw.tcl"]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "de2_kanto_ctrl.vhd"]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "kanto_ctrl.vhd"]
 # null
 set_global_assignment -name SDC_FILE [file join $::quartus(ip_rootpath) "altera/sopc_builder_ip/altera_avalon_clock_adapter/altera_avalon_clock_adapter.sdc"]
-set_global_assignment -name SOPC_BUILDER_SIGNATURE_ID "BC305BE679520000013E6B9E21F2"
+set_global_assignment -name SOPC_BUILDER_SIGNATURE_ID "BC305BE679700000013E7B30C1F9"
 set_global_assignment -entity "nios_system" -name IP_TOOL_NAME "sopc"
 set_global_assignment -entity "nios_system" -name IP_TOOL_VERSION "12.1"
 set_global_assignment -entity "nios_system" -name IP_TOOL_ENV "sopc"
