@@ -4,7 +4,7 @@
  * Machine generated for CPU 'cpu_0' in SOPC Builder design 'nios_system'
  * SOPC Builder design path: ../../nios_system.sopcinfo
  *
- * Generated: Fri May 03 14:50:09 EDT 2013
+ * Generated: Mon May 06 15:15:24 EDT 2013
  */
 
 /*
@@ -125,7 +125,7 @@
 
 #define __ALTERA_AVALON_JTAG_UART
 #define __ALTERA_NIOS2
-#define __DE2_LED_FLASHER
+#define __DE2_KANTO_CTRL
 #define __DE2_SRAM_CONTROLLER
 
 
@@ -145,19 +145,19 @@
 #define ALT_NUM_INTERNAL_INTERRUPT_CONTROLLERS 1
 #define ALT_NUM_INTERRUPT_CONTROLLERS 1
 #define ALT_STDERR "/dev/jtag_uart_0"
-#define ALT_STDERR_BASE 0x101040
+#define ALT_STDERR_BASE 0x101020
 #define ALT_STDERR_DEV jtag_uart_0
 #define ALT_STDERR_IS_JTAG_UART
 #define ALT_STDERR_PRESENT
 #define ALT_STDERR_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDIN "/dev/jtag_uart_0"
-#define ALT_STDIN_BASE 0x101040
+#define ALT_STDIN_BASE 0x101020
 #define ALT_STDIN_DEV jtag_uart_0
 #define ALT_STDIN_IS_JTAG_UART
 #define ALT_STDIN_PRESENT
 #define ALT_STDIN_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDOUT "/dev/jtag_uart_0"
-#define ALT_STDOUT_BASE 0x101040
+#define ALT_STDOUT_BASE 0x101020
 #define ALT_STDOUT_DEV jtag_uart_0
 #define ALT_STDOUT_IS_JTAG_UART
 #define ALT_STDOUT_PRESENT
@@ -181,7 +181,7 @@
  */
 
 #define ALT_MODULE_CLASS_jtag_uart_0 altera_avalon_jtag_uart
-#define JTAG_UART_0_BASE 0x101040
+#define JTAG_UART_0_BASE 0x101020
 #define JTAG_UART_0_IRQ 0
 #define JTAG_UART_0_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define JTAG_UART_0_NAME "/dev/jtag_uart_0"
@@ -194,17 +194,17 @@
 
 
 /*
- * leds configuration
+ * kanto_ctrl configuration
  *
  */
 
-#define ALT_MODULE_CLASS_leds de2_led_flasher
-#define LEDS_BASE 0x101000
-#define LEDS_IRQ -1
-#define LEDS_IRQ_INTERRUPT_CONTROLLER_ID -1
-#define LEDS_NAME "/dev/leds"
-#define LEDS_SPAN 64
-#define LEDS_TYPE "de2_led_flasher"
+#define ALT_MODULE_CLASS_kanto_ctrl de2_kanto_ctrl
+#define KANTO_CTRL_BASE 0x101000
+#define KANTO_CTRL_IRQ -1
+#define KANTO_CTRL_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define KANTO_CTRL_NAME "/dev/kanto_ctrl"
+#define KANTO_CTRL_SPAN 32
+#define KANTO_CTRL_TYPE "de2_kanto_ctrl"
 
 
 /*
