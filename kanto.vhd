@@ -243,7 +243,14 @@ begin
         SRAM_LB_N_from_the_sram => SRAM_LB_N,
         SRAM_OE_N_from_the_sram => SRAM_OE_N,
         SRAM_UB_N_from_the_sram => SRAM_UB_N,
-        SRAM_WE_N_from_the_sram => SRAM_WE_N
+        SRAM_WE_N_from_the_sram => SRAM_WE_N,
+
+        unsigned(nios_addr_from_the_kanto_ctrl) => nios_addr,
+        nios_done_to_the_kanto_ctrl => nios_done,
+        nios_play_from_the_kanto_ctrl => nios_play,
+        nios_readblock_from_the_kanto_ctrl => nios_readblock,
+        nios_stop_from_the_kanto_ctrl => nios_stop,
+        sd_blockaddr_to_the_kanto_ctrl => std_logic_vector(sd_blockaddr)
     );
 
     PLL : entity work.audpll port map (
