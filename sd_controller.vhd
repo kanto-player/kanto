@@ -18,6 +18,7 @@ port (
     writedata       : out signed(15 downto 0);
     writeaddr       : out unsigned(7 downto 0);
     write_en        : out std_logic;
+    blockaddr       : in unsigned(31 downto 0);
     
     state_debug     : out std_logic_vector(7 downto 0);
     resp_debug      : out std_logic_vector(7 downto 0)
@@ -53,9 +54,7 @@ architecture rtl of sd_controller is
     signal hold_start : std_logic;
     signal state_indicator : unsigned(7 downto 0) := x"00";
 
-    signal blockaddr :  unsigned(31 downto 0) := (others => '0');
     signal word_count : unsigned(7 downto 0);
-    signal hc : std_logic;
 begin
     sclk <= sclk_sig;
     ready <= '1' when state = cmd_done else '0';
@@ -64,7 +63,6 @@ begin
     state_debug <= std_logic_vector(state_indicator);
     waiting <= '1' when state = wait_resp else '0';
     clk_enable <= '1' when clk_divider = "11" else '0';
-    ccs <= hc;
     
     -- clock divider for sd clock
     process(clk50)
@@ -178,7 +176,7 @@ begin
 
         -- is this standard or high capacity card?
         when check_cmd58_ccs =>
-            hc <= response(14);
+            ccs <= response(14);
             counter <= to_unsigned(15, 8);
             state <= recv_resp;
             return_state <= cmd_done;
@@ -286,13 +284,6 @@ begin
                 -- send the read block command (cmd17)
                 counter <= to_unsigned(47, 8);
                 command <= x"51" & std_logic_vector(blockaddr) & x"ff";
-                if hc = '1' then
-                    -- HC cards are block addressed
-                    blockaddr <= blockaddr + 1;
-                else
-                    -- SC cards are byte addressed
-                    blockaddr <= blockaddr + 512;
-                end if;
                 return_state <= check_cmd17;
                 state <= clear_input;
                 state_indicator <= x"17";

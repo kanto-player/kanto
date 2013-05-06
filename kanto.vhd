@@ -202,6 +202,7 @@ architecture datapath of kanto is
     signal sd_ccs : std_logic;
     signal sd_writedata : signed(15 downto 0);
     signal sd_writeaddr : unsigned(7 downto 0);
+    signal sd_blockaddr : unsigned(31 downto 0);
     signal sd_write_en : std_logic;
 	  
     signal clk25 : std_logic := '0';
@@ -256,12 +257,13 @@ begin
     
     CDTR : entity work.conductor port map (
         clk => main_clk,
-        reset_n => master_reset_n,
         ab_audio_ok => ab_audio_ok,
         ab_swapped => ab_swapped,
         ab_force_swap => ab_force_swap,
         sd_start => sd_start,
         sd_ready => sd_ready,
+        sd_ccs => sd_ccs,
+        sd_address => sd_blockaddr,
         fft_start => fft_start,
         fft_done => fft_done,
         fft_allow_write => fft_allow_write,
@@ -304,6 +306,7 @@ begin
         resp_debug => sd_resp_debug,
         state_debug => sd_state_debug,
         
+        blockaddr => sd_blockaddr,
         writedata => sd_writedata,
         writeaddr => sd_writeaddr,
         write_en => sd_write_en
