@@ -1669,13 +1669,6 @@ SYSTEM nios_system
                direction = "input";
                Is_Enabled = "1";
             }
-            PORT read
-            {
-               type = "read";
-               width = "1";
-               direction = "input";
-               Is_Enabled = "1";
-            }
             PORT write
             {
                type = "write";
@@ -1708,6 +1701,13 @@ SYSTEM nios_system
             {
                type = "writedata";
                width = "32";
+               direction = "input";
+               Is_Enabled = "1";
+            }
+            PORT read
+            {
+               type = "read";
+               width = "1";
                direction = "input";
                Is_Enabled = "1";
             }

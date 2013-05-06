@@ -96,8 +96,8 @@
  <parameter name="maxAdditionalLatency" value="0" />
  <parameter name="projectName" value="kanto.qpf" />
  <parameter name="sopcBorderPoints" value="true" />
- <parameter name="systemHash" value="-18178084095" />
- <parameter name="timeStamp" value="1367866391106" />
+ <parameter name="systemHash" value="-19650433893" />
+ <parameter name="timeStamp" value="1367872797724" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <module kind="clock_source" version="12.1" enabled="1" name="clk_0">
   <parameter name="clockFrequency" value="50000000" />
@@ -226,9 +226,7 @@
   <parameter name="writeBufferDepth" value="64" />
   <parameter name="writeIRQThreshold" value="8" />
  </module>
- <module kind="de2_kanto_ctrl" version="1.0" enabled="1" name="kanto_ctrl">
-  <parameter name="AUTO_CLOCK_CLOCK_RATE" value="50000000" />
- </module>
+ <module kind="de2_kanto_ctrl" version="1.0" enabled="1" name="kanto_ctrl" />
  <connection kind="clock" version="12.1" start="clk_0.clk" end="cpu_0.clk" />
  <connection
    kind="avalon"
