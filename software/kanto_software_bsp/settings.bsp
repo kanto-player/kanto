@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>May 6, 2013 3:15:22 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1367867722967</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>May 6, 2013 4:47:35 PM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1367873255884</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>/home/user2/spring13/zm2169/EmbeddedSystems/kanto/software/kanto_software_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>../../nios_system.sopcinfo</SopcDesignFile>
