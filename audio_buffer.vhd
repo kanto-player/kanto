@@ -47,6 +47,7 @@ begin
         if rising_edge(clk) then
             swapped <= '0';
             last_audio_request <= audio_request;
+            -- detect rising edge of audio_request
             counter_en := audio_request and (not last_audio_request);
 
             if counter_en = '1' then

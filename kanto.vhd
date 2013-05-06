@@ -208,15 +208,7 @@ architecture datapath of kanto is
     signal master_reset_n : std_logic;
     signal viz_reset : std_logic; 
     signal cond_err : std_logic;
-    signal sum_debug : std_logic_vector(7 downto 0);
     
-    -- visUALIZER reset testing
-    signal one_cycle_reset : std_logic := '0';
-    signal reset_counter : integer := 0;
-    
-    signal nios_reset_n : std_logic;
-    signal nios_counter : unsigned(15 downto 0);
-
     component de2_i2c_av_config is
         port (iclk : in std_logic;
               irst_n : in std_logic;
@@ -224,20 +216,6 @@ architecture datapath of kanto is
               i2c_sdat : inout std_logic);
     end component;
 begin
-
-    process(CLOCK_50)
-    begin
-    
-        if rising_edge(CLOCK_50) then
-            if nios_counter = x"ffff" then  
-                nios_reset_n <= '1';
-            else
-                nios_reset_n <= '0';
-                nios_counter <= nios_counter + 1;
-            end if;
-        end if;
-        
-    end process;
 
     LEDG(0) <= sd_ready;
     LEDG(1) <= sd_ccs;
@@ -248,10 +226,9 @@ begin
     master_reset_n <= KEY(0);
     
     NIOS : entity work.nios_system port map (
-        clk_0 => CLOCK_50,
-        reset_n => nios_reset_n,
-        --leds are not hooked up
-        --leds_from_the_leds => LEDR(15 downto 0),
+        clk_0 => main_clk,
+        reset_n => '1',
+        
         SRAM_ADDR_from_the_sram => SRAM_ADDR,
         SRAM_CE_N_from_the_sram => SRAM_CE_N,
         SRAM_DQ_to_and_from_the_sram => SRAM_DQ,
@@ -348,10 +325,8 @@ begin
     );
     
 	 VISUALIZER : entity work.visualizer port map(
-		--clk   			=> main_clk,
 		clk25 => clk25,
         clk50 => main_clk,
-        sum_debug => sum_debug,
         reset_data      => viz_reset,
 		fft_fdom_addr 	=> fft_fdom_addr,
 		fft_fdom_data 	=> fft_fdom_data,
@@ -365,7 +340,10 @@ begin
 		VGA_B 			=> VGA_B,
 		ledr17				=> LEDR(17),
 		ledr16				=> LEDR(16),
-		ledr15				=> LEDR(15)
+		ledr15				=> LEDR(15),
+        sw_r            => SW(2),
+        sw_g            => SW(1),
+        sw_b            => SW(0)
 	 );
      
     SS0 : entity work.sevenseg port map (
@@ -388,16 +366,6 @@ begin
         display => HEX3
     );
     
-    SS4 : entity work.sevenseg port map (
-        number => sum_debug(3 downto 0),
-        display => HEX4
-    );
-    
-    SS5 : entity work.sevenseg port map (
-        number => sum_debug(7 downto 4),
-        display => HEX5
-    );
-	 
     HEX7 <= (others => '1');
     HEX6 <= (others => '1');
 
