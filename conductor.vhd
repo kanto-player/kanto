@@ -31,7 +31,7 @@ architecture rtl of conductor is
                              resume, playing, fft_end, block_end);
     signal state : conductor_state := initial; 
     signal fft_done_last : std_logic;
-    signal fft_counter : unsigned(1 downto 0) := "11";
+    signal fft_counter : unsigned(1 downto 0);
     signal blockaddr : unsigned(31 downto 0);
 begin
     sd_addr <= blockaddr;
@@ -47,6 +47,7 @@ begin
                         -- once SD card is initialized,
                         -- let the CPU take control
                         state <= cpuctrl;
+                        fft_counter <= "11";
                     end if;
                 when cpuctrl =>
                     if nios_readblock = '1' then
