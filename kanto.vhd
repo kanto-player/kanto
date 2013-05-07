@@ -208,8 +208,6 @@ architecture datapath of kanto is
     signal clk25 : std_logic := '0';
     signal viz_reset : std_logic; 
     signal cond_err : std_logic;
-    signal skip_back : std_logic;
-    signal skip_forward : std_logic;
     signal audio_track : std_logic_vector(7 downto 0);
 
     -- control and status signals for NIOS
@@ -236,8 +234,6 @@ begin
     LEDR(0) <= sd_err;
     LEDR(1) <= cond_err;
     ab_play <= SW(17) and ab_audio_ok;
-    skip_forward <= not KEY(0);
-    skip_back <= not KEY(1);
     
     NIOS : entity work.nios_system port map (
         clk_0 => main_clk,
@@ -257,8 +253,7 @@ begin
         nios_readblock_from_the_kanto_ctrl => nios_readblock,
         sd_blockaddr_to_the_kanto_ctrl => std_logic_vector(sd_blockaddr),
         audio_track_from_the_kanto_ctrl => audio_track,
-        skip_back_to_the_kanto_ctrl => skip_back,
-        skip_forward_to_the_kanto_ctrl => skip_forward,
+        keys_to_the_kanto_ctrl => not KEY,
 
         sdbuf_addr_from_the_sdbuf => sdbuf_addr,
         sdbuf_data_to_the_sdbuf => sdbuf_data,
