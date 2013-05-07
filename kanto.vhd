@@ -217,6 +217,10 @@ architecture datapath of kanto is
     signal nios_done : std_logic;
     signal nios_stop : std_logic;
     
+    signal sdbuf_rden : std_logic;
+    signal sdbuf_addr : std_logic_vector(7 downto 0);
+    signal sdbuf_data : std_logic_vector(15 downto 0);
+
     component de2_i2c_av_config is
         port (iclk : in std_logic;
               irst_n : in std_logic;
@@ -367,6 +371,16 @@ begin
         sw_g            => SW(1),
         sw_b            => SW(0)
 	 );
+
+    SDBUF : entity work.tdom_full_ram port map (
+        clock => main_clk,
+        data => std_logic_vector(sd_writedata),
+        wraddress => std_logic_vector(sd_writeaddr),
+        wren => fft_tdom_write,
+        rdaddress => sdbuf_addr,
+        q => sdbuf_data,
+        rden => sdbuf_rden
+    );
      
     SS0 : entity work.sevenseg port map (
         number => sd_resp_debug(3 downto 0),
