@@ -6,10 +6,9 @@
 #define KANTO_BLOCKADDR 0
 #define KANTO_READBLOCK 4
 #define KANTO_PLAY 8
-#define KANTO_STOP 12
-#define KANTO_DONE 16
-#define KANTO_TRACK 20
-#define KANTO_SKIP 24
+#define KANTO_DONE 12
+#define KANTO_TRACK 16
+#define KANTO_KEYS 20
 
 #define wait_for_done() while (!IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_DONE))
 
@@ -29,7 +28,7 @@ int main()
 {
     uint32_t blockaddr;
     uint32_t sdbuf_word;
-    unsigned char skip;
+    unsigned char keys;
     int i;
 
     printf("Hello, Kanto\n");
@@ -59,9 +58,9 @@ int main()
 
     for (;;) {
     	blockaddr = IORD_32DIRECT(KANTO_CTRL_BASE, KANTO_BLOCKADDR);
-    	skip = IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_SKIP);
+    	keys = IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_KEYS);
 
-    	if (skip & 0x3) {
+    	if (keys & 0x3) {
     		IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_PLAY, 0);
     		wait_for_done();
     	}
