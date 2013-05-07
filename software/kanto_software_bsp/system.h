@@ -4,7 +4,7 @@
  * Machine generated for CPU 'cpu_0' in SOPC Builder design 'nios_system'
  * SOPC Builder design path: ../../nios_system.sopcinfo
  *
- * Generated: Mon May 06 15:15:24 EDT 2013
+ * Generated: Mon May 06 20:50:47 EDT 2013
  */
 
 /*
@@ -126,6 +126,7 @@
 #define __ALTERA_AVALON_JTAG_UART
 #define __ALTERA_NIOS2
 #define __DE2_KANTO_CTRL
+#define __DE2_SD_BUFFER
 #define __DE2_SRAM_CONTROLLER
 
 
@@ -145,19 +146,19 @@
 #define ALT_NUM_INTERNAL_INTERRUPT_CONTROLLERS 1
 #define ALT_NUM_INTERRUPT_CONTROLLERS 1
 #define ALT_STDERR "/dev/jtag_uart_0"
-#define ALT_STDERR_BASE 0x101020
+#define ALT_STDERR_BASE 0x101220
 #define ALT_STDERR_DEV jtag_uart_0
 #define ALT_STDERR_IS_JTAG_UART
 #define ALT_STDERR_PRESENT
 #define ALT_STDERR_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDIN "/dev/jtag_uart_0"
-#define ALT_STDIN_BASE 0x101020
+#define ALT_STDIN_BASE 0x101220
 #define ALT_STDIN_DEV jtag_uart_0
 #define ALT_STDIN_IS_JTAG_UART
 #define ALT_STDIN_PRESENT
 #define ALT_STDIN_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDOUT "/dev/jtag_uart_0"
-#define ALT_STDOUT_BASE 0x101020
+#define ALT_STDOUT_BASE 0x101220
 #define ALT_STDOUT_DEV jtag_uart_0
 #define ALT_STDOUT_IS_JTAG_UART
 #define ALT_STDOUT_PRESENT
@@ -181,7 +182,7 @@
  */
 
 #define ALT_MODULE_CLASS_jtag_uart_0 altera_avalon_jtag_uart
-#define JTAG_UART_0_BASE 0x101020
+#define JTAG_UART_0_BASE 0x101220
 #define JTAG_UART_0_IRQ 0
 #define JTAG_UART_0_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define JTAG_UART_0_NAME "/dev/jtag_uart_0"
@@ -199,12 +200,26 @@
  */
 
 #define ALT_MODULE_CLASS_kanto_ctrl de2_kanto_ctrl
-#define KANTO_CTRL_BASE 0x101000
+#define KANTO_CTRL_BASE 0x101200
 #define KANTO_CTRL_IRQ -1
 #define KANTO_CTRL_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define KANTO_CTRL_NAME "/dev/kanto_ctrl"
 #define KANTO_CTRL_SPAN 32
 #define KANTO_CTRL_TYPE "de2_kanto_ctrl"
+
+
+/*
+ * sdbuf configuration
+ *
+ */
+
+#define ALT_MODULE_CLASS_sdbuf de2_sd_buffer
+#define SDBUF_BASE 0x101000
+#define SDBUF_IRQ -1
+#define SDBUF_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define SDBUF_NAME "/dev/sdbuf"
+#define SDBUF_SPAN 512
+#define SDBUF_TYPE "de2_sd_buffer"
 
 
 /*

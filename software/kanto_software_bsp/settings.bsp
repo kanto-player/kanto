@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>May 6, 2013 4:47:35 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1367873255884</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>May 6, 2013 8:50:46 PM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1367887846837</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>/home/user2/spring13/zm2169/EmbeddedSystems/kanto/software/kanto_software_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>../../nios_system.sopcinfo</SopcDesignFile>
@@ -857,14 +857,20 @@
                 <attributes>memory</attributes>
         </MemoryMap>
         <MemoryMap>
+                <slaveDescriptor>sdbuf</slaveDescriptor>
+                <addressRange>0x00101000 - 0x001011FF</addressRange>
+                <addressSpan>512</addressSpan>
+                <attributes/>
+        </MemoryMap>
+        <MemoryMap>
                 <slaveDescriptor>kanto_ctrl</slaveDescriptor>
-                <addressRange>0x00101000 - 0x0010101F</addressRange>
+                <addressRange>0x00101200 - 0x0010121F</addressRange>
                 <addressSpan>32</addressSpan>
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
                 <slaveDescriptor>jtag_uart_0</slaveDescriptor>
-                <addressRange>0x00101020 - 0x00101027</addressRange>
+                <addressRange>0x00101220 - 0x00101227</addressRange>
                 <addressSpan>8</addressSpan>
                 <attributes>printable</attributes>
         </MemoryMap>
