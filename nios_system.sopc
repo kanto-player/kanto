@@ -10,14 +10,6 @@
          type = "String";
       }
    }
-   element kanto_ctrl.avalon_slave_0
-   {
-      datum baseAddress
-      {
-         value = "1053184";
-         type = "String";
-      }
-   }
    element sdbuf.avalon_slave_0
    {
       datum baseAddress
@@ -31,6 +23,14 @@
       datum baseAddress
       {
          value = "524288";
+         type = "String";
+      }
+   }
+   element kanto_ctrl.avalon_slave_0
+   {
+      datum baseAddress
+      {
+         value = "1053184";
          type = "String";
       }
    }
@@ -75,7 +75,7 @@
    {
       datum _sortIndex
       {
-         value = "4";
+         value = "5";
          type = "int";
       }
    }
@@ -86,7 +86,7 @@
    {
       datum _sortIndex
       {
-         value = "5";
+         value = "4";
          type = "int";
       }
    }
@@ -112,8 +112,8 @@
  <parameter name="maxAdditionalLatency" value="0" />
  <parameter name="projectName" value="kanto.qpf" />
  <parameter name="sopcBorderPoints" value="true" />
- <parameter name="systemHash" value="-19830003473" />
- <parameter name="timeStamp" value="1367886688220" />
+ <parameter name="systemHash" value="-21302353271" />
+ <parameter name="timeStamp" value="1367891396101" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <module kind="clock_source" version="12.1" enabled="1" name="clk_0">
   <parameter name="clockFrequency" value="50000000" />
@@ -242,12 +242,10 @@
   <parameter name="writeBufferDepth" value="64" />
   <parameter name="writeIRQThreshold" value="8" />
  </module>
- <module kind="de2_kanto_ctrl" version="1.0" enabled="1" name="kanto_ctrl">
-  <parameter name="AUTO_CLOCK_CLOCK_RATE" value="50000000" />
- </module>
  <module kind="de2_sd_buffer" version="1.0" enabled="1" name="sdbuf">
   <parameter name="AUTO_CLOCK_CLOCK_RATE" value="50000000" />
  </module>
+ <module kind="de2_kanto_ctrl" version="1.0" enabled="1" name="kanto_ctrl" />
  <connection kind="clock" version="12.1" start="clk_0.clk" end="cpu_0.clk" />
  <connection
    kind="avalon"
@@ -297,15 +295,6 @@
    end="jtag_uart_0.irq">
   <parameter name="irqNumber" value="0" />
  </connection>
- <connection kind="clock" version="12.1" start="clk_0.clk" end="kanto_ctrl.clock" />
- <connection
-   kind="avalon"
-   version="12.1"
-   start="cpu_0.data_master"
-   end="kanto_ctrl.avalon_slave_0">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x00101200" />
- </connection>
  <connection kind="clock" version="12.1" start="clk_0.clk" end="sdbuf.clock" />
  <connection
    kind="avalon"
@@ -314,5 +303,14 @@
    end="sdbuf.avalon_slave_0">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x00101000" />
+ </connection>
+ <connection kind="clock" version="12.1" start="clk_0.clk" end="kanto_ctrl.clock" />
+ <connection
+   kind="avalon"
+   version="12.1"
+   start="cpu_0.data_master"
+   end="kanto_ctrl.avalon_slave_0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x00101200" />
  </connection>
 </system>

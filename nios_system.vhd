@@ -2002,14 +2002,12 @@ entity nios_system is
 
               -- the_kanto_ctrl
                  signal audio_track_from_the_kanto_ctrl : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
+                 signal keys_to_the_kanto_ctrl : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
                  signal nios_addr_from_the_kanto_ctrl : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
                  signal nios_done_to_the_kanto_ctrl : IN STD_LOGIC;
                  signal nios_play_from_the_kanto_ctrl : OUT STD_LOGIC;
                  signal nios_readblock_from_the_kanto_ctrl : OUT STD_LOGIC;
-                 signal nios_stop_from_the_kanto_ctrl : OUT STD_LOGIC;
                  signal sd_blockaddr_to_the_kanto_ctrl : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
-                 signal skip_back_to_the_kanto_ctrl : IN STD_LOGIC;
-                 signal skip_forward_to_the_kanto_ctrl : IN STD_LOGIC;
 
               -- the_sdbuf
                  signal sdbuf_addr_from_the_sdbuf : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
@@ -2273,12 +2271,11 @@ component kanto_ctrl is
                     signal address : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
                     signal chipselect : IN STD_LOGIC;
                     signal clk : IN STD_LOGIC;
+                    signal keys : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
                     signal nios_done : IN STD_LOGIC;
                     signal read : IN STD_LOGIC;
                     signal reset_n : IN STD_LOGIC;
                     signal sd_blockaddr : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
-                    signal skip_back : IN STD_LOGIC;
-                    signal skip_forward : IN STD_LOGIC;
                     signal write : IN STD_LOGIC;
                     signal writedata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
 
@@ -2287,7 +2284,6 @@ component kanto_ctrl is
                     signal nios_addr : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
                     signal nios_play : OUT STD_LOGIC;
                     signal nios_readblock : OUT STD_LOGIC;
-                    signal nios_stop : OUT STD_LOGIC;
                     signal readdata : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
                  );
 end component kanto_ctrl;
@@ -2483,7 +2479,6 @@ end component nios_system_reset_clk_0_domain_synch_module;
                 signal internal_nios_addr_from_the_kanto_ctrl :  STD_LOGIC_VECTOR (31 DOWNTO 0);
                 signal internal_nios_play_from_the_kanto_ctrl :  STD_LOGIC;
                 signal internal_nios_readblock_from_the_kanto_ctrl :  STD_LOGIC;
-                signal internal_nios_stop_from_the_kanto_ctrl :  STD_LOGIC;
                 signal internal_sdbuf_addr_from_the_sdbuf :  STD_LOGIC_VECTOR (7 DOWNTO 0);
                 signal internal_sdbuf_rden_from_the_sdbuf :  STD_LOGIC;
                 signal jtag_uart_0_avalon_jtag_slave_address :  STD_LOGIC;
@@ -2760,17 +2755,15 @@ begin
       nios_addr => internal_nios_addr_from_the_kanto_ctrl,
       nios_play => internal_nios_play_from_the_kanto_ctrl,
       nios_readblock => internal_nios_readblock_from_the_kanto_ctrl,
-      nios_stop => internal_nios_stop_from_the_kanto_ctrl,
       readdata => kanto_ctrl_avalon_slave_0_readdata,
       address => kanto_ctrl_avalon_slave_0_address,
       chipselect => kanto_ctrl_avalon_slave_0_chipselect,
       clk => clk_0,
+      keys => keys_to_the_kanto_ctrl,
       nios_done => nios_done_to_the_kanto_ctrl,
       read => kanto_ctrl_avalon_slave_0_read,
       reset_n => kanto_ctrl_avalon_slave_0_reset_n,
       sd_blockaddr => sd_blockaddr_to_the_kanto_ctrl,
-      skip_back => skip_back_to_the_kanto_ctrl,
-      skip_forward => skip_forward_to_the_kanto_ctrl,
       write => kanto_ctrl_avalon_slave_0_write,
       writedata => kanto_ctrl_avalon_slave_0_writedata
     );
@@ -2905,8 +2898,6 @@ begin
   --vhdl renameroo for output signals
   nios_readblock_from_the_kanto_ctrl <= internal_nios_readblock_from_the_kanto_ctrl;
   --vhdl renameroo for output signals
-  nios_stop_from_the_kanto_ctrl <= internal_nios_stop_from_the_kanto_ctrl;
-  --vhdl renameroo for output signals
   sdbuf_addr_from_the_sdbuf <= internal_sdbuf_addr_from_the_sdbuf;
   --vhdl renameroo for output signals
   sdbuf_rden_from_the_sdbuf <= internal_sdbuf_rden_from_the_sdbuf;
@@ -2946,14 +2937,12 @@ component nios_system is
 
                  -- the_kanto_ctrl
                     signal audio_track_from_the_kanto_ctrl : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
+                    signal keys_to_the_kanto_ctrl : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
                     signal nios_addr_from_the_kanto_ctrl : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
                     signal nios_done_to_the_kanto_ctrl : IN STD_LOGIC;
                     signal nios_play_from_the_kanto_ctrl : OUT STD_LOGIC;
                     signal nios_readblock_from_the_kanto_ctrl : OUT STD_LOGIC;
-                    signal nios_stop_from_the_kanto_ctrl : OUT STD_LOGIC;
                     signal sd_blockaddr_to_the_kanto_ctrl : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
-                    signal skip_back_to_the_kanto_ctrl : IN STD_LOGIC;
-                    signal skip_forward_to_the_kanto_ctrl : IN STD_LOGIC;
 
                  -- the_sdbuf
                     signal sdbuf_addr_from_the_sdbuf : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
@@ -2983,18 +2972,16 @@ end component nios_system;
                 signal clk_0 :  STD_LOGIC;
                 signal jtag_uart_0_avalon_jtag_slave_dataavailable_from_sa :  STD_LOGIC;
                 signal jtag_uart_0_avalon_jtag_slave_readyfordata_from_sa :  STD_LOGIC;
+                signal keys_to_the_kanto_ctrl :  STD_LOGIC_VECTOR (3 DOWNTO 0);
                 signal nios_addr_from_the_kanto_ctrl :  STD_LOGIC_VECTOR (31 DOWNTO 0);
                 signal nios_done_to_the_kanto_ctrl :  STD_LOGIC;
                 signal nios_play_from_the_kanto_ctrl :  STD_LOGIC;
                 signal nios_readblock_from_the_kanto_ctrl :  STD_LOGIC;
-                signal nios_stop_from_the_kanto_ctrl :  STD_LOGIC;
                 signal reset_n :  STD_LOGIC;
                 signal sd_blockaddr_to_the_kanto_ctrl :  STD_LOGIC_VECTOR (31 DOWNTO 0);
                 signal sdbuf_addr_from_the_sdbuf :  STD_LOGIC_VECTOR (7 DOWNTO 0);
                 signal sdbuf_data_to_the_sdbuf :  STD_LOGIC_VECTOR (15 DOWNTO 0);
                 signal sdbuf_rden_from_the_sdbuf :  STD_LOGIC;
-                signal skip_back_to_the_kanto_ctrl :  STD_LOGIC;
-                signal skip_forward_to_the_kanto_ctrl :  STD_LOGIC;
 
 
 -- <ALTERA_NOTE> CODE INSERTED BETWEEN HERE
@@ -3018,16 +3005,14 @@ begin
       nios_addr_from_the_kanto_ctrl => nios_addr_from_the_kanto_ctrl,
       nios_play_from_the_kanto_ctrl => nios_play_from_the_kanto_ctrl,
       nios_readblock_from_the_kanto_ctrl => nios_readblock_from_the_kanto_ctrl,
-      nios_stop_from_the_kanto_ctrl => nios_stop_from_the_kanto_ctrl,
       sdbuf_addr_from_the_sdbuf => sdbuf_addr_from_the_sdbuf,
       sdbuf_rden_from_the_sdbuf => sdbuf_rden_from_the_sdbuf,
       clk_0 => clk_0,
+      keys_to_the_kanto_ctrl => keys_to_the_kanto_ctrl,
       nios_done_to_the_kanto_ctrl => nios_done_to_the_kanto_ctrl,
       reset_n => reset_n,
       sd_blockaddr_to_the_kanto_ctrl => sd_blockaddr_to_the_kanto_ctrl,
-      sdbuf_data_to_the_sdbuf => sdbuf_data_to_the_sdbuf,
-      skip_back_to_the_kanto_ctrl => skip_back_to_the_kanto_ctrl,
-      skip_forward_to_the_kanto_ctrl => skip_forward_to_the_kanto_ctrl
+      sdbuf_data_to_the_sdbuf => sdbuf_data_to_the_sdbuf
     );
 
 

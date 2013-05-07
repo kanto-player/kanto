@@ -7,17 +7,17 @@ set_global_assignment -name TCL_FILE [file join $::quartus(qip_path) "de2_sram_c
 set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "de2_sram_controller.vhd"]
 set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "sram.vhd"]
 # jtag_uart_0
-# kanto_ctrl
-set_global_assignment -name TCL_FILE [file join $::quartus(qip_path) "de2_kanto_ctrl_hw.tcl"]
-set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "de2_kanto_ctrl.vhd"]
-set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "kanto_ctrl.vhd"]
 # sdbuf
 set_global_assignment -name TCL_FILE [file join $::quartus(qip_path) "de2_sd_buffer_hw.tcl"]
 set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "de2_sd_buffer.vhd"]
 set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "sdbuf.vhd"]
+# kanto_ctrl
+set_global_assignment -name TCL_FILE [file join $::quartus(qip_path) "de2_kanto_ctrl_hw.tcl"]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "de2_kanto_ctrl.vhd"]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "kanto_ctrl.vhd"]
 # null
 set_global_assignment -name SDC_FILE [file join $::quartus(ip_rootpath) "altera/sopc_builder_ip/altera_avalon_clock_adapter/altera_avalon_clock_adapter.sdc"]
-set_global_assignment -name SOPC_BUILDER_SIGNATURE_ID "BC305BE679700000013E7C667E03"
+set_global_assignment -name SOPC_BUILDER_SIGNATURE_ID "BC305BE679700000013E7CAE574B"
 set_global_assignment -entity "nios_system" -name IP_TOOL_NAME "sopc"
 set_global_assignment -entity "nios_system" -name IP_TOOL_VERSION "12.1"
 set_global_assignment -entity "nios_system" -name IP_TOOL_ENV "sopc"
