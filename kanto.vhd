@@ -257,7 +257,14 @@ begin
         nios_play_from_the_kanto_ctrl => nios_play,
         nios_readblock_from_the_kanto_ctrl => nios_readblock,
         nios_stop_from_the_kanto_ctrl => nios_stop,
-        sd_blockaddr_to_the_kanto_ctrl => std_logic_vector(sd_blockaddr)
+        sd_blockaddr_to_the_kanto_ctrl => std_logic_vector(sd_blockaddr),
+        audio_track_from_the_kanto_ctrl => audio_track,
+        skip_back_to_the_kanto_ctrl => skip_back,
+        skip_forward_to_the_kanto_ctrl => skip_forward,
+
+        sdbuf_addr_from_the_sdbuf => sdbuf_addr,
+        sdbuf_data_to_the_sdbuf => sdbuf_data,
+        sdbuf_rden_from_the_sdbuf => sdbuf_rden
     );
 
     PLL : entity work.audpll port map (
@@ -375,7 +382,7 @@ begin
         sw_b            => SW(0)
 	 );
 
-    SDBUF : entity work.tdom_full_ram port map (
+    SDBUF_RAM : entity work.tdom_full_ram port map (
         clock => main_clk,
         data => std_logic_vector(sd_writedata),
         wraddress => std_logic_vector(sd_writeaddr),
