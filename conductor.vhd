@@ -18,7 +18,6 @@ entity conductor is
           nios_addr : in unsigned(31 downto 0);
           nios_readblock : in std_logic;
           nios_play : in std_logic;
-          nios_stop : in std_logic;
           nios_done : out std_logic;
 
           fft_start : out std_logic;
@@ -69,7 +68,7 @@ begin
                     state <= playing;
                     fft_counter <= "00";
                 when playing =>
-                    if nios_stop = '1' then
+                    if nios_play = '0' then
                         state <= initial;
                     elsif ab_swapped = '1' then
                         -- if we've outrun the SD card
