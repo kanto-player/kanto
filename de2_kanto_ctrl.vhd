@@ -14,15 +14,20 @@ entity de2_kanto_ctrl is
           nios_addr : out std_logic_vector(31 downto 0);
           nios_readblock : out std_logic;
           nios_play : out std_logic;
-          nios_stop : out std_logic;
           nios_done : in std_logic;
 
-          skip_back : in std_logic;
-          skip_forward : in std_logic;
+          keys : in std_logic_vector(3 downto 0);
 
           audio_track : out std_logic_vector(7 downto 0);
           sd_blockaddr : in std_logic_vector(31 downto 0));
 end de2_kanto_ctrl;
+
+-- 0 is block address
+-- 1 is readblock
+-- 2 is play
+-- 3 is done
+-- 4 is audio_track
+-- 5 is keys
 
 architecture rtl of de2_kanto_ctrl is
 begin
@@ -31,7 +36,7 @@ begin
         if rising_edge(clk) then
             if reset_n = '0' then
                 nios_addr <= (others => '0');
-                nios_stop <= '1';
+                nios_play <= '0';
             elsif chipselect = '1' then
                 case address is
                     when "000" =>
@@ -49,21 +54,16 @@ begin
                             nios_play <= writedata(0);
                         end if;
                     when "011" =>
-                        if write = '1' then
-                            nios_stop <= writedata(0);
-                        end if;
-                    when "100" =>
                         if read = '1' then
                             readdata <= (31 downto 1 => '0') & nios_done;
                         end if;
-                    when "101" =>
+                    when "100" =>
                         if write = '1' then
                             audio_track <= writedata(7 downto 0);
                         end if;
-                    when "110" =>
+                    when "101" =>
                         if read = '1' then
-                            readdata <= (31 downto 2 => '0') 
-                                            & skip_back & skip_forward;
+                            readdata <= (31 downto 4 => '0') & keys;
                         end if;
                     when others =>
                         if read = '1' then
