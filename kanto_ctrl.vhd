@@ -10,7 +10,7 @@ use IEEE.numeric_std.all;
 entity kanto_ctrl is
 	port (
 		clk            : in  std_logic                     := '0';             --          clock.clk
-		reset_n        : in  std_logic                     := '0';             --               .reset_n
+		reset_n        : in  std_logic                     := '0';             --    clock_reset.reset_n
 		write          : in  std_logic                     := '0';             -- avalon_slave_0.write
 		chipselect     : in  std_logic                     := '0';             --               .chipselect
 		address        : in  std_logic_vector(2 downto 0)  := (others => '0'); --               .address
@@ -22,7 +22,10 @@ entity kanto_ctrl is
 		nios_stop      : out std_logic;                                        --               .export
 		nios_addr      : out std_logic_vector(31 downto 0);                    --               .export
 		nios_done      : in  std_logic                     := '0';             --               .export
-		sd_blockaddr   : in  std_logic_vector(31 downto 0) := (others => '0')  --               .export
+		sd_blockaddr   : in  std_logic_vector(31 downto 0) := (others => '0'); --               .export
+		skip_back      : in  std_logic                     := '0';             --               .export
+		skip_forward   : in  std_logic                     := '0';             --               .export
+		audio_track    : out std_logic_vector(7 downto 0)                      --               .export
 	);
 end entity kanto_ctrl;
 
@@ -42,7 +45,10 @@ architecture rtl of kanto_ctrl is
 			nios_stop      : out std_logic;                                        -- export
 			nios_addr      : out std_logic_vector(31 downto 0);                    -- export
 			nios_done      : in  std_logic                     := 'X';             -- export
-			sd_blockaddr   : in  std_logic_vector(31 downto 0) := (others => 'X')  -- export
+			sd_blockaddr   : in  std_logic_vector(31 downto 0) := (others => 'X'); -- export
+			skip_back      : in  std_logic                     := 'X';             -- export
+			skip_forward   : in  std_logic                     := 'X';             -- export
+			audio_track    : out std_logic_vector(7 downto 0)                      -- export
 		);
 	end component de2_kanto_ctrl;
 
@@ -51,7 +57,7 @@ begin
 	kanto_ctrl : component de2_kanto_ctrl
 		port map (
 			clk            => clk,            --          clock.clk
-			reset_n        => reset_n,        --               .reset_n
+			reset_n        => reset_n,        --    clock_reset.reset_n
 			write          => write,          -- avalon_slave_0.write
 			chipselect     => chipselect,     --               .chipselect
 			address        => address,        --               .address
@@ -63,7 +69,10 @@ begin
 			nios_stop      => nios_stop,      --               .export
 			nios_addr      => nios_addr,      --               .export
 			nios_done      => nios_done,      --               .export
-			sd_blockaddr   => sd_blockaddr    --               .export
+			sd_blockaddr   => sd_blockaddr,   --               .export
+			skip_back      => skip_back,      --               .export
+			skip_forward   => skip_forward,   --               .export
+			audio_track    => audio_track     --               .export
 		);
 
 end architecture rtl; -- of kanto_ctrl
