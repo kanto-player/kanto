@@ -28,3 +28,4 @@
 *.objdump
 obj
 *.swp
+*.a
