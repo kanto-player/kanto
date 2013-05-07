@@ -206,9 +206,11 @@ architecture datapath of kanto is
     signal sd_write_en : std_logic;
 	  
     signal clk25 : std_logic := '0';
-    signal master_reset_n : std_logic;
     signal viz_reset : std_logic; 
     signal cond_err : std_logic;
+    signal skip_back : std_logic;
+    signal skip_forward : std_logic;
+    signal audio_track : std_logic_vector(7 downto 0);
 
     -- control and status signals for NIOS
     signal nios_addr : unsigned(31 downto 0);
@@ -235,7 +237,8 @@ begin
     LEDR(0) <= sd_err;
     LEDR(1) <= cond_err;
     ab_play <= SW(17) and ab_audio_ok;
-    master_reset_n <= KEY(0);
+    skip_forward <= not KEY(0);
+    skip_back <= not KEY(1);
     
     NIOS : entity work.nios_system port map (
         clk_0 => main_clk,
@@ -400,6 +403,16 @@ begin
     SS3 : entity work.sevenseg port map (
         number => sd_state_debug(7 downto 4),
         display => HEX3
+    );
+
+    SS4 : entity work.sevenseg port map (
+        number => audio_track(3 downto 0),
+        display => HEX4
+    );
+    
+    SS5 : entity work.sevenseg port map (
+        number => audio_track(7 downto 4),
+        display => HEX5
     );
     
     HEX7 <= (others => '1');

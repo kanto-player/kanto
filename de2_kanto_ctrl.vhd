@@ -17,6 +17,10 @@ entity de2_kanto_ctrl is
           nios_stop : out std_logic;
           nios_done : in std_logic;
 
+          skip_back : in std_logic;
+          skip_forward : in std_logic;
+
+          audio_track : out std_logic_vector(7 downto 0);
           sd_blockaddr : in std_logic_vector(31 downto 0));
 end de2_kanto_ctrl;
 
@@ -48,9 +52,22 @@ begin
                         if write = '1' then
                             nios_stop <= writedata(0);
                         end if;
-                    when others =>
+                    when "100" =>
                         if read = '1' then
                             readdata <= (31 downto 1 => '0') & nios_done;
+                        end if;
+                    when "101" =>
+                        if write = '1' then
+                            audio_track <= writedata(7 downto 0);
+                        end if;
+                    when "110" =>
+                        if read = '1' then
+                            readdata <= (31 downto 2 => '0') 
+                                            & skip_back & skip_forward;
+                        end if;
+                    when others =>
+                        if read = '1' then
+                            readdata <= (others => '0');
                         end if;
                 end case;
             end if;
