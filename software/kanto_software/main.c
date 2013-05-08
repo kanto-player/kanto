@@ -10,9 +10,15 @@
 #define KANTO_TRACK 16
 #define KANTO_KEYS 20
 
+#define MAX_TRACKS 128
+
+uint32_t track_table[MAX_TRACKS];
+unsigned char curtrack;
+uint32_t track_end;
+
 #define wait_for_done() while (!IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_DONE))
 
-static inline uint32_t read_sdbuf_word(unsigned char offset)
+static inline uint32_t sdbuf_read_word(unsigned char offset)
 {
 	uint32_t word, upper, lower;
 
@@ -24,45 +30,96 @@ static inline uint32_t read_sdbuf_word(unsigned char offset)
 	return word;
 }
 
+static inline void stop_playback(void)
+{
+	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_PLAY, 0);
+	wait_for_done();
+}
+
+static inline void start_playback(void)
+{
+	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_PLAY, 1);
+}
+
+static inline void read_block(uint32_t addr)
+{
+	IOWR_32DIRECT(KANTO_CTRL_BASE, KANTO_BLOCKADDR, addr);
+	// pulse the readblock signal
+	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_READBLOCK, 1);
+	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_READBLOCK, 0);
+	wait_for_done();
+}
+
+static inline void setup_track_table(void)
+{
+	int i;
+
+	for (i = 0; i < MAX_TRACKS; i++) {
+		track_table[i] = sdbuf_read_word(i);
+	}
+}
+
+static inline void check_curtrack(void)
+{
+	if (track_table[curtrack] == 0 || track_table[curtrack + 1] == 0)
+		curtrack = 0;
+}
+
+static inline void seek_to_track(int track)
+{
+	uint32_t track_start;
+	curtrack = track;
+	check_curtrack();
+	track_start = track_table[curtrack];
+	track_end = track_table[curtrack + 1];
+
+	read_block(track_start);
+	printf("Setting current track to %d\n", curtrack);
+	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_TRACK, curtrack);
+}
+
 int main()
 {
     uint32_t blockaddr;
-    uint32_t sdbuf_word;
     unsigned char keys;
-    int i;
+    unsigned char last_keys;
 
     printf("Hello, Kanto\n");
 
     // stop playback
-    IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_PLAY, 0);
-    // wait for sd card to become ready
-    wait_for_done();
+    stop_playback();
 
     printf("Starting initialization\n");
-    // set the block address back to the beginning
-    IOWR_32DIRECT(KANTO_CTRL_BASE, KANTO_BLOCKADDR, 0);
-    // pulse the readblock signal
-    IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_READBLOCK, 1);
-    IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_READBLOCK, 0);
-    wait_for_done();
+    // read first (metadata) block
+    read_block(0);
+    setup_track_table();
+    printf("Track table read\n");
+
+    seek_to_track(0);
 
     printf("First block read\n");
-    for (i = 0; i < 128; i++) {
-    	sdbuf_word = read_sdbuf_word(i);
-    	printf("%x\n", sdbuf_word);
-    }
-    IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_TRACK, 0xff);
-    IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_PLAY, 1);
+
+    start_playback();
 
     printf("Playing audio\n");
 
     for (;;) {
     	blockaddr = IORD_32DIRECT(KANTO_CTRL_BASE, KANTO_BLOCKADDR);
+    	last_keys = keys;
     	keys = IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_KEYS);
 
-    	if (keys & 0x3) {
-    		IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_PLAY, 0);
-    		wait_for_done();
+    	if ((keys & 0x3) && !(last_keys & 0x3)) {
+    		stop_playback();
+    		if (keys & 0x1)
+    			seek_to_track(curtrack + 1);
+    		else if (keys & 0x2)
+    			seek_to_track(curtrack - 1);
+    		start_playback();
+    	} else if (blockaddr >= track_end) {
+    		curtrack++;
+    		check_curtrack();
+    		track_end = track_table[curtrack + 1];
+    		IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_TRACK, curtrack);
     	}
     }
 
