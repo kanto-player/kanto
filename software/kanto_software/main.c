@@ -18,7 +18,9 @@ uint32_t track_end;
 
 #define SKIP_FORWARD 0x1
 #define SKIP_BACK 0x2
-#define RESTART 0x4
+
+/* number of blocks in a second */
+#define BLOCK_SECOND 172
 
 #define wait_for_done() while (!IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_DONE))
 
@@ -116,10 +118,12 @@ int main()
     		stop_playback();
     		if (keys & SKIP_FORWARD)
     			seek_to_track(curtrack + 1);
-    		else if (keys & SKIP_BACK)
-    			seek_to_track(curtrack - 1);
-    		else if (keys & RESTART)
-    			seek_to_track(curtrack);
+    		else if (keys & SKIP_BACK) {
+    			if ((blockaddr - track_table[curtrack]) < BLOCK_SECOND)
+    				seek_to_track(curtrack - 1);
+    			else
+    				seek_to_track(curtrack);
+    		}
     		start_playback();
     	} else if (blockaddr >= track_end) {
     		curtrack++;
