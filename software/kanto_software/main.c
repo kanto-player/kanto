@@ -16,6 +16,10 @@ uint32_t track_table[MAX_TRACKS];
 unsigned char curtrack;
 uint32_t track_end;
 
+#define SKIP_FORWARD 0x1
+#define SKIP_BACK 0x2
+#define RESTART 0x4
+
 #define wait_for_done() while (!IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_DONE))
 
 static inline uint32_t sdbuf_read_word(unsigned char offset)
@@ -108,12 +112,14 @@ int main()
     	last_keys = keys;
     	keys = IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_KEYS);
 
-    	if ((keys & 0x3) && !(last_keys & 0x3)) {
+    	if (keys && !last_keys) {
     		stop_playback();
-    		if (keys & 0x1)
+    		if (keys & SKIP_FORWARD)
     			seek_to_track(curtrack + 1);
-    		else if (keys & 0x2)
+    		else if (keys & SKIP_BACK)
     			seek_to_track(curtrack - 1);
+    		else if (keys & RESTART)
+    			seek_to_track(curtrack);
     		start_playback();
     	} else if (blockaddr >= track_end) {
     		curtrack++;
