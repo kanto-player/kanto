@@ -14,10 +14,13 @@
 
 uint32_t track_table[MAX_TRACKS];
 unsigned char curtrack;
+uint32_t track_start;
 uint32_t track_end;
 
-#define SKIP_FORWARD 0x1
-#define SKIP_BACK 0x2
+#define NEXT_TRACK 0x1
+#define LAST_TRACK 0x2
+#define FAST_FORWARD 0x4
+#define REWIND 0x8
 
 /* number of blocks in a second */
 #define BLOCK_SECOND 172
@@ -73,7 +76,6 @@ static inline void check_curtrack(void)
 
 static inline void seek_to_track(int track)
 {
-	uint32_t track_start;
 	curtrack = track;
 	check_curtrack();
 	track_start = track_table[curtrack];
@@ -116,13 +118,23 @@ int main()
 
     	if (keys && !last_keys) {
     		stop_playback();
-    		if (keys & SKIP_FORWARD)
+    		if (keys & NEXT_TRACK)
     			seek_to_track(curtrack + 1);
-    		else if (keys & SKIP_BACK) {
-    			if ((blockaddr - track_table[curtrack]) < BLOCK_SECOND)
+    		else if (keys & LAST_TRACK) {
+    			if ((blockaddr - track_start) < BLOCK_SECOND)
     				seek_to_track(curtrack - 1);
     			else
     				seek_to_track(curtrack);
+    		} else if (keys & FAST_FORWARD) {
+    			if (track_end - blockaddr < 5 * BLOCK_SECOND)
+    				seek_to_track(curtrack + 1);
+    			else
+    				read_block(blockaddr + 5 * BLOCK_SECOND);
+    		} else if (keys & REWIND) {
+    			if (blockaddr - track_start < 5 * BLOCK_SECOND)
+    				seek_to_track(curtrack);
+    			else
+    				read_block(blockaddr - 5 * BLOCK_SECOND);
     		}
     		start_playback();
     	} else if (blockaddr >= track_end) {
