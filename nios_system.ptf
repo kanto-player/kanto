@@ -524,10 +524,10 @@ SYSTEM nios_system
                span = "0x00000008";
                is_bridge = "0";
             }
-            Entry de2_vga_text_buffer_0/vga
+            Entry vga/vga
             {
-               address = "0x00004000";
-               span = "0x00004000";
+               address = "0x00002000";
+               span = "0x00002000";
                is_bridge = "0";
             }
          }
@@ -2131,7 +2131,7 @@ SYSTEM nios_system
       {
       }
    }
-   MODULE de2_vga_text_buffer_0
+   MODULE vga
    {
       SLAVE vga
       {
@@ -2175,21 +2175,21 @@ SYSTEM nios_system
             PORT vga_address
             {
                type = "address";
-               width = "10";
+               width = "11";
                direction = "input";
                Is_Enabled = "1";
             }
             PORT vga_readdata
             {
                type = "readdata";
-               width = "128";
+               width = "32";
                direction = "output";
                Is_Enabled = "1";
             }
             PORT vga_writedata
             {
                type = "writedata";
-               width = "128";
+               width = "32";
                direction = "input";
                Is_Enabled = "1";
             }
@@ -2205,7 +2205,7 @@ SYSTEM nios_system
             Address_Alignment = "dynamic";
             Well_Behaved_Waitrequest = "0";
             Is_Nonvolatile_Storage = "0";
-            Address_Span = "16384";
+            Address_Span = "8192";
             Read_Latency = "0";
             Is_Memory_Device = "0";
             Maximum_Pending_Read_Transactions = "0";
@@ -2213,8 +2213,8 @@ SYSTEM nios_system
             Accepts_Internal_Connections = "1";
             Write_Latency = "0";
             Is_Flash = "0";
-            Data_Width = "128";
-            Address_Width = "10";
+            Data_Width = "32";
+            Address_Width = "11";
             Maximum_Burst_Size = "1";
             Register_Incoming_Signals = "0";
             Register_Outgoing_Signals = "0";
@@ -2227,9 +2227,9 @@ SYSTEM nios_system
             MASTERED_BY cpu_0/data_master
             {
                priority = "1";
-               Offset_Address = "0x00004000";
+               Offset_Address = "0x00002000";
             }
-            Base_Address = "0x00004000";
+            Base_Address = "0x00002000";
             Address_Group = "0";
             IRQ_MASTER cpu_0/data_master
             {
@@ -2268,7 +2268,7 @@ SYSTEM nios_system
       }
       HDL_INFO 
       {
-         Simulation_HDL_Files = "__PROJECT_DIRECTORY__/de2_vga_text_buffer.vhd";
+         Simulation_HDL_Files = "__PROJECT_DIRECTORY__/de2_vga_text_buffer.vhd,__PROJECT_DIRECTORY__/vga.vhd";
       }
       WIZARD_SCRIPT_ARGUMENTS 
       {

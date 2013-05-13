@@ -426,45 +426,44 @@ entity cpu_0_data_master_arbitrator is
                  signal cpu_0_data_master_address : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
                  signal cpu_0_data_master_byteenable_sram_avalon_slave_0 : IN STD_LOGIC_VECTOR (1 DOWNTO 0);
                  signal cpu_0_data_master_granted_cpu_0_jtag_debug_module : IN STD_LOGIC;
-                 signal cpu_0_data_master_granted_de2_vga_text_buffer_0_vga : IN STD_LOGIC;
                  signal cpu_0_data_master_granted_jtag_uart_0_avalon_jtag_slave : IN STD_LOGIC;
                  signal cpu_0_data_master_granted_kanto_ctrl_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_granted_ps2_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_granted_sdbuf_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_granted_sram_avalon_slave_0 : IN STD_LOGIC;
+                 signal cpu_0_data_master_granted_vga_vga : IN STD_LOGIC;
                  signal cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module : IN STD_LOGIC;
-                 signal cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga : IN STD_LOGIC;
                  signal cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave : IN STD_LOGIC;
                  signal cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_qualified_request_ps2_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_qualified_request_sdbuf_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_qualified_request_sram_avalon_slave_0 : IN STD_LOGIC;
+                 signal cpu_0_data_master_qualified_request_vga_vga : IN STD_LOGIC;
                  signal cpu_0_data_master_read : IN STD_LOGIC;
                  signal cpu_0_data_master_read_data_valid_cpu_0_jtag_debug_module : IN STD_LOGIC;
-                 signal cpu_0_data_master_read_data_valid_de2_vga_text_buffer_0_vga : IN STD_LOGIC;
                  signal cpu_0_data_master_read_data_valid_jtag_uart_0_avalon_jtag_slave : IN STD_LOGIC;
                  signal cpu_0_data_master_read_data_valid_kanto_ctrl_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_read_data_valid_ps2_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_read_data_valid_sdbuf_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_read_data_valid_sram_avalon_slave_0 : IN STD_LOGIC;
+                 signal cpu_0_data_master_read_data_valid_vga_vga : IN STD_LOGIC;
                  signal cpu_0_data_master_requests_cpu_0_jtag_debug_module : IN STD_LOGIC;
-                 signal cpu_0_data_master_requests_de2_vga_text_buffer_0_vga : IN STD_LOGIC;
                  signal cpu_0_data_master_requests_jtag_uart_0_avalon_jtag_slave : IN STD_LOGIC;
                  signal cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_requests_ps2_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_requests_sdbuf_avalon_slave_0 : IN STD_LOGIC;
                  signal cpu_0_data_master_requests_sram_avalon_slave_0 : IN STD_LOGIC;
+                 signal cpu_0_data_master_requests_vga_vga : IN STD_LOGIC;
                  signal cpu_0_data_master_write : IN STD_LOGIC;
                  signal cpu_0_data_master_writedata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
                  signal cpu_0_jtag_debug_module_readdata_from_sa : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
                  signal d1_cpu_0_jtag_debug_module_end_xfer : IN STD_LOGIC;
-                 signal d1_de2_vga_text_buffer_0_vga_end_xfer : IN STD_LOGIC;
                  signal d1_jtag_uart_0_avalon_jtag_slave_end_xfer : IN STD_LOGIC;
                  signal d1_kanto_ctrl_avalon_slave_0_end_xfer : IN STD_LOGIC;
                  signal d1_ps2_avalon_slave_0_end_xfer : IN STD_LOGIC;
                  signal d1_sdbuf_avalon_slave_0_end_xfer : IN STD_LOGIC;
                  signal d1_sram_avalon_slave_0_end_xfer : IN STD_LOGIC;
-                 signal de2_vga_text_buffer_0_vga_readdata_from_sa : IN STD_LOGIC_VECTOR (127 DOWNTO 0);
+                 signal d1_vga_vga_end_xfer : IN STD_LOGIC;
                  signal jtag_uart_0_avalon_jtag_slave_irq_from_sa : IN STD_LOGIC;
                  signal jtag_uart_0_avalon_jtag_slave_readdata_from_sa : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
                  signal jtag_uart_0_avalon_jtag_slave_waitrequest_from_sa : IN STD_LOGIC;
@@ -473,6 +472,7 @@ entity cpu_0_data_master_arbitrator is
                  signal reset_n : IN STD_LOGIC;
                  signal sdbuf_avalon_slave_0_readdata_from_sa : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
                  signal sram_avalon_slave_0_readdata_from_sa : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+                 signal vga_vga_readdata_from_sa : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
 
               -- outputs:
                  signal cpu_0_data_master_address_to_slave : OUT STD_LOGIC_VECTOR (20 DOWNTO 0);
@@ -495,7 +495,6 @@ architecture europa of cpu_0_data_master_arbitrator is
                 signal dbs_8_reg_segment_2 :  STD_LOGIC_VECTOR (7 DOWNTO 0);
                 signal dbs_count_enable :  STD_LOGIC;
                 signal dbs_counter_overflow :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_readdata_from_sa_part_selected_by_negative_dbs :  STD_LOGIC_VECTOR (31 DOWNTO 0);
                 signal internal_cpu_0_data_master_address_to_slave :  STD_LOGIC_VECTOR (20 DOWNTO 0);
                 signal internal_cpu_0_data_master_dbs_address :  STD_LOGIC_VECTOR (1 DOWNTO 0);
                 signal internal_cpu_0_data_master_no_byte_enables_and_last_term :  STD_LOGIC;
@@ -515,15 +514,15 @@ architecture europa of cpu_0_data_master_arbitrator is
 begin
 
   --r_0 master_run cascaded wait assignment, which is an e_assign
-  r_0 <= Vector_To_Std_Logic((((((((((((((((((((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module OR NOT cpu_0_data_master_requests_cpu_0_jtag_debug_module)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_granted_cpu_0_jtag_debug_module OR NOT cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module OR NOT cpu_0_data_master_read)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module OR NOT cpu_0_data_master_write)))) OR ((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga OR NOT cpu_0_data_master_requests_de2_vga_text_buffer_0_vga)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga OR NOT cpu_0_data_master_read)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga OR NOT cpu_0_data_master_write)))) OR ((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave OR NOT cpu_0_data_master_requests_jtag_uart_0_avalon_jtag_slave)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave OR NOT ((cpu_0_data_master_read OR cpu_0_data_master_write)))))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(NOT jtag_uart_0_avalon_jtag_slave_waitrequest_from_sa)))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_read OR cpu_0_data_master_write)))))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave OR NOT ((cpu_0_data_master_read OR cpu_0_data_master_write)))))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(NOT jtag_uart_0_avalon_jtag_slave_waitrequest_from_sa)))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_read OR cpu_0_data_master_write)))))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 OR NOT cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 OR NOT cpu_0_data_master_read)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 OR NOT cpu_0_data_master_write)))) OR ((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_ps2_avalon_slave_0 OR NOT cpu_0_data_master_read)))) OR ((((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((internal_cpu_0_data_master_dbs_address(1) AND internal_cpu_0_data_master_dbs_address(0))))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_ps2_avalon_slave_0 OR NOT cpu_0_data_master_write)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((internal_cpu_0_data_master_dbs_address(1) AND internal_cpu_0_data_master_dbs_address(0))))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))));
+  r_0 <= Vector_To_Std_Logic((((((((((((((((((((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module OR NOT cpu_0_data_master_requests_cpu_0_jtag_debug_module)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_granted_cpu_0_jtag_debug_module OR NOT cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module OR NOT cpu_0_data_master_read)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module OR NOT cpu_0_data_master_write)))) OR ((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave OR NOT cpu_0_data_master_requests_jtag_uart_0_avalon_jtag_slave)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave OR NOT ((cpu_0_data_master_read OR cpu_0_data_master_write)))))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(NOT jtag_uart_0_avalon_jtag_slave_waitrequest_from_sa)))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_read OR cpu_0_data_master_write)))))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave OR NOT ((cpu_0_data_master_read OR cpu_0_data_master_write)))))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(NOT jtag_uart_0_avalon_jtag_slave_waitrequest_from_sa)))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_read OR cpu_0_data_master_write)))))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 OR NOT cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 OR NOT cpu_0_data_master_read)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 OR NOT cpu_0_data_master_write)))) OR ((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_ps2_avalon_slave_0 OR NOT cpu_0_data_master_read)))) OR ((((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((internal_cpu_0_data_master_dbs_address(1) AND internal_cpu_0_data_master_dbs_address(0))))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_ps2_avalon_slave_0 OR NOT cpu_0_data_master_write)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((internal_cpu_0_data_master_dbs_address(1) AND internal_cpu_0_data_master_dbs_address(0))))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_sdbuf_avalon_slave_0 OR NOT cpu_0_data_master_read)))) OR ((((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((internal_cpu_0_data_master_dbs_address(1)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_sdbuf_avalon_slave_0 OR NOT cpu_0_data_master_write)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((internal_cpu_0_data_master_dbs_address(1)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))) AND std_logic_vector'("00000000000000000000000000000001")));
   --cascaded wait assignment, which is an e_assign
   cpu_0_data_master_run <= r_0 AND r_1;
   --r_1 master_run cascaded wait assignment, which is an e_assign
-  r_1 <= Vector_To_Std_Logic((((((((std_logic_vector'("00000000000000000000000000000001") AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_sdbuf_avalon_slave_0 OR NOT cpu_0_data_master_read)))) OR ((((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((internal_cpu_0_data_master_dbs_address(1)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_sdbuf_avalon_slave_0 OR NOT cpu_0_data_master_write)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((internal_cpu_0_data_master_dbs_address(1)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((((cpu_0_data_master_qualified_request_sram_avalon_slave_0 OR (((cpu_0_data_master_write AND NOT(or_reduce(cpu_0_data_master_byteenable_sram_avalon_slave_0))) AND internal_cpu_0_data_master_dbs_address(1)))) OR NOT cpu_0_data_master_requests_sram_avalon_slave_0)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_granted_sram_avalon_slave_0 OR NOT cpu_0_data_master_qualified_request_sram_avalon_slave_0)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_sram_avalon_slave_0 OR NOT cpu_0_data_master_read)))) OR ((((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((internal_cpu_0_data_master_dbs_address(1)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_sram_avalon_slave_0 OR NOT cpu_0_data_master_write)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((internal_cpu_0_data_master_dbs_address(1)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))));
+  r_1 <= Vector_To_Std_Logic((((((((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((((cpu_0_data_master_qualified_request_sram_avalon_slave_0 OR (((cpu_0_data_master_write AND NOT(or_reduce(cpu_0_data_master_byteenable_sram_avalon_slave_0))) AND internal_cpu_0_data_master_dbs_address(1)))) OR NOT cpu_0_data_master_requests_sram_avalon_slave_0)) AND ((cpu_0_data_master_granted_sram_avalon_slave_0 OR NOT cpu_0_data_master_qualified_request_sram_avalon_slave_0)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_sram_avalon_slave_0 OR NOT cpu_0_data_master_read)))) OR ((((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((internal_cpu_0_data_master_dbs_address(1)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_sram_avalon_slave_0 OR NOT cpu_0_data_master_write)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((internal_cpu_0_data_master_dbs_address(1)))))) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))) AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(((cpu_0_data_master_qualified_request_vga_vga OR NOT cpu_0_data_master_requests_vga_vga)))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_vga_vga OR NOT cpu_0_data_master_read)))) OR (((std_logic_vector'("00000000000000000000000000000001") AND std_logic_vector'("00000000000000000000000000000001")) AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_read)))))))) AND (((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR((NOT cpu_0_data_master_qualified_request_vga_vga OR NOT cpu_0_data_master_write)))) OR ((std_logic_vector'("00000000000000000000000000000001") AND (std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(cpu_0_data_master_write)))))))));
   --optimize select-logic by passing only those address bits which matter.
   internal_cpu_0_data_master_address_to_slave <= cpu_0_data_master_address(20 DOWNTO 0);
   --cpu_0/data_master readdata mux, which is an e_mux
-  cpu_0_data_master_readdata <= (((((((A_REP(NOT cpu_0_data_master_requests_cpu_0_jtag_debug_module, 32) OR cpu_0_jtag_debug_module_readdata_from_sa)) AND ((A_REP(NOT cpu_0_data_master_requests_de2_vga_text_buffer_0_vga, 32) OR de2_vga_text_buffer_0_vga_readdata_from_sa_part_selected_by_negative_dbs))) AND ((A_REP(NOT cpu_0_data_master_requests_jtag_uart_0_avalon_jtag_slave, 32) OR registered_cpu_0_data_master_readdata))) AND ((A_REP(NOT cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0, 32) OR kanto_ctrl_avalon_slave_0_readdata_from_sa))) AND ((A_REP(NOT cpu_0_data_master_requests_ps2_avalon_slave_0, 32) OR Std_Logic_Vector'(ps2_avalon_slave_0_readdata_from_sa(7 DOWNTO 0) & dbs_8_reg_segment_2 & dbs_8_reg_segment_1 & dbs_8_reg_segment_0)))) AND ((A_REP(NOT cpu_0_data_master_requests_sdbuf_avalon_slave_0, 32) OR Std_Logic_Vector'(sdbuf_avalon_slave_0_readdata_from_sa(15 DOWNTO 0) & dbs_16_reg_segment_0)))) AND ((A_REP(NOT cpu_0_data_master_requests_sram_avalon_slave_0, 32) OR Std_Logic_Vector'(sram_avalon_slave_0_readdata_from_sa(15 DOWNTO 0) & dbs_16_reg_segment_0)));
+  cpu_0_data_master_readdata <= (((((((A_REP(NOT cpu_0_data_master_requests_cpu_0_jtag_debug_module, 32) OR cpu_0_jtag_debug_module_readdata_from_sa)) AND ((A_REP(NOT cpu_0_data_master_requests_jtag_uart_0_avalon_jtag_slave, 32) OR registered_cpu_0_data_master_readdata))) AND ((A_REP(NOT cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0, 32) OR kanto_ctrl_avalon_slave_0_readdata_from_sa))) AND ((A_REP(NOT cpu_0_data_master_requests_ps2_avalon_slave_0, 32) OR Std_Logic_Vector'(ps2_avalon_slave_0_readdata_from_sa(7 DOWNTO 0) & dbs_8_reg_segment_2 & dbs_8_reg_segment_1 & dbs_8_reg_segment_0)))) AND ((A_REP(NOT cpu_0_data_master_requests_sdbuf_avalon_slave_0, 32) OR Std_Logic_Vector'(sdbuf_avalon_slave_0_readdata_from_sa(15 DOWNTO 0) & dbs_16_reg_segment_0)))) AND ((A_REP(NOT cpu_0_data_master_requests_sram_avalon_slave_0, 32) OR Std_Logic_Vector'(sram_avalon_slave_0_readdata_from_sa(15 DOWNTO 0) & dbs_16_reg_segment_0)))) AND ((A_REP(NOT cpu_0_data_master_requests_vga_vga, 32) OR vga_vga_readdata_from_sa));
   --actual waitrequest port, which is an e_register
   process (clk, reset_n)
   begin
@@ -535,10 +534,6 @@ begin
 
   end process;
 
-  --Negative Dynamic Bus-sizing mux.
-  --this mux selects the correct fourth of the 
-  --wide data coming from the slave de2_vga_text_buffer_0/vga 
-  de2_vga_text_buffer_0_vga_readdata_from_sa_part_selected_by_negative_dbs <= A_WE_StdLogicVector((((std_logic_vector'("000000000000000000000000000000") & (internal_cpu_0_data_master_address_to_slave(3 DOWNTO 2))) = std_logic_vector'("00000000000000000000000000000000"))), de2_vga_text_buffer_0_vga_readdata_from_sa(31 DOWNTO 0), A_WE_StdLogicVector((((std_logic_vector'("000000000000000000000000000000") & (internal_cpu_0_data_master_address_to_slave(3 DOWNTO 2))) = std_logic_vector'("00000000000000000000000000000001"))), de2_vga_text_buffer_0_vga_readdata_from_sa(63 DOWNTO 32), A_WE_StdLogicVector((((std_logic_vector'("000000000000000000000000000000") & (internal_cpu_0_data_master_address_to_slave(3 DOWNTO 2))) = std_logic_vector'("00000000000000000000000000000010"))), de2_vga_text_buffer_0_vga_readdata_from_sa(95 DOWNTO 64), de2_vga_text_buffer_0_vga_readdata_from_sa(127 DOWNTO 96))));
   --unpredictable registered wait state incoming data, which is an e_register
   process (clk, reset_n)
   begin
@@ -852,250 +847,6 @@ begin
           deallocate (write_line3);
           assert false report "VHDL STOP" severity failure;
         end if;
-      end if;
-
-    end process;
-
---synthesis translate_on
-
-end europa;
-
-
-
--- turn off superfluous VHDL processor warnings 
--- altera message_level Level1 
--- altera message_off 10034 10035 10036 10037 10230 10240 10030 
-
-library altera;
-use altera.altera_europa_support_lib.all;
-
-library altera_mf;
-use altera_mf.altera_mf_components.all;
-
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-use ieee.std_logic_unsigned.all;
-
-entity de2_vga_text_buffer_0_vga_arbitrator is 
-        port (
-              -- inputs:
-                 signal clk : IN STD_LOGIC;
-                 signal cpu_0_data_master_address_to_slave : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
-                 signal cpu_0_data_master_read : IN STD_LOGIC;
-                 signal cpu_0_data_master_waitrequest : IN STD_LOGIC;
-                 signal cpu_0_data_master_write : IN STD_LOGIC;
-                 signal cpu_0_data_master_writedata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
-                 signal de2_vga_text_buffer_0_vga_readdata : IN STD_LOGIC_VECTOR (127 DOWNTO 0);
-                 signal reset_n : IN STD_LOGIC;
-
-              -- outputs:
-                 signal cpu_0_data_master_granted_de2_vga_text_buffer_0_vga : OUT STD_LOGIC;
-                 signal cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga : OUT STD_LOGIC;
-                 signal cpu_0_data_master_read_data_valid_de2_vga_text_buffer_0_vga : OUT STD_LOGIC;
-                 signal cpu_0_data_master_requests_de2_vga_text_buffer_0_vga : OUT STD_LOGIC;
-                 signal d1_de2_vga_text_buffer_0_vga_end_xfer : OUT STD_LOGIC;
-                 signal de2_vga_text_buffer_0_vga_address : OUT STD_LOGIC_VECTOR (9 DOWNTO 0);
-                 signal de2_vga_text_buffer_0_vga_chipselect : OUT STD_LOGIC;
-                 signal de2_vga_text_buffer_0_vga_read : OUT STD_LOGIC;
-                 signal de2_vga_text_buffer_0_vga_readdata_from_sa : OUT STD_LOGIC_VECTOR (127 DOWNTO 0);
-                 signal de2_vga_text_buffer_0_vga_reset : OUT STD_LOGIC;
-                 signal de2_vga_text_buffer_0_vga_write : OUT STD_LOGIC;
-                 signal de2_vga_text_buffer_0_vga_writedata : OUT STD_LOGIC_VECTOR (127 DOWNTO 0)
-              );
-end entity de2_vga_text_buffer_0_vga_arbitrator;
-
-
-architecture europa of de2_vga_text_buffer_0_vga_arbitrator is
-                signal cpu_0_data_master_arbiterlock :  STD_LOGIC;
-                signal cpu_0_data_master_arbiterlock2 :  STD_LOGIC;
-                signal cpu_0_data_master_continuerequest :  STD_LOGIC;
-                signal cpu_0_data_master_saved_grant_de2_vga_text_buffer_0_vga :  STD_LOGIC;
-                signal cpu_0_data_master_writedata_replicated :  STD_LOGIC_VECTOR (127 DOWNTO 0);
-                signal d1_reasons_to_wait :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_allgrants :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_allow_new_arb_cycle :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_any_bursting_master_saved_grant :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_any_continuerequest :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_arb_counter_enable :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_arb_share_counter :  STD_LOGIC_VECTOR (2 DOWNTO 0);
-                signal de2_vga_text_buffer_0_vga_arb_share_counter_next_value :  STD_LOGIC_VECTOR (2 DOWNTO 0);
-                signal de2_vga_text_buffer_0_vga_arb_share_set_values :  STD_LOGIC_VECTOR (2 DOWNTO 0);
-                signal de2_vga_text_buffer_0_vga_beginbursttransfer_internal :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_begins_xfer :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_end_xfer :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_firsttransfer :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_grant_vector :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_in_a_read_cycle :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_in_a_write_cycle :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_master_qreq_vector :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_non_bursting_master_requests :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_reg_firsttransfer :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_slavearbiterlockenable :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_slavearbiterlockenable2 :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_unreg_firsttransfer :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_waits_for_read :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_waits_for_write :  STD_LOGIC;
-                signal enable_nonzero_assertions :  STD_LOGIC;
-                signal end_xfer_arb_share_counter_term_de2_vga_text_buffer_0_vga :  STD_LOGIC;
-                signal in_a_read_cycle :  STD_LOGIC;
-                signal in_a_write_cycle :  STD_LOGIC;
-                signal internal_cpu_0_data_master_granted_de2_vga_text_buffer_0_vga :  STD_LOGIC;
-                signal internal_cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga :  STD_LOGIC;
-                signal internal_cpu_0_data_master_requests_de2_vga_text_buffer_0_vga :  STD_LOGIC;
-                signal shifted_address_to_de2_vga_text_buffer_0_vga_from_cpu_0_data_master :  STD_LOGIC_VECTOR (20 DOWNTO 0);
-                signal wait_for_de2_vga_text_buffer_0_vga_counter :  STD_LOGIC;
-
-begin
-
-  process (clk, reset_n)
-  begin
-    if reset_n = '0' then
-      d1_reasons_to_wait <= std_logic'('0');
-    elsif clk'event and clk = '1' then
-      d1_reasons_to_wait <= NOT de2_vga_text_buffer_0_vga_end_xfer;
-    end if;
-
-  end process;
-
-  de2_vga_text_buffer_0_vga_begins_xfer <= NOT d1_reasons_to_wait AND (internal_cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga);
-  --assign de2_vga_text_buffer_0_vga_readdata_from_sa = de2_vga_text_buffer_0_vga_readdata so that symbol knows where to group signals which may go to master only, which is an e_assign
-  de2_vga_text_buffer_0_vga_readdata_from_sa <= de2_vga_text_buffer_0_vga_readdata;
-  internal_cpu_0_data_master_requests_de2_vga_text_buffer_0_vga <= to_std_logic(((Std_Logic_Vector'(cpu_0_data_master_address_to_slave(20 DOWNTO 14) & std_logic_vector'("00000000000000")) = std_logic_vector'("000000100000000000000")))) AND ((cpu_0_data_master_read OR cpu_0_data_master_write));
-  --de2_vga_text_buffer_0_vga_arb_share_counter set values, which is an e_mux
-  de2_vga_text_buffer_0_vga_arb_share_set_values <= std_logic_vector'("001");
-  --de2_vga_text_buffer_0_vga_non_bursting_master_requests mux, which is an e_mux
-  de2_vga_text_buffer_0_vga_non_bursting_master_requests <= internal_cpu_0_data_master_requests_de2_vga_text_buffer_0_vga;
-  --de2_vga_text_buffer_0_vga_any_bursting_master_saved_grant mux, which is an e_mux
-  de2_vga_text_buffer_0_vga_any_bursting_master_saved_grant <= std_logic'('0');
-  --de2_vga_text_buffer_0_vga_arb_share_counter_next_value assignment, which is an e_assign
-  de2_vga_text_buffer_0_vga_arb_share_counter_next_value <= A_EXT (A_WE_StdLogicVector((std_logic'(de2_vga_text_buffer_0_vga_firsttransfer) = '1'), (((std_logic_vector'("000000000000000000000000000000") & (de2_vga_text_buffer_0_vga_arb_share_set_values)) - std_logic_vector'("000000000000000000000000000000001"))), A_WE_StdLogicVector((std_logic'(or_reduce(de2_vga_text_buffer_0_vga_arb_share_counter)) = '1'), (((std_logic_vector'("000000000000000000000000000000") & (de2_vga_text_buffer_0_vga_arb_share_counter)) - std_logic_vector'("000000000000000000000000000000001"))), std_logic_vector'("000000000000000000000000000000000"))), 3);
-  --de2_vga_text_buffer_0_vga_allgrants all slave grants, which is an e_mux
-  de2_vga_text_buffer_0_vga_allgrants <= de2_vga_text_buffer_0_vga_grant_vector;
-  --de2_vga_text_buffer_0_vga_end_xfer assignment, which is an e_assign
-  de2_vga_text_buffer_0_vga_end_xfer <= NOT ((de2_vga_text_buffer_0_vga_waits_for_read OR de2_vga_text_buffer_0_vga_waits_for_write));
-  --end_xfer_arb_share_counter_term_de2_vga_text_buffer_0_vga arb share counter enable term, which is an e_assign
-  end_xfer_arb_share_counter_term_de2_vga_text_buffer_0_vga <= de2_vga_text_buffer_0_vga_end_xfer AND (((NOT de2_vga_text_buffer_0_vga_any_bursting_master_saved_grant OR in_a_read_cycle) OR in_a_write_cycle));
-  --de2_vga_text_buffer_0_vga_arb_share_counter arbitration counter enable, which is an e_assign
-  de2_vga_text_buffer_0_vga_arb_counter_enable <= ((end_xfer_arb_share_counter_term_de2_vga_text_buffer_0_vga AND de2_vga_text_buffer_0_vga_allgrants)) OR ((end_xfer_arb_share_counter_term_de2_vga_text_buffer_0_vga AND NOT de2_vga_text_buffer_0_vga_non_bursting_master_requests));
-  --de2_vga_text_buffer_0_vga_arb_share_counter counter, which is an e_register
-  process (clk, reset_n)
-  begin
-    if reset_n = '0' then
-      de2_vga_text_buffer_0_vga_arb_share_counter <= std_logic_vector'("000");
-    elsif clk'event and clk = '1' then
-      if std_logic'(de2_vga_text_buffer_0_vga_arb_counter_enable) = '1' then 
-        de2_vga_text_buffer_0_vga_arb_share_counter <= de2_vga_text_buffer_0_vga_arb_share_counter_next_value;
-      end if;
-    end if;
-
-  end process;
-
-  --de2_vga_text_buffer_0_vga_slavearbiterlockenable slave enables arbiterlock, which is an e_register
-  process (clk, reset_n)
-  begin
-    if reset_n = '0' then
-      de2_vga_text_buffer_0_vga_slavearbiterlockenable <= std_logic'('0');
-    elsif clk'event and clk = '1' then
-      if std_logic'((((de2_vga_text_buffer_0_vga_master_qreq_vector AND end_xfer_arb_share_counter_term_de2_vga_text_buffer_0_vga)) OR ((end_xfer_arb_share_counter_term_de2_vga_text_buffer_0_vga AND NOT de2_vga_text_buffer_0_vga_non_bursting_master_requests)))) = '1' then 
-        de2_vga_text_buffer_0_vga_slavearbiterlockenable <= or_reduce(de2_vga_text_buffer_0_vga_arb_share_counter_next_value);
-      end if;
-    end if;
-
-  end process;
-
-  --cpu_0/data_master de2_vga_text_buffer_0/vga arbiterlock, which is an e_assign
-  cpu_0_data_master_arbiterlock <= de2_vga_text_buffer_0_vga_slavearbiterlockenable AND cpu_0_data_master_continuerequest;
-  --de2_vga_text_buffer_0_vga_slavearbiterlockenable2 slave enables arbiterlock2, which is an e_assign
-  de2_vga_text_buffer_0_vga_slavearbiterlockenable2 <= or_reduce(de2_vga_text_buffer_0_vga_arb_share_counter_next_value);
-  --cpu_0/data_master de2_vga_text_buffer_0/vga arbiterlock2, which is an e_assign
-  cpu_0_data_master_arbiterlock2 <= de2_vga_text_buffer_0_vga_slavearbiterlockenable2 AND cpu_0_data_master_continuerequest;
-  --de2_vga_text_buffer_0_vga_any_continuerequest at least one master continues requesting, which is an e_assign
-  de2_vga_text_buffer_0_vga_any_continuerequest <= std_logic'('1');
-  --cpu_0_data_master_continuerequest continued request, which is an e_assign
-  cpu_0_data_master_continuerequest <= std_logic'('1');
-  internal_cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga <= internal_cpu_0_data_master_requests_de2_vga_text_buffer_0_vga AND NOT (((NOT cpu_0_data_master_waitrequest) AND cpu_0_data_master_write));
-  --replicate narrow data for wide slave
-  cpu_0_data_master_writedata_replicated <= cpu_0_data_master_writedata & cpu_0_data_master_writedata & cpu_0_data_master_writedata & cpu_0_data_master_writedata;
-  --de2_vga_text_buffer_0_vga_writedata mux, which is an e_mux
-  de2_vga_text_buffer_0_vga_writedata <= cpu_0_data_master_writedata_replicated;
-  --master is always granted when requested
-  internal_cpu_0_data_master_granted_de2_vga_text_buffer_0_vga <= internal_cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga;
-  --cpu_0/data_master saved-grant de2_vga_text_buffer_0/vga, which is an e_assign
-  cpu_0_data_master_saved_grant_de2_vga_text_buffer_0_vga <= internal_cpu_0_data_master_requests_de2_vga_text_buffer_0_vga;
-  --allow new arb cycle for de2_vga_text_buffer_0/vga, which is an e_assign
-  de2_vga_text_buffer_0_vga_allow_new_arb_cycle <= std_logic'('1');
-  --placeholder chosen master
-  de2_vga_text_buffer_0_vga_grant_vector <= std_logic'('1');
-  --placeholder vector of master qualified-requests
-  de2_vga_text_buffer_0_vga_master_qreq_vector <= std_logic'('1');
-  --~de2_vga_text_buffer_0_vga_reset assignment, which is an e_assign
-  de2_vga_text_buffer_0_vga_reset <= NOT reset_n;
-  de2_vga_text_buffer_0_vga_chipselect <= internal_cpu_0_data_master_granted_de2_vga_text_buffer_0_vga;
-  --de2_vga_text_buffer_0_vga_firsttransfer first transaction, which is an e_assign
-  de2_vga_text_buffer_0_vga_firsttransfer <= A_WE_StdLogic((std_logic'(de2_vga_text_buffer_0_vga_begins_xfer) = '1'), de2_vga_text_buffer_0_vga_unreg_firsttransfer, de2_vga_text_buffer_0_vga_reg_firsttransfer);
-  --de2_vga_text_buffer_0_vga_unreg_firsttransfer first transaction, which is an e_assign
-  de2_vga_text_buffer_0_vga_unreg_firsttransfer <= NOT ((de2_vga_text_buffer_0_vga_slavearbiterlockenable AND de2_vga_text_buffer_0_vga_any_continuerequest));
-  --de2_vga_text_buffer_0_vga_reg_firsttransfer first transaction, which is an e_register
-  process (clk, reset_n)
-  begin
-    if reset_n = '0' then
-      de2_vga_text_buffer_0_vga_reg_firsttransfer <= std_logic'('1');
-    elsif clk'event and clk = '1' then
-      if std_logic'(de2_vga_text_buffer_0_vga_begins_xfer) = '1' then 
-        de2_vga_text_buffer_0_vga_reg_firsttransfer <= de2_vga_text_buffer_0_vga_unreg_firsttransfer;
-      end if;
-    end if;
-
-  end process;
-
-  --de2_vga_text_buffer_0_vga_beginbursttransfer_internal begin burst transfer, which is an e_assign
-  de2_vga_text_buffer_0_vga_beginbursttransfer_internal <= de2_vga_text_buffer_0_vga_begins_xfer;
-  --de2_vga_text_buffer_0_vga_read assignment, which is an e_mux
-  de2_vga_text_buffer_0_vga_read <= internal_cpu_0_data_master_granted_de2_vga_text_buffer_0_vga AND cpu_0_data_master_read;
-  --de2_vga_text_buffer_0_vga_write assignment, which is an e_mux
-  de2_vga_text_buffer_0_vga_write <= internal_cpu_0_data_master_granted_de2_vga_text_buffer_0_vga AND cpu_0_data_master_write;
-  shifted_address_to_de2_vga_text_buffer_0_vga_from_cpu_0_data_master <= cpu_0_data_master_address_to_slave;
-  --de2_vga_text_buffer_0_vga_address mux, which is an e_mux
-  de2_vga_text_buffer_0_vga_address <= A_EXT (A_SRL(shifted_address_to_de2_vga_text_buffer_0_vga_from_cpu_0_data_master,std_logic_vector'("00000000000000000000000000000100")), 10);
-  --d1_de2_vga_text_buffer_0_vga_end_xfer register, which is an e_register
-  process (clk, reset_n)
-  begin
-    if reset_n = '0' then
-      d1_de2_vga_text_buffer_0_vga_end_xfer <= std_logic'('1');
-    elsif clk'event and clk = '1' then
-      d1_de2_vga_text_buffer_0_vga_end_xfer <= de2_vga_text_buffer_0_vga_end_xfer;
-    end if;
-
-  end process;
-
-  --de2_vga_text_buffer_0_vga_waits_for_read in a cycle, which is an e_mux
-  de2_vga_text_buffer_0_vga_waits_for_read <= de2_vga_text_buffer_0_vga_in_a_read_cycle AND de2_vga_text_buffer_0_vga_begins_xfer;
-  --de2_vga_text_buffer_0_vga_in_a_read_cycle assignment, which is an e_assign
-  de2_vga_text_buffer_0_vga_in_a_read_cycle <= internal_cpu_0_data_master_granted_de2_vga_text_buffer_0_vga AND cpu_0_data_master_read;
-  --in_a_read_cycle assignment, which is an e_mux
-  in_a_read_cycle <= de2_vga_text_buffer_0_vga_in_a_read_cycle;
-  --de2_vga_text_buffer_0_vga_waits_for_write in a cycle, which is an e_mux
-  de2_vga_text_buffer_0_vga_waits_for_write <= Vector_To_Std_Logic(((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(de2_vga_text_buffer_0_vga_in_a_write_cycle))) AND std_logic_vector'("00000000000000000000000000000000")));
-  --de2_vga_text_buffer_0_vga_in_a_write_cycle assignment, which is an e_assign
-  de2_vga_text_buffer_0_vga_in_a_write_cycle <= internal_cpu_0_data_master_granted_de2_vga_text_buffer_0_vga AND cpu_0_data_master_write;
-  --in_a_write_cycle assignment, which is an e_mux
-  in_a_write_cycle <= de2_vga_text_buffer_0_vga_in_a_write_cycle;
-  wait_for_de2_vga_text_buffer_0_vga_counter <= std_logic'('0');
-  --vhdl renameroo for output signals
-  cpu_0_data_master_granted_de2_vga_text_buffer_0_vga <= internal_cpu_0_data_master_granted_de2_vga_text_buffer_0_vga;
-  --vhdl renameroo for output signals
-  cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga <= internal_cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga;
-  --vhdl renameroo for output signals
-  cpu_0_data_master_requests_de2_vga_text_buffer_0_vga <= internal_cpu_0_data_master_requests_de2_vga_text_buffer_0_vga;
---synthesis translate_off
-    --de2_vga_text_buffer_0/vga enable non-zero assertions, which is an e_register
-    process (clk, reset_n)
-    begin
-      if reset_n = '0' then
-        enable_nonzero_assertions <= std_logic'('0');
-      elsif clk'event and clk = '1' then
-        enable_nonzero_assertions <= std_logic'('1');
       end if;
 
     end process;
@@ -2477,6 +2228,247 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
+entity vga_vga_arbitrator is 
+        port (
+              -- inputs:
+                 signal clk : IN STD_LOGIC;
+                 signal cpu_0_data_master_address_to_slave : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
+                 signal cpu_0_data_master_read : IN STD_LOGIC;
+                 signal cpu_0_data_master_waitrequest : IN STD_LOGIC;
+                 signal cpu_0_data_master_write : IN STD_LOGIC;
+                 signal cpu_0_data_master_writedata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+                 signal reset_n : IN STD_LOGIC;
+                 signal vga_vga_readdata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+
+              -- outputs:
+                 signal cpu_0_data_master_granted_vga_vga : OUT STD_LOGIC;
+                 signal cpu_0_data_master_qualified_request_vga_vga : OUT STD_LOGIC;
+                 signal cpu_0_data_master_read_data_valid_vga_vga : OUT STD_LOGIC;
+                 signal cpu_0_data_master_requests_vga_vga : OUT STD_LOGIC;
+                 signal d1_vga_vga_end_xfer : OUT STD_LOGIC;
+                 signal vga_vga_address : OUT STD_LOGIC_VECTOR (10 DOWNTO 0);
+                 signal vga_vga_chipselect : OUT STD_LOGIC;
+                 signal vga_vga_read : OUT STD_LOGIC;
+                 signal vga_vga_readdata_from_sa : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+                 signal vga_vga_reset : OUT STD_LOGIC;
+                 signal vga_vga_write : OUT STD_LOGIC;
+                 signal vga_vga_writedata : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+              );
+end entity vga_vga_arbitrator;
+
+
+architecture europa of vga_vga_arbitrator is
+                signal cpu_0_data_master_arbiterlock :  STD_LOGIC;
+                signal cpu_0_data_master_arbiterlock2 :  STD_LOGIC;
+                signal cpu_0_data_master_continuerequest :  STD_LOGIC;
+                signal cpu_0_data_master_saved_grant_vga_vga :  STD_LOGIC;
+                signal d1_reasons_to_wait :  STD_LOGIC;
+                signal enable_nonzero_assertions :  STD_LOGIC;
+                signal end_xfer_arb_share_counter_term_vga_vga :  STD_LOGIC;
+                signal in_a_read_cycle :  STD_LOGIC;
+                signal in_a_write_cycle :  STD_LOGIC;
+                signal internal_cpu_0_data_master_granted_vga_vga :  STD_LOGIC;
+                signal internal_cpu_0_data_master_qualified_request_vga_vga :  STD_LOGIC;
+                signal internal_cpu_0_data_master_requests_vga_vga :  STD_LOGIC;
+                signal shifted_address_to_vga_vga_from_cpu_0_data_master :  STD_LOGIC_VECTOR (20 DOWNTO 0);
+                signal vga_vga_allgrants :  STD_LOGIC;
+                signal vga_vga_allow_new_arb_cycle :  STD_LOGIC;
+                signal vga_vga_any_bursting_master_saved_grant :  STD_LOGIC;
+                signal vga_vga_any_continuerequest :  STD_LOGIC;
+                signal vga_vga_arb_counter_enable :  STD_LOGIC;
+                signal vga_vga_arb_share_counter :  STD_LOGIC_VECTOR (2 DOWNTO 0);
+                signal vga_vga_arb_share_counter_next_value :  STD_LOGIC_VECTOR (2 DOWNTO 0);
+                signal vga_vga_arb_share_set_values :  STD_LOGIC_VECTOR (2 DOWNTO 0);
+                signal vga_vga_beginbursttransfer_internal :  STD_LOGIC;
+                signal vga_vga_begins_xfer :  STD_LOGIC;
+                signal vga_vga_end_xfer :  STD_LOGIC;
+                signal vga_vga_firsttransfer :  STD_LOGIC;
+                signal vga_vga_grant_vector :  STD_LOGIC;
+                signal vga_vga_in_a_read_cycle :  STD_LOGIC;
+                signal vga_vga_in_a_write_cycle :  STD_LOGIC;
+                signal vga_vga_master_qreq_vector :  STD_LOGIC;
+                signal vga_vga_non_bursting_master_requests :  STD_LOGIC;
+                signal vga_vga_reg_firsttransfer :  STD_LOGIC;
+                signal vga_vga_slavearbiterlockenable :  STD_LOGIC;
+                signal vga_vga_slavearbiterlockenable2 :  STD_LOGIC;
+                signal vga_vga_unreg_firsttransfer :  STD_LOGIC;
+                signal vga_vga_waits_for_read :  STD_LOGIC;
+                signal vga_vga_waits_for_write :  STD_LOGIC;
+                signal wait_for_vga_vga_counter :  STD_LOGIC;
+
+begin
+
+  process (clk, reset_n)
+  begin
+    if reset_n = '0' then
+      d1_reasons_to_wait <= std_logic'('0');
+    elsif clk'event and clk = '1' then
+      d1_reasons_to_wait <= NOT vga_vga_end_xfer;
+    end if;
+
+  end process;
+
+  vga_vga_begins_xfer <= NOT d1_reasons_to_wait AND (internal_cpu_0_data_master_qualified_request_vga_vga);
+  --assign vga_vga_readdata_from_sa = vga_vga_readdata so that symbol knows where to group signals which may go to master only, which is an e_assign
+  vga_vga_readdata_from_sa <= vga_vga_readdata;
+  internal_cpu_0_data_master_requests_vga_vga <= to_std_logic(((Std_Logic_Vector'(cpu_0_data_master_address_to_slave(20 DOWNTO 13) & std_logic_vector'("0000000000000")) = std_logic_vector'("000000010000000000000")))) AND ((cpu_0_data_master_read OR cpu_0_data_master_write));
+  --vga_vga_arb_share_counter set values, which is an e_mux
+  vga_vga_arb_share_set_values <= std_logic_vector'("001");
+  --vga_vga_non_bursting_master_requests mux, which is an e_mux
+  vga_vga_non_bursting_master_requests <= internal_cpu_0_data_master_requests_vga_vga;
+  --vga_vga_any_bursting_master_saved_grant mux, which is an e_mux
+  vga_vga_any_bursting_master_saved_grant <= std_logic'('0');
+  --vga_vga_arb_share_counter_next_value assignment, which is an e_assign
+  vga_vga_arb_share_counter_next_value <= A_EXT (A_WE_StdLogicVector((std_logic'(vga_vga_firsttransfer) = '1'), (((std_logic_vector'("000000000000000000000000000000") & (vga_vga_arb_share_set_values)) - std_logic_vector'("000000000000000000000000000000001"))), A_WE_StdLogicVector((std_logic'(or_reduce(vga_vga_arb_share_counter)) = '1'), (((std_logic_vector'("000000000000000000000000000000") & (vga_vga_arb_share_counter)) - std_logic_vector'("000000000000000000000000000000001"))), std_logic_vector'("000000000000000000000000000000000"))), 3);
+  --vga_vga_allgrants all slave grants, which is an e_mux
+  vga_vga_allgrants <= vga_vga_grant_vector;
+  --vga_vga_end_xfer assignment, which is an e_assign
+  vga_vga_end_xfer <= NOT ((vga_vga_waits_for_read OR vga_vga_waits_for_write));
+  --end_xfer_arb_share_counter_term_vga_vga arb share counter enable term, which is an e_assign
+  end_xfer_arb_share_counter_term_vga_vga <= vga_vga_end_xfer AND (((NOT vga_vga_any_bursting_master_saved_grant OR in_a_read_cycle) OR in_a_write_cycle));
+  --vga_vga_arb_share_counter arbitration counter enable, which is an e_assign
+  vga_vga_arb_counter_enable <= ((end_xfer_arb_share_counter_term_vga_vga AND vga_vga_allgrants)) OR ((end_xfer_arb_share_counter_term_vga_vga AND NOT vga_vga_non_bursting_master_requests));
+  --vga_vga_arb_share_counter counter, which is an e_register
+  process (clk, reset_n)
+  begin
+    if reset_n = '0' then
+      vga_vga_arb_share_counter <= std_logic_vector'("000");
+    elsif clk'event and clk = '1' then
+      if std_logic'(vga_vga_arb_counter_enable) = '1' then 
+        vga_vga_arb_share_counter <= vga_vga_arb_share_counter_next_value;
+      end if;
+    end if;
+
+  end process;
+
+  --vga_vga_slavearbiterlockenable slave enables arbiterlock, which is an e_register
+  process (clk, reset_n)
+  begin
+    if reset_n = '0' then
+      vga_vga_slavearbiterlockenable <= std_logic'('0');
+    elsif clk'event and clk = '1' then
+      if std_logic'((((vga_vga_master_qreq_vector AND end_xfer_arb_share_counter_term_vga_vga)) OR ((end_xfer_arb_share_counter_term_vga_vga AND NOT vga_vga_non_bursting_master_requests)))) = '1' then 
+        vga_vga_slavearbiterlockenable <= or_reduce(vga_vga_arb_share_counter_next_value);
+      end if;
+    end if;
+
+  end process;
+
+  --cpu_0/data_master vga/vga arbiterlock, which is an e_assign
+  cpu_0_data_master_arbiterlock <= vga_vga_slavearbiterlockenable AND cpu_0_data_master_continuerequest;
+  --vga_vga_slavearbiterlockenable2 slave enables arbiterlock2, which is an e_assign
+  vga_vga_slavearbiterlockenable2 <= or_reduce(vga_vga_arb_share_counter_next_value);
+  --cpu_0/data_master vga/vga arbiterlock2, which is an e_assign
+  cpu_0_data_master_arbiterlock2 <= vga_vga_slavearbiterlockenable2 AND cpu_0_data_master_continuerequest;
+  --vga_vga_any_continuerequest at least one master continues requesting, which is an e_assign
+  vga_vga_any_continuerequest <= std_logic'('1');
+  --cpu_0_data_master_continuerequest continued request, which is an e_assign
+  cpu_0_data_master_continuerequest <= std_logic'('1');
+  internal_cpu_0_data_master_qualified_request_vga_vga <= internal_cpu_0_data_master_requests_vga_vga AND NOT (((NOT cpu_0_data_master_waitrequest) AND cpu_0_data_master_write));
+  --vga_vga_writedata mux, which is an e_mux
+  vga_vga_writedata <= cpu_0_data_master_writedata;
+  --master is always granted when requested
+  internal_cpu_0_data_master_granted_vga_vga <= internal_cpu_0_data_master_qualified_request_vga_vga;
+  --cpu_0/data_master saved-grant vga/vga, which is an e_assign
+  cpu_0_data_master_saved_grant_vga_vga <= internal_cpu_0_data_master_requests_vga_vga;
+  --allow new arb cycle for vga/vga, which is an e_assign
+  vga_vga_allow_new_arb_cycle <= std_logic'('1');
+  --placeholder chosen master
+  vga_vga_grant_vector <= std_logic'('1');
+  --placeholder vector of master qualified-requests
+  vga_vga_master_qreq_vector <= std_logic'('1');
+  --~vga_vga_reset assignment, which is an e_assign
+  vga_vga_reset <= NOT reset_n;
+  vga_vga_chipselect <= internal_cpu_0_data_master_granted_vga_vga;
+  --vga_vga_firsttransfer first transaction, which is an e_assign
+  vga_vga_firsttransfer <= A_WE_StdLogic((std_logic'(vga_vga_begins_xfer) = '1'), vga_vga_unreg_firsttransfer, vga_vga_reg_firsttransfer);
+  --vga_vga_unreg_firsttransfer first transaction, which is an e_assign
+  vga_vga_unreg_firsttransfer <= NOT ((vga_vga_slavearbiterlockenable AND vga_vga_any_continuerequest));
+  --vga_vga_reg_firsttransfer first transaction, which is an e_register
+  process (clk, reset_n)
+  begin
+    if reset_n = '0' then
+      vga_vga_reg_firsttransfer <= std_logic'('1');
+    elsif clk'event and clk = '1' then
+      if std_logic'(vga_vga_begins_xfer) = '1' then 
+        vga_vga_reg_firsttransfer <= vga_vga_unreg_firsttransfer;
+      end if;
+    end if;
+
+  end process;
+
+  --vga_vga_beginbursttransfer_internal begin burst transfer, which is an e_assign
+  vga_vga_beginbursttransfer_internal <= vga_vga_begins_xfer;
+  --vga_vga_read assignment, which is an e_mux
+  vga_vga_read <= internal_cpu_0_data_master_granted_vga_vga AND cpu_0_data_master_read;
+  --vga_vga_write assignment, which is an e_mux
+  vga_vga_write <= internal_cpu_0_data_master_granted_vga_vga AND cpu_0_data_master_write;
+  shifted_address_to_vga_vga_from_cpu_0_data_master <= cpu_0_data_master_address_to_slave;
+  --vga_vga_address mux, which is an e_mux
+  vga_vga_address <= A_EXT (A_SRL(shifted_address_to_vga_vga_from_cpu_0_data_master,std_logic_vector'("00000000000000000000000000000010")), 11);
+  --d1_vga_vga_end_xfer register, which is an e_register
+  process (clk, reset_n)
+  begin
+    if reset_n = '0' then
+      d1_vga_vga_end_xfer <= std_logic'('1');
+    elsif clk'event and clk = '1' then
+      d1_vga_vga_end_xfer <= vga_vga_end_xfer;
+    end if;
+
+  end process;
+
+  --vga_vga_waits_for_read in a cycle, which is an e_mux
+  vga_vga_waits_for_read <= vga_vga_in_a_read_cycle AND vga_vga_begins_xfer;
+  --vga_vga_in_a_read_cycle assignment, which is an e_assign
+  vga_vga_in_a_read_cycle <= internal_cpu_0_data_master_granted_vga_vga AND cpu_0_data_master_read;
+  --in_a_read_cycle assignment, which is an e_mux
+  in_a_read_cycle <= vga_vga_in_a_read_cycle;
+  --vga_vga_waits_for_write in a cycle, which is an e_mux
+  vga_vga_waits_for_write <= Vector_To_Std_Logic(((std_logic_vector'("0000000000000000000000000000000") & (A_TOSTDLOGICVECTOR(vga_vga_in_a_write_cycle))) AND std_logic_vector'("00000000000000000000000000000000")));
+  --vga_vga_in_a_write_cycle assignment, which is an e_assign
+  vga_vga_in_a_write_cycle <= internal_cpu_0_data_master_granted_vga_vga AND cpu_0_data_master_write;
+  --in_a_write_cycle assignment, which is an e_mux
+  in_a_write_cycle <= vga_vga_in_a_write_cycle;
+  wait_for_vga_vga_counter <= std_logic'('0');
+  --vhdl renameroo for output signals
+  cpu_0_data_master_granted_vga_vga <= internal_cpu_0_data_master_granted_vga_vga;
+  --vhdl renameroo for output signals
+  cpu_0_data_master_qualified_request_vga_vga <= internal_cpu_0_data_master_qualified_request_vga_vga;
+  --vhdl renameroo for output signals
+  cpu_0_data_master_requests_vga_vga <= internal_cpu_0_data_master_requests_vga_vga;
+--synthesis translate_off
+    --vga/vga enable non-zero assertions, which is an e_register
+    process (clk, reset_n)
+    begin
+      if reset_n = '0' then
+        enable_nonzero_assertions <= std_logic'('0');
+      elsif clk'event and clk = '1' then
+        enable_nonzero_assertions <= std_logic'('1');
+      end if;
+
+    end process;
+
+--synthesis translate_on
+
+end europa;
+
+
+
+-- turn off superfluous VHDL processor warnings 
+-- altera message_level Level1 
+-- altera message_off 10034 10035 10036 10037 10230 10240 10030 
+
+library altera;
+use altera.altera_europa_support_lib.all;
+
+library altera_mf;
+use altera_mf.altera_mf_components.all;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+
 entity nios_system_reset_clk_0_domain_synch_module is 
         port (
               -- inputs:
@@ -2544,9 +2536,6 @@ entity nios_system is
                  signal clk_0 : IN STD_LOGIC;
                  signal reset_n : IN STD_LOGIC;
 
-              -- the_de2_vga_text_buffer_0
-                 signal display_pixel_on_from_the_de2_vga_text_buffer_0 : OUT STD_LOGIC;
-
               -- the_kanto_ctrl
                  signal audio_track_from_the_kanto_ctrl : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
                  signal keys_to_the_kanto_ctrl : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
@@ -2572,7 +2561,10 @@ entity nios_system is
                  signal SRAM_LB_N_from_the_sram : OUT STD_LOGIC;
                  signal SRAM_OE_N_from_the_sram : OUT STD_LOGIC;
                  signal SRAM_UB_N_from_the_sram : OUT STD_LOGIC;
-                 signal SRAM_WE_N_from_the_sram : OUT STD_LOGIC
+                 signal SRAM_WE_N_from_the_sram : OUT STD_LOGIC;
+
+              -- the_vga
+                 signal display_pixel_on_from_the_vga : OUT STD_LOGIC
               );
 end entity nios_system;
 
@@ -2625,45 +2617,44 @@ component cpu_0_data_master_arbitrator is
                     signal cpu_0_data_master_address : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
                     signal cpu_0_data_master_byteenable_sram_avalon_slave_0 : IN STD_LOGIC_VECTOR (1 DOWNTO 0);
                     signal cpu_0_data_master_granted_cpu_0_jtag_debug_module : IN STD_LOGIC;
-                    signal cpu_0_data_master_granted_de2_vga_text_buffer_0_vga : IN STD_LOGIC;
                     signal cpu_0_data_master_granted_jtag_uart_0_avalon_jtag_slave : IN STD_LOGIC;
                     signal cpu_0_data_master_granted_kanto_ctrl_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_granted_ps2_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_granted_sdbuf_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_granted_sram_avalon_slave_0 : IN STD_LOGIC;
+                    signal cpu_0_data_master_granted_vga_vga : IN STD_LOGIC;
                     signal cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module : IN STD_LOGIC;
-                    signal cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga : IN STD_LOGIC;
                     signal cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave : IN STD_LOGIC;
                     signal cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_qualified_request_ps2_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_qualified_request_sdbuf_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_qualified_request_sram_avalon_slave_0 : IN STD_LOGIC;
+                    signal cpu_0_data_master_qualified_request_vga_vga : IN STD_LOGIC;
                     signal cpu_0_data_master_read : IN STD_LOGIC;
                     signal cpu_0_data_master_read_data_valid_cpu_0_jtag_debug_module : IN STD_LOGIC;
-                    signal cpu_0_data_master_read_data_valid_de2_vga_text_buffer_0_vga : IN STD_LOGIC;
                     signal cpu_0_data_master_read_data_valid_jtag_uart_0_avalon_jtag_slave : IN STD_LOGIC;
                     signal cpu_0_data_master_read_data_valid_kanto_ctrl_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_read_data_valid_ps2_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_read_data_valid_sdbuf_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_read_data_valid_sram_avalon_slave_0 : IN STD_LOGIC;
+                    signal cpu_0_data_master_read_data_valid_vga_vga : IN STD_LOGIC;
                     signal cpu_0_data_master_requests_cpu_0_jtag_debug_module : IN STD_LOGIC;
-                    signal cpu_0_data_master_requests_de2_vga_text_buffer_0_vga : IN STD_LOGIC;
                     signal cpu_0_data_master_requests_jtag_uart_0_avalon_jtag_slave : IN STD_LOGIC;
                     signal cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_requests_ps2_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_requests_sdbuf_avalon_slave_0 : IN STD_LOGIC;
                     signal cpu_0_data_master_requests_sram_avalon_slave_0 : IN STD_LOGIC;
+                    signal cpu_0_data_master_requests_vga_vga : IN STD_LOGIC;
                     signal cpu_0_data_master_write : IN STD_LOGIC;
                     signal cpu_0_data_master_writedata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
                     signal cpu_0_jtag_debug_module_readdata_from_sa : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
                     signal d1_cpu_0_jtag_debug_module_end_xfer : IN STD_LOGIC;
-                    signal d1_de2_vga_text_buffer_0_vga_end_xfer : IN STD_LOGIC;
                     signal d1_jtag_uart_0_avalon_jtag_slave_end_xfer : IN STD_LOGIC;
                     signal d1_kanto_ctrl_avalon_slave_0_end_xfer : IN STD_LOGIC;
                     signal d1_ps2_avalon_slave_0_end_xfer : IN STD_LOGIC;
                     signal d1_sdbuf_avalon_slave_0_end_xfer : IN STD_LOGIC;
                     signal d1_sram_avalon_slave_0_end_xfer : IN STD_LOGIC;
-                    signal de2_vga_text_buffer_0_vga_readdata_from_sa : IN STD_LOGIC_VECTOR (127 DOWNTO 0);
+                    signal d1_vga_vga_end_xfer : IN STD_LOGIC;
                     signal jtag_uart_0_avalon_jtag_slave_irq_from_sa : IN STD_LOGIC;
                     signal jtag_uart_0_avalon_jtag_slave_readdata_from_sa : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
                     signal jtag_uart_0_avalon_jtag_slave_waitrequest_from_sa : IN STD_LOGIC;
@@ -2672,6 +2663,7 @@ component cpu_0_data_master_arbitrator is
                     signal reset_n : IN STD_LOGIC;
                     signal sdbuf_avalon_slave_0_readdata_from_sa : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
                     signal sram_avalon_slave_0_readdata_from_sa : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+                    signal vga_vga_readdata_from_sa : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
 
                  -- outputs:
                     signal cpu_0_data_master_address_to_slave : OUT STD_LOGIC_VECTOR (20 DOWNTO 0);
@@ -2743,51 +2735,6 @@ component cpu_0 is
                     signal jtag_debug_module_resetrequest : OUT STD_LOGIC
                  );
 end component cpu_0;
-
-component de2_vga_text_buffer_0_vga_arbitrator is 
-           port (
-                 -- inputs:
-                    signal clk : IN STD_LOGIC;
-                    signal cpu_0_data_master_address_to_slave : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
-                    signal cpu_0_data_master_read : IN STD_LOGIC;
-                    signal cpu_0_data_master_waitrequest : IN STD_LOGIC;
-                    signal cpu_0_data_master_write : IN STD_LOGIC;
-                    signal cpu_0_data_master_writedata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
-                    signal de2_vga_text_buffer_0_vga_readdata : IN STD_LOGIC_VECTOR (127 DOWNTO 0);
-                    signal reset_n : IN STD_LOGIC;
-
-                 -- outputs:
-                    signal cpu_0_data_master_granted_de2_vga_text_buffer_0_vga : OUT STD_LOGIC;
-                    signal cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga : OUT STD_LOGIC;
-                    signal cpu_0_data_master_read_data_valid_de2_vga_text_buffer_0_vga : OUT STD_LOGIC;
-                    signal cpu_0_data_master_requests_de2_vga_text_buffer_0_vga : OUT STD_LOGIC;
-                    signal d1_de2_vga_text_buffer_0_vga_end_xfer : OUT STD_LOGIC;
-                    signal de2_vga_text_buffer_0_vga_address : OUT STD_LOGIC_VECTOR (9 DOWNTO 0);
-                    signal de2_vga_text_buffer_0_vga_chipselect : OUT STD_LOGIC;
-                    signal de2_vga_text_buffer_0_vga_read : OUT STD_LOGIC;
-                    signal de2_vga_text_buffer_0_vga_readdata_from_sa : OUT STD_LOGIC_VECTOR (127 DOWNTO 0);
-                    signal de2_vga_text_buffer_0_vga_reset : OUT STD_LOGIC;
-                    signal de2_vga_text_buffer_0_vga_write : OUT STD_LOGIC;
-                    signal de2_vga_text_buffer_0_vga_writedata : OUT STD_LOGIC_VECTOR (127 DOWNTO 0)
-                 );
-end component de2_vga_text_buffer_0_vga_arbitrator;
-
-component de2_vga_text_buffer_0 is 
-           port (
-                 -- inputs:
-                    signal vga_address : IN STD_LOGIC_VECTOR (9 DOWNTO 0);
-                    signal vga_chipselect : IN STD_LOGIC;
-                    signal vga_clk : IN STD_LOGIC;
-                    signal vga_read : IN STD_LOGIC;
-                    signal vga_reset : IN STD_LOGIC;
-                    signal vga_write : IN STD_LOGIC;
-                    signal vga_writedata : IN STD_LOGIC_VECTOR (127 DOWNTO 0);
-
-                 -- outputs:
-                    signal display_pixel_on : OUT STD_LOGIC;
-                    signal vga_readdata : OUT STD_LOGIC_VECTOR (127 DOWNTO 0)
-                 );
-end component de2_vga_text_buffer_0;
 
 component jtag_uart_0_avalon_jtag_slave_arbitrator is 
            port (
@@ -3040,6 +2987,51 @@ component sram is
                  );
 end component sram;
 
+component vga_vga_arbitrator is 
+           port (
+                 -- inputs:
+                    signal clk : IN STD_LOGIC;
+                    signal cpu_0_data_master_address_to_slave : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
+                    signal cpu_0_data_master_read : IN STD_LOGIC;
+                    signal cpu_0_data_master_waitrequest : IN STD_LOGIC;
+                    signal cpu_0_data_master_write : IN STD_LOGIC;
+                    signal cpu_0_data_master_writedata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+                    signal reset_n : IN STD_LOGIC;
+                    signal vga_vga_readdata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+
+                 -- outputs:
+                    signal cpu_0_data_master_granted_vga_vga : OUT STD_LOGIC;
+                    signal cpu_0_data_master_qualified_request_vga_vga : OUT STD_LOGIC;
+                    signal cpu_0_data_master_read_data_valid_vga_vga : OUT STD_LOGIC;
+                    signal cpu_0_data_master_requests_vga_vga : OUT STD_LOGIC;
+                    signal d1_vga_vga_end_xfer : OUT STD_LOGIC;
+                    signal vga_vga_address : OUT STD_LOGIC_VECTOR (10 DOWNTO 0);
+                    signal vga_vga_chipselect : OUT STD_LOGIC;
+                    signal vga_vga_read : OUT STD_LOGIC;
+                    signal vga_vga_readdata_from_sa : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+                    signal vga_vga_reset : OUT STD_LOGIC;
+                    signal vga_vga_write : OUT STD_LOGIC;
+                    signal vga_vga_writedata : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+                 );
+end component vga_vga_arbitrator;
+
+component vga is 
+           port (
+                 -- inputs:
+                    signal vga_address : IN STD_LOGIC_VECTOR (10 DOWNTO 0);
+                    signal vga_chipselect : IN STD_LOGIC;
+                    signal vga_clk : IN STD_LOGIC;
+                    signal vga_read : IN STD_LOGIC;
+                    signal vga_reset : IN STD_LOGIC;
+                    signal vga_write : IN STD_LOGIC;
+                    signal vga_writedata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+
+                 -- outputs:
+                    signal display_pixel_on : OUT STD_LOGIC;
+                    signal vga_readdata : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+                 );
+end component vga;
+
 component nios_system_reset_clk_0_domain_synch_module is 
            port (
                  -- inputs:
@@ -3061,37 +3053,37 @@ end component nios_system_reset_clk_0_domain_synch_module;
                 signal cpu_0_data_master_dbs_write_16 :  STD_LOGIC_VECTOR (15 DOWNTO 0);
                 signal cpu_0_data_master_debugaccess :  STD_LOGIC;
                 signal cpu_0_data_master_granted_cpu_0_jtag_debug_module :  STD_LOGIC;
-                signal cpu_0_data_master_granted_de2_vga_text_buffer_0_vga :  STD_LOGIC;
                 signal cpu_0_data_master_granted_jtag_uart_0_avalon_jtag_slave :  STD_LOGIC;
                 signal cpu_0_data_master_granted_kanto_ctrl_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_granted_ps2_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_granted_sdbuf_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_granted_sram_avalon_slave_0 :  STD_LOGIC;
+                signal cpu_0_data_master_granted_vga_vga :  STD_LOGIC;
                 signal cpu_0_data_master_irq :  STD_LOGIC_VECTOR (31 DOWNTO 0);
                 signal cpu_0_data_master_no_byte_enables_and_last_term :  STD_LOGIC;
                 signal cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module :  STD_LOGIC;
-                signal cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga :  STD_LOGIC;
                 signal cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave :  STD_LOGIC;
                 signal cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_qualified_request_ps2_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_qualified_request_sdbuf_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_qualified_request_sram_avalon_slave_0 :  STD_LOGIC;
+                signal cpu_0_data_master_qualified_request_vga_vga :  STD_LOGIC;
                 signal cpu_0_data_master_read :  STD_LOGIC;
                 signal cpu_0_data_master_read_data_valid_cpu_0_jtag_debug_module :  STD_LOGIC;
-                signal cpu_0_data_master_read_data_valid_de2_vga_text_buffer_0_vga :  STD_LOGIC;
                 signal cpu_0_data_master_read_data_valid_jtag_uart_0_avalon_jtag_slave :  STD_LOGIC;
                 signal cpu_0_data_master_read_data_valid_kanto_ctrl_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_read_data_valid_ps2_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_read_data_valid_sdbuf_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_read_data_valid_sram_avalon_slave_0 :  STD_LOGIC;
+                signal cpu_0_data_master_read_data_valid_vga_vga :  STD_LOGIC;
                 signal cpu_0_data_master_readdata :  STD_LOGIC_VECTOR (31 DOWNTO 0);
                 signal cpu_0_data_master_requests_cpu_0_jtag_debug_module :  STD_LOGIC;
-                signal cpu_0_data_master_requests_de2_vga_text_buffer_0_vga :  STD_LOGIC;
                 signal cpu_0_data_master_requests_jtag_uart_0_avalon_jtag_slave :  STD_LOGIC;
                 signal cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_requests_ps2_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_requests_sdbuf_avalon_slave_0 :  STD_LOGIC;
                 signal cpu_0_data_master_requests_sram_avalon_slave_0 :  STD_LOGIC;
+                signal cpu_0_data_master_requests_vga_vga :  STD_LOGIC;
                 signal cpu_0_data_master_waitrequest :  STD_LOGIC;
                 signal cpu_0_data_master_write :  STD_LOGIC;
                 signal cpu_0_data_master_writedata :  STD_LOGIC_VECTOR (31 DOWNTO 0);
@@ -3122,20 +3114,12 @@ end component nios_system_reset_clk_0_domain_synch_module;
                 signal cpu_0_jtag_debug_module_write :  STD_LOGIC;
                 signal cpu_0_jtag_debug_module_writedata :  STD_LOGIC_VECTOR (31 DOWNTO 0);
                 signal d1_cpu_0_jtag_debug_module_end_xfer :  STD_LOGIC;
-                signal d1_de2_vga_text_buffer_0_vga_end_xfer :  STD_LOGIC;
                 signal d1_jtag_uart_0_avalon_jtag_slave_end_xfer :  STD_LOGIC;
                 signal d1_kanto_ctrl_avalon_slave_0_end_xfer :  STD_LOGIC;
                 signal d1_ps2_avalon_slave_0_end_xfer :  STD_LOGIC;
                 signal d1_sdbuf_avalon_slave_0_end_xfer :  STD_LOGIC;
                 signal d1_sram_avalon_slave_0_end_xfer :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_address :  STD_LOGIC_VECTOR (9 DOWNTO 0);
-                signal de2_vga_text_buffer_0_vga_chipselect :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_read :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_readdata :  STD_LOGIC_VECTOR (127 DOWNTO 0);
-                signal de2_vga_text_buffer_0_vga_readdata_from_sa :  STD_LOGIC_VECTOR (127 DOWNTO 0);
-                signal de2_vga_text_buffer_0_vga_reset :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_write :  STD_LOGIC;
-                signal de2_vga_text_buffer_0_vga_writedata :  STD_LOGIC_VECTOR (127 DOWNTO 0);
+                signal d1_vga_vga_end_xfer :  STD_LOGIC;
                 signal internal_SRAM_ADDR_from_the_sram :  STD_LOGIC_VECTOR (17 DOWNTO 0);
                 signal internal_SRAM_CE_N_from_the_sram :  STD_LOGIC;
                 signal internal_SRAM_LB_N_from_the_sram :  STD_LOGIC;
@@ -3143,7 +3127,7 @@ end component nios_system_reset_clk_0_domain_synch_module;
                 signal internal_SRAM_UB_N_from_the_sram :  STD_LOGIC;
                 signal internal_SRAM_WE_N_from_the_sram :  STD_LOGIC;
                 signal internal_audio_track_from_the_kanto_ctrl :  STD_LOGIC_VECTOR (7 DOWNTO 0);
-                signal internal_display_pixel_on_from_the_de2_vga_text_buffer_0 :  STD_LOGIC;
+                signal internal_display_pixel_on_from_the_vga :  STD_LOGIC;
                 signal internal_nios_addr_from_the_kanto_ctrl :  STD_LOGIC_VECTOR (31 DOWNTO 0);
                 signal internal_nios_play_from_the_kanto_ctrl :  STD_LOGIC;
                 signal internal_nios_readblock_from_the_kanto_ctrl :  STD_LOGIC;
@@ -3195,6 +3179,14 @@ end component nios_system_reset_clk_0_domain_synch_module;
                 signal sram_avalon_slave_0_readdata_from_sa :  STD_LOGIC_VECTOR (15 DOWNTO 0);
                 signal sram_avalon_slave_0_write :  STD_LOGIC;
                 signal sram_avalon_slave_0_writedata :  STD_LOGIC_VECTOR (15 DOWNTO 0);
+                signal vga_vga_address :  STD_LOGIC_VECTOR (10 DOWNTO 0);
+                signal vga_vga_chipselect :  STD_LOGIC;
+                signal vga_vga_read :  STD_LOGIC;
+                signal vga_vga_readdata :  STD_LOGIC_VECTOR (31 DOWNTO 0);
+                signal vga_vga_readdata_from_sa :  STD_LOGIC_VECTOR (31 DOWNTO 0);
+                signal vga_vga_reset :  STD_LOGIC;
+                signal vga_vga_write :  STD_LOGIC;
+                signal vga_vga_writedata :  STD_LOGIC_VECTOR (31 DOWNTO 0);
 
 begin
 
@@ -3250,45 +3242,44 @@ begin
       cpu_0_data_master_address => cpu_0_data_master_address,
       cpu_0_data_master_byteenable_sram_avalon_slave_0 => cpu_0_data_master_byteenable_sram_avalon_slave_0,
       cpu_0_data_master_granted_cpu_0_jtag_debug_module => cpu_0_data_master_granted_cpu_0_jtag_debug_module,
-      cpu_0_data_master_granted_de2_vga_text_buffer_0_vga => cpu_0_data_master_granted_de2_vga_text_buffer_0_vga,
       cpu_0_data_master_granted_jtag_uart_0_avalon_jtag_slave => cpu_0_data_master_granted_jtag_uart_0_avalon_jtag_slave,
       cpu_0_data_master_granted_kanto_ctrl_avalon_slave_0 => cpu_0_data_master_granted_kanto_ctrl_avalon_slave_0,
       cpu_0_data_master_granted_ps2_avalon_slave_0 => cpu_0_data_master_granted_ps2_avalon_slave_0,
       cpu_0_data_master_granted_sdbuf_avalon_slave_0 => cpu_0_data_master_granted_sdbuf_avalon_slave_0,
       cpu_0_data_master_granted_sram_avalon_slave_0 => cpu_0_data_master_granted_sram_avalon_slave_0,
+      cpu_0_data_master_granted_vga_vga => cpu_0_data_master_granted_vga_vga,
       cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module => cpu_0_data_master_qualified_request_cpu_0_jtag_debug_module,
-      cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga => cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga,
       cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave => cpu_0_data_master_qualified_request_jtag_uart_0_avalon_jtag_slave,
       cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0 => cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0,
       cpu_0_data_master_qualified_request_ps2_avalon_slave_0 => cpu_0_data_master_qualified_request_ps2_avalon_slave_0,
       cpu_0_data_master_qualified_request_sdbuf_avalon_slave_0 => cpu_0_data_master_qualified_request_sdbuf_avalon_slave_0,
       cpu_0_data_master_qualified_request_sram_avalon_slave_0 => cpu_0_data_master_qualified_request_sram_avalon_slave_0,
+      cpu_0_data_master_qualified_request_vga_vga => cpu_0_data_master_qualified_request_vga_vga,
       cpu_0_data_master_read => cpu_0_data_master_read,
       cpu_0_data_master_read_data_valid_cpu_0_jtag_debug_module => cpu_0_data_master_read_data_valid_cpu_0_jtag_debug_module,
-      cpu_0_data_master_read_data_valid_de2_vga_text_buffer_0_vga => cpu_0_data_master_read_data_valid_de2_vga_text_buffer_0_vga,
       cpu_0_data_master_read_data_valid_jtag_uart_0_avalon_jtag_slave => cpu_0_data_master_read_data_valid_jtag_uart_0_avalon_jtag_slave,
       cpu_0_data_master_read_data_valid_kanto_ctrl_avalon_slave_0 => cpu_0_data_master_read_data_valid_kanto_ctrl_avalon_slave_0,
       cpu_0_data_master_read_data_valid_ps2_avalon_slave_0 => cpu_0_data_master_read_data_valid_ps2_avalon_slave_0,
       cpu_0_data_master_read_data_valid_sdbuf_avalon_slave_0 => cpu_0_data_master_read_data_valid_sdbuf_avalon_slave_0,
       cpu_0_data_master_read_data_valid_sram_avalon_slave_0 => cpu_0_data_master_read_data_valid_sram_avalon_slave_0,
+      cpu_0_data_master_read_data_valid_vga_vga => cpu_0_data_master_read_data_valid_vga_vga,
       cpu_0_data_master_requests_cpu_0_jtag_debug_module => cpu_0_data_master_requests_cpu_0_jtag_debug_module,
-      cpu_0_data_master_requests_de2_vga_text_buffer_0_vga => cpu_0_data_master_requests_de2_vga_text_buffer_0_vga,
       cpu_0_data_master_requests_jtag_uart_0_avalon_jtag_slave => cpu_0_data_master_requests_jtag_uart_0_avalon_jtag_slave,
       cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0 => cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0,
       cpu_0_data_master_requests_ps2_avalon_slave_0 => cpu_0_data_master_requests_ps2_avalon_slave_0,
       cpu_0_data_master_requests_sdbuf_avalon_slave_0 => cpu_0_data_master_requests_sdbuf_avalon_slave_0,
       cpu_0_data_master_requests_sram_avalon_slave_0 => cpu_0_data_master_requests_sram_avalon_slave_0,
+      cpu_0_data_master_requests_vga_vga => cpu_0_data_master_requests_vga_vga,
       cpu_0_data_master_write => cpu_0_data_master_write,
       cpu_0_data_master_writedata => cpu_0_data_master_writedata,
       cpu_0_jtag_debug_module_readdata_from_sa => cpu_0_jtag_debug_module_readdata_from_sa,
       d1_cpu_0_jtag_debug_module_end_xfer => d1_cpu_0_jtag_debug_module_end_xfer,
-      d1_de2_vga_text_buffer_0_vga_end_xfer => d1_de2_vga_text_buffer_0_vga_end_xfer,
       d1_jtag_uart_0_avalon_jtag_slave_end_xfer => d1_jtag_uart_0_avalon_jtag_slave_end_xfer,
       d1_kanto_ctrl_avalon_slave_0_end_xfer => d1_kanto_ctrl_avalon_slave_0_end_xfer,
       d1_ps2_avalon_slave_0_end_xfer => d1_ps2_avalon_slave_0_end_xfer,
       d1_sdbuf_avalon_slave_0_end_xfer => d1_sdbuf_avalon_slave_0_end_xfer,
       d1_sram_avalon_slave_0_end_xfer => d1_sram_avalon_slave_0_end_xfer,
-      de2_vga_text_buffer_0_vga_readdata_from_sa => de2_vga_text_buffer_0_vga_readdata_from_sa,
+      d1_vga_vga_end_xfer => d1_vga_vga_end_xfer,
       jtag_uart_0_avalon_jtag_slave_irq_from_sa => jtag_uart_0_avalon_jtag_slave_irq_from_sa,
       jtag_uart_0_avalon_jtag_slave_readdata_from_sa => jtag_uart_0_avalon_jtag_slave_readdata_from_sa,
       jtag_uart_0_avalon_jtag_slave_waitrequest_from_sa => jtag_uart_0_avalon_jtag_slave_waitrequest_from_sa,
@@ -3296,7 +3287,8 @@ begin
       ps2_avalon_slave_0_readdata_from_sa => ps2_avalon_slave_0_readdata_from_sa,
       reset_n => clk_0_reset_n,
       sdbuf_avalon_slave_0_readdata_from_sa => sdbuf_avalon_slave_0_readdata_from_sa,
-      sram_avalon_slave_0_readdata_from_sa => sram_avalon_slave_0_readdata_from_sa
+      sram_avalon_slave_0_readdata_from_sa => sram_avalon_slave_0_readdata_from_sa,
+      vga_vga_readdata_from_sa => vga_vga_readdata_from_sa
     );
 
 
@@ -3353,47 +3345,6 @@ begin
       jtag_debug_module_write => cpu_0_jtag_debug_module_write,
       jtag_debug_module_writedata => cpu_0_jtag_debug_module_writedata,
       reset_n => cpu_0_jtag_debug_module_reset_n
-    );
-
-
-  --the_de2_vga_text_buffer_0_vga, which is an e_instance
-  the_de2_vga_text_buffer_0_vga : de2_vga_text_buffer_0_vga_arbitrator
-    port map(
-      cpu_0_data_master_granted_de2_vga_text_buffer_0_vga => cpu_0_data_master_granted_de2_vga_text_buffer_0_vga,
-      cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga => cpu_0_data_master_qualified_request_de2_vga_text_buffer_0_vga,
-      cpu_0_data_master_read_data_valid_de2_vga_text_buffer_0_vga => cpu_0_data_master_read_data_valid_de2_vga_text_buffer_0_vga,
-      cpu_0_data_master_requests_de2_vga_text_buffer_0_vga => cpu_0_data_master_requests_de2_vga_text_buffer_0_vga,
-      d1_de2_vga_text_buffer_0_vga_end_xfer => d1_de2_vga_text_buffer_0_vga_end_xfer,
-      de2_vga_text_buffer_0_vga_address => de2_vga_text_buffer_0_vga_address,
-      de2_vga_text_buffer_0_vga_chipselect => de2_vga_text_buffer_0_vga_chipselect,
-      de2_vga_text_buffer_0_vga_read => de2_vga_text_buffer_0_vga_read,
-      de2_vga_text_buffer_0_vga_readdata_from_sa => de2_vga_text_buffer_0_vga_readdata_from_sa,
-      de2_vga_text_buffer_0_vga_reset => de2_vga_text_buffer_0_vga_reset,
-      de2_vga_text_buffer_0_vga_write => de2_vga_text_buffer_0_vga_write,
-      de2_vga_text_buffer_0_vga_writedata => de2_vga_text_buffer_0_vga_writedata,
-      clk => clk_0,
-      cpu_0_data_master_address_to_slave => cpu_0_data_master_address_to_slave,
-      cpu_0_data_master_read => cpu_0_data_master_read,
-      cpu_0_data_master_waitrequest => cpu_0_data_master_waitrequest,
-      cpu_0_data_master_write => cpu_0_data_master_write,
-      cpu_0_data_master_writedata => cpu_0_data_master_writedata,
-      de2_vga_text_buffer_0_vga_readdata => de2_vga_text_buffer_0_vga_readdata,
-      reset_n => clk_0_reset_n
-    );
-
-
-  --the_de2_vga_text_buffer_0, which is an e_ptf_instance
-  the_de2_vga_text_buffer_0 : de2_vga_text_buffer_0
-    port map(
-      display_pixel_on => internal_display_pixel_on_from_the_de2_vga_text_buffer_0,
-      vga_readdata => de2_vga_text_buffer_0_vga_readdata,
-      vga_address => de2_vga_text_buffer_0_vga_address,
-      vga_chipselect => de2_vga_text_buffer_0_vga_chipselect,
-      vga_clk => clk_0,
-      vga_read => de2_vga_text_buffer_0_vga_read,
-      vga_reset => de2_vga_text_buffer_0_vga_reset,
-      vga_write => de2_vga_text_buffer_0_vga_write,
-      vga_writedata => de2_vga_text_buffer_0_vga_writedata
     );
 
 
@@ -3628,6 +3579,47 @@ begin
     );
 
 
+  --the_vga_vga, which is an e_instance
+  the_vga_vga : vga_vga_arbitrator
+    port map(
+      cpu_0_data_master_granted_vga_vga => cpu_0_data_master_granted_vga_vga,
+      cpu_0_data_master_qualified_request_vga_vga => cpu_0_data_master_qualified_request_vga_vga,
+      cpu_0_data_master_read_data_valid_vga_vga => cpu_0_data_master_read_data_valid_vga_vga,
+      cpu_0_data_master_requests_vga_vga => cpu_0_data_master_requests_vga_vga,
+      d1_vga_vga_end_xfer => d1_vga_vga_end_xfer,
+      vga_vga_address => vga_vga_address,
+      vga_vga_chipselect => vga_vga_chipselect,
+      vga_vga_read => vga_vga_read,
+      vga_vga_readdata_from_sa => vga_vga_readdata_from_sa,
+      vga_vga_reset => vga_vga_reset,
+      vga_vga_write => vga_vga_write,
+      vga_vga_writedata => vga_vga_writedata,
+      clk => clk_0,
+      cpu_0_data_master_address_to_slave => cpu_0_data_master_address_to_slave,
+      cpu_0_data_master_read => cpu_0_data_master_read,
+      cpu_0_data_master_waitrequest => cpu_0_data_master_waitrequest,
+      cpu_0_data_master_write => cpu_0_data_master_write,
+      cpu_0_data_master_writedata => cpu_0_data_master_writedata,
+      reset_n => clk_0_reset_n,
+      vga_vga_readdata => vga_vga_readdata
+    );
+
+
+  --the_vga, which is an e_ptf_instance
+  the_vga : vga
+    port map(
+      display_pixel_on => internal_display_pixel_on_from_the_vga,
+      vga_readdata => vga_vga_readdata,
+      vga_address => vga_vga_address,
+      vga_chipselect => vga_vga_chipselect,
+      vga_clk => clk_0,
+      vga_read => vga_vga_read,
+      vga_reset => vga_vga_reset,
+      vga_write => vga_vga_write,
+      vga_writedata => vga_vga_writedata
+    );
+
+
   --reset is asserted asynchronously and deasserted synchronously
   nios_system_reset_clk_0_domain_synch : nios_system_reset_clk_0_domain_synch_module
     port map(
@@ -3656,7 +3648,7 @@ begin
   --vhdl renameroo for output signals
   audio_track_from_the_kanto_ctrl <= internal_audio_track_from_the_kanto_ctrl;
   --vhdl renameroo for output signals
-  display_pixel_on_from_the_de2_vga_text_buffer_0 <= internal_display_pixel_on_from_the_de2_vga_text_buffer_0;
+  display_pixel_on_from_the_vga <= internal_display_pixel_on_from_the_vga;
   --vhdl renameroo for output signals
   nios_addr_from_the_kanto_ctrl <= internal_nios_addr_from_the_kanto_ctrl;
   --vhdl renameroo for output signals
@@ -3701,9 +3693,6 @@ component nios_system is
                     signal clk_0 : IN STD_LOGIC;
                     signal reset_n : IN STD_LOGIC;
 
-                 -- the_de2_vga_text_buffer_0
-                    signal display_pixel_on_from_the_de2_vga_text_buffer_0 : OUT STD_LOGIC;
-
                  -- the_kanto_ctrl
                     signal audio_track_from_the_kanto_ctrl : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
                     signal keys_to_the_kanto_ctrl : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
@@ -3729,7 +3718,10 @@ component nios_system is
                     signal SRAM_LB_N_from_the_sram : OUT STD_LOGIC;
                     signal SRAM_OE_N_from_the_sram : OUT STD_LOGIC;
                     signal SRAM_UB_N_from_the_sram : OUT STD_LOGIC;
-                    signal SRAM_WE_N_from_the_sram : OUT STD_LOGIC
+                    signal SRAM_WE_N_from_the_sram : OUT STD_LOGIC;
+
+                 -- the_vga
+                    signal display_pixel_on_from_the_vga : OUT STD_LOGIC
                  );
 end component nios_system;
 
@@ -3745,7 +3737,7 @@ end component nios_system;
                 signal audio_track_from_the_kanto_ctrl :  STD_LOGIC_VECTOR (7 DOWNTO 0);
                 signal clk :  STD_LOGIC;
                 signal clk_0 :  STD_LOGIC;
-                signal display_pixel_on_from_the_de2_vga_text_buffer_0 :  STD_LOGIC;
+                signal display_pixel_on_from_the_vga :  STD_LOGIC;
                 signal jtag_uart_0_avalon_jtag_slave_dataavailable_from_sa :  STD_LOGIC;
                 signal jtag_uart_0_avalon_jtag_slave_readyfordata_from_sa :  STD_LOGIC;
                 signal keys_to_the_kanto_ctrl :  STD_LOGIC_VECTOR (3 DOWNTO 0);
@@ -3778,7 +3770,7 @@ begin
       SRAM_UB_N_from_the_sram => SRAM_UB_N_from_the_sram,
       SRAM_WE_N_from_the_sram => SRAM_WE_N_from_the_sram,
       audio_track_from_the_kanto_ctrl => audio_track_from_the_kanto_ctrl,
-      display_pixel_on_from_the_de2_vga_text_buffer_0 => display_pixel_on_from_the_de2_vga_text_buffer_0,
+      display_pixel_on_from_the_vga => display_pixel_on_from_the_vga,
       nios_addr_from_the_kanto_ctrl => nios_addr_from_the_kanto_ctrl,
       nios_play_from_the_kanto_ctrl => nios_play_from_the_kanto_ctrl,
       nios_readblock_from_the_kanto_ctrl => nios_readblock_from_the_kanto_ctrl,

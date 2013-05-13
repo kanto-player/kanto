@@ -9,7 +9,7 @@
       SRAM_UB_N_from_the_sram => SRAM_UB_N_from_the_sram,
       SRAM_WE_N_from_the_sram => SRAM_WE_N_from_the_sram,
       audio_track_from_the_kanto_ctrl => audio_track_from_the_kanto_ctrl,
-      display_pixel_on_from_the_de2_vga_text_buffer_0 => display_pixel_on_from_the_de2_vga_text_buffer_0,
+      display_pixel_on_from_the_vga => display_pixel_on_from_the_vga,
       nios_addr_from_the_kanto_ctrl => nios_addr_from_the_kanto_ctrl,
       nios_play_from_the_kanto_ctrl => nios_play_from_the_kanto_ctrl,
       nios_readblock_from_the_kanto_ctrl => nios_readblock_from_the_kanto_ctrl,

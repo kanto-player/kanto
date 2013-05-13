@@ -4,7 +4,7 @@
  * Machine generated for CPU 'cpu_0' in SOPC Builder design 'nios_system'
  * SOPC Builder design path: ../../nios_system.sopcinfo
  *
- * Generated: Mon May 13 13:01:38 EDT 2013
+ * Generated: Mon May 13 14:14:26 EDT 2013
  */
 
 /*
@@ -169,20 +169,6 @@
 
 
 /*
- * de2_vga_text_buffer_0 configuration
- *
- */
-
-#define ALT_MODULE_CLASS_de2_vga_text_buffer_0 de2_vga_text_buffer
-#define DE2_VGA_TEXT_BUFFER_0_BASE 0x4000
-#define DE2_VGA_TEXT_BUFFER_0_IRQ -1
-#define DE2_VGA_TEXT_BUFFER_0_IRQ_INTERRUPT_CONTROLLER_ID -1
-#define DE2_VGA_TEXT_BUFFER_0_NAME "/dev/de2_vga_text_buffer_0"
-#define DE2_VGA_TEXT_BUFFER_0_SPAN 16384
-#define DE2_VGA_TEXT_BUFFER_0_TYPE "de2_vga_text_buffer"
-
-
-/*
  * hal configuration
  *
  */
@@ -264,5 +250,19 @@
 #define SRAM_NAME "/dev/sram"
 #define SRAM_SPAN 524288
 #define SRAM_TYPE "de2_sram_controller"
+
+
+/*
+ * vga configuration
+ *
+ */
+
+#define ALT_MODULE_CLASS_vga de2_vga_text_buffer
+#define VGA_BASE 0x2000
+#define VGA_IRQ -1
+#define VGA_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define VGA_NAME "/dev/vga"
+#define VGA_SPAN 8192
+#define VGA_TYPE "de2_vga_text_buffer"
 
 #endif /* __SYSTEM_H_ */

@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>May 13, 2013 1:07:59 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1368464879837</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>May 13, 2013 2:14:52 PM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1368468892337</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>/home/user4/spring13/jy2432/kanto/software/kanto_software_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>../../nios_system.sopcinfo</SopcDesignFile>
@@ -857,9 +857,9 @@
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
-                <slaveDescriptor>de2_vga_text_buffer_0</slaveDescriptor>
-                <addressRange>0x00004000 - 0x00007FFF</addressRange>
-                <addressSpan>16384</addressSpan>
+                <slaveDescriptor>vga</slaveDescriptor>
+                <addressRange>0x00002000 - 0x00003FFF</addressRange>
+                <addressSpan>8192</addressSpan>
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
