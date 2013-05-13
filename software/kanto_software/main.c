@@ -23,7 +23,7 @@ uint32_t track_end;
 #define REWIND 0x8
 
 /* number of blocks in a second */
-#define BLOCK_SECOND 172
+#define BLOCK_SECOND (172 * 512)
 
 #define wait_for_done() while (!IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_DONE))
 

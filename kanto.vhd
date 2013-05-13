@@ -257,7 +257,10 @@ begin
 
         sdbuf_addr_from_the_sdbuf => sdbuf_addr,
         sdbuf_data_to_the_sdbuf => sdbuf_data,
-        sdbuf_rden_from_the_sdbuf => sdbuf_rden
+        sdbuf_rden_from_the_sdbuf => sdbuf_rden,
+        
+        PS2_Clk_to_the_ps2 => PS2_CLK,
+        PS2_Data_to_the_ps2 => PS2_DAT
     );
 
     PLL : entity work.audpll port map (

@@ -4,7 +4,7 @@
  * Machine generated for CPU 'cpu_0' in SOPC Builder design 'nios_system'
  * SOPC Builder design path: ../../nios_system.sopcinfo
  *
- * Generated: Mon May 06 20:50:47 EDT 2013
+ * Generated: Mon May 13 07:17:31 EDT 2013
  */
 
 /*
@@ -126,6 +126,7 @@
 #define __ALTERA_AVALON_JTAG_UART
 #define __ALTERA_NIOS2
 #define __DE2_KANTO_CTRL
+#define __DE2_PS2
 #define __DE2_SD_BUFFER
 #define __DE2_SRAM_CONTROLLER
 
@@ -206,6 +207,20 @@
 #define KANTO_CTRL_NAME "/dev/kanto_ctrl"
 #define KANTO_CTRL_SPAN 32
 #define KANTO_CTRL_TYPE "de2_kanto_ctrl"
+
+
+/*
+ * ps2 configuration
+ *
+ */
+
+#define ALT_MODULE_CLASS_ps2 de2_ps2
+#define PS2_BASE 0x0
+#define PS2_IRQ -1
+#define PS2_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define PS2_NAME "/dev/ps2"
+#define PS2_SPAN 8
+#define PS2_TYPE "de2_ps2"
 
 
 /*

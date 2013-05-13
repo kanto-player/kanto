@@ -15,9 +15,13 @@ set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "sdbuf.vhd
 set_global_assignment -name TCL_FILE [file join $::quartus(qip_path) "de2_kanto_ctrl_hw.tcl"]
 set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "de2_kanto_ctrl.vhd"]
 set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "kanto_ctrl.vhd"]
+# ps2
+set_global_assignment -name TCL_FILE [file join $::quartus(qip_path) "de2_ps2_hw.tcl"]
+set_global_assignment -name VHDL_FILE [file join $::quartus(qip_path) "de2_ps2.vhd"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "ps2.v"]
 # null
 set_global_assignment -name SDC_FILE [file join $::quartus(ip_rootpath) "altera/sopc_builder_ip/altera_avalon_clock_adapter/altera_avalon_clock_adapter.sdc"]
-set_global_assignment -name SOPC_BUILDER_SIGNATURE_ID "BC305BE679700000013E7CAE574B"
+set_global_assignment -name SOPC_BUILDER_SIGNATURE_ID "BC305BE672700000013E9D973906"
 set_global_assignment -entity "nios_system" -name IP_TOOL_NAME "sopc"
 set_global_assignment -entity "nios_system" -name IP_TOOL_VERSION "12.1"
 set_global_assignment -entity "nios_system" -name IP_TOOL_ENV "sopc"

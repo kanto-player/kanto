@@ -14,6 +14,8 @@
       nios_readblock_from_the_kanto_ctrl => nios_readblock_from_the_kanto_ctrl,
       sdbuf_addr_from_the_sdbuf => sdbuf_addr_from_the_sdbuf,
       sdbuf_rden_from_the_sdbuf => sdbuf_rden_from_the_sdbuf,
+      PS2_Clk_to_the_ps2 => PS2_Clk_to_the_ps2,
+      PS2_Data_to_the_ps2 => PS2_Data_to_the_ps2,
       clk_0 => clk_0,
       keys_to_the_kanto_ctrl => keys_to_the_kanto_ctrl,
       nios_done_to_the_kanto_ctrl => nios_done_to_the_kanto_ctrl,
