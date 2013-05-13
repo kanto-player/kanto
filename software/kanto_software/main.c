@@ -10,9 +10,11 @@
 #define KANTO_TRACK 16
 #define KANTO_KEYS 20
 
-#define MAX_TRACKS 128
+#define MAX_TRACKS 8
 
 uint32_t track_table[MAX_TRACKS];
+char track_titles[MAX_TRACKS][60];
+int track_count = 0;
 unsigned char curtrack;
 uint32_t track_start;
 uint32_t track_end;
@@ -61,11 +63,24 @@ static inline void read_block(uint32_t addr)
 
 static inline void setup_track_table(void)
 {
-	int i;
+	int i, j;
+	uint32_t word;
 
 	for (i = 0; i < MAX_TRACKS; i++) {
-		track_table[i] = sdbuf_read_word(i);
+		track_table[i] = sdbuf_read_word(i * 16);
+		if (track_table[i] != 0)
+			track_count++;
+		for (j = 0; j < 15; j += 1) {
+			word = sdbuf_read_word(i * 16 + 1 + j);
+			track_titles[i][j * 4 + 0] = word >> 24 & 0xff;
+			track_titles[i][j * 4 + 1] = word >> 16 & 0xff;
+			track_titles[i][j * 4 + 2] = word >> 8 & 0xff;
+			track_titles[i][j * 4 + 3] = word >> 0 & 0xff;
+		}
+		printf("%i.  %s\n", i, (char * ) &track_titles[i]);
 	}
+	track_count--;
+	printf("Track count: %d\n", track_count);
 }
 
 static inline void check_curtrack(void)
@@ -136,7 +151,7 @@ void key_receive(uint32_t blockaddr)
 
 	case 0x4d: // 'p' previous track
 		stop_playback();
-		if ((blockaddr - track_start) < BLOCK_SECOND)
+		if ((blockaddr - track_start) < 2 * BLOCK_SECOND)
 			seek_to_track(curtrack - 1);
 		else
 			seek_to_track(curtrack);
