@@ -2246,6 +2246,20 @@ SYSTEM nios_system
             direction = "output";
             Is_Enabled = "1";
          }
+         PORT display_x
+         {
+            type = "export";
+            width = "10";
+            direction = "input";
+            Is_Enabled = "1";
+         }
+         PORT display_y
+         {
+            type = "export";
+            width = "7";
+            direction = "input";
+            Is_Enabled = "1";
+         }
       }
       class = "no_legacy_module";
       class_version = "7.08121";

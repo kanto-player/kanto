@@ -10,6 +10,14 @@
          type = "String";
       }
    }
+   element sdbuf.avalon_slave_0
+   {
+      datum baseAddress
+      {
+         value = "1052672";
+         type = "String";
+      }
+   }
    element sram.avalon_slave_0
    {
       datum baseAddress
@@ -31,14 +39,6 @@
       datum baseAddress
       {
          value = "1053184";
-         type = "String";
-      }
-   }
-   element sdbuf.avalon_slave_0
-   {
-      datum baseAddress
-      {
-         value = "1052672";
          type = "String";
       }
    }
@@ -118,7 +118,7 @@
    {
       datum baseAddress
       {
-         value = "16384";
+         value = "8192";
          type = "String";
       }
    }
@@ -145,7 +145,7 @@
  <parameter name="projectName" value="kanto.qpf" />
  <parameter name="sopcBorderPoints" value="true" />
  <parameter name="systemHash" value="-21242591764" />
- <parameter name="timeStamp" value="1368469991962" />
+ <parameter name="timeStamp" value="1368472665069" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <module kind="clock_source" version="12.1" enabled="1" name="clk_0">
   <parameter name="clockFrequency" value="50000000" />

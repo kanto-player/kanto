@@ -18,6 +18,8 @@
       PS2_Clk_to_the_ps2 => PS2_Clk_to_the_ps2,
       PS2_Data_to_the_ps2 => PS2_Data_to_the_ps2,
       clk_0 => clk_0,
+      display_x_to_the_vga => display_x_to_the_vga,
+      display_y_to_the_vga => display_y_to_the_vga,
       keys_to_the_kanto_ctrl => keys_to_the_kanto_ctrl,
       nios_done_to_the_kanto_ctrl => nios_done_to_the_kanto_ctrl,
       reset_n => reset_n,

@@ -220,6 +220,10 @@ architecture datapath of kanto is
     signal sdbuf_addr : std_logic_vector(7 downto 0);
     signal sdbuf_data : std_logic_vector(15 downto 0);
 
+    signal vga_display_x : std_logic_vector(9 downto 0);
+    signal vga_display_y : std_logic_vector(6 downto 0);
+    signal vga_display_pixel_on : std_logic;
+
     component de2_i2c_av_config is
         port (iclk : in std_logic;
               irst_n : in std_logic;
@@ -260,7 +264,11 @@ begin
         sdbuf_rden_from_the_sdbuf => sdbuf_rden,
         
         PS2_Clk_to_the_ps2 => PS2_CLK,
-        PS2_Data_to_the_ps2 => PS2_DAT
+        PS2_Data_to_the_ps2 => PS2_DAT,
+
+        display_x_to_the_vga => vga_display_x,
+        display_y_to_the_vga => vga_display_y,
+        display_pixel_on_from_the_vga => vga_display_pixel_on
     );
 
     PLL : entity work.audpll port map (

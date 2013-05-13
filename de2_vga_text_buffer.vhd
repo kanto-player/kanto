@@ -24,8 +24,8 @@ port(
     -- it's 40 pixels high because we have 5 lines,
     -- each 16 pixels high
     display_pixel_on : out std_logic;
-    display_x : in unsigned(9 downto 0);
-    display_y : in unsigned(6 downto 0)
+    display_x : in std_logic_vector(9 downto 0);
+    display_y : in std_logic_vector(6 downto 0)
 );
 end de2_vga_text_buffer;
 
@@ -92,7 +92,7 @@ begin
         
     -- there are 16 lines in each font character, so we can
     -- look at the bottom 4 bits of y to know which line we're on
-    y <= to_integer(display_y(3 downto 0));
+    y <= to_integer(unsigned(display_y(3 downto 0)));
     
     -- each character is 8 pixels wide, so to find which character
     -- we're in, ignore the bottom 3 bits. But there's a catch - we
@@ -100,12 +100,12 @@ begin
     -- where row_length = 80
     --
     -- we can implement this as y * 80 == y << 6 + y << 4
-    x <= to_integer(display_x(9 downto 3)
-    	+ display_y(6 downto 4) & "000000"
-    	+ display_y(6 downto 4) & "0000");
+    x <= to_integer(unsigned(display_x(9 downto 3))
+    	+ unsigned(display_y(6 downto 4) & "000000")
+    	+ unsigned(display_y(6 downto 4) & "0000"));
     	
     -- we still need to find the x position within that particular char.
-    inner_x <= to_integer(display_x(2 downto 0));
+    inner_x <= to_integer(unsigned(display_x(2 downto 0)));
     
     display_pixel_on <= font_ram(y)(x)(inner_x);
 
