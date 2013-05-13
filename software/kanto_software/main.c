@@ -137,29 +137,6 @@ void key_receive(uint32_t blockaddr)
 		return;
 	}
 
-//	if (key == 0x31) { // 'n' -- next track
-//		stop_playback();
-//		seek_to_track(curtrack + 1);
-//		start_playback();
-//	} else if (key == 0x4d) { // 'p' -- previous track
-//		stop_playback();
-//		if ((blockaddr - track_start) < BLOCK_SECOND)
-//			seek_to_track(curtrack - 1);
-//		else
-//			seek_to_track(curtrack);
-//		start_playback();
-//	} else if (key == 0x2b) { // 'f' -- fast forward
-//		if (track_end - blockaddr < 5 * BLOCK_SECOND)
-//			seek_to_track(curtrack + 1);
-//		else
-//			read_block(blockaddr + 5 * BLOCK_SECOND);
-//	} else if (key == 0x32) { // 'b' -- rewind
-//		if (blockaddr - track_start < 5 * BLOCK_SECOND)
-//			seek_to_track(curtrack);
-//		else
-//			read_block(blockaddr - 5 * BLOCK_SECOND);
-//	}
-
 	switch (key) {
 
 	case 0x31: // 'n' next track
