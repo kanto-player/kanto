@@ -10,19 +10,19 @@
          type = "String";
       }
    }
-   element sdbuf.avalon_slave_0
-   {
-      datum baseAddress
-      {
-         value = "1052672";
-         type = "String";
-      }
-   }
    element ps2.avalon_slave_0
    {
       datum baseAddress
       {
          value = "0";
+         type = "String";
+      }
+   }
+   element sram.avalon_slave_0
+   {
+      datum baseAddress
+      {
+         value = "524288";
          type = "String";
       }
    }
@@ -34,11 +34,11 @@
          type = "String";
       }
    }
-   element sram.avalon_slave_0
+   element sdbuf.avalon_slave_0
    {
       datum baseAddress
       {
-         value = "524288";
+         value = "1052672";
          type = "String";
       }
    }
@@ -61,6 +61,14 @@
       {
          value = "{}";
          type = "String";
+      }
+   }
+   element de2_vga_text_buffer_0
+   {
+      datum _sortIndex
+      {
+         value = "7";
+         type = "int";
       }
    }
    element cpu_0.jtag_debug_module
@@ -114,6 +122,14 @@
          type = "int";
       }
    }
+   element de2_vga_text_buffer_0.vga
+   {
+      datum baseAddress
+      {
+         value = "16384";
+         type = "String";
+      }
+   }
 }
 ]]></parameter>
  <parameter name="clockCrossingAdapter" value="HANDSHAKE" />
@@ -128,8 +144,8 @@
  <parameter name="maxAdditionalLatency" value="0" />
  <parameter name="projectName" value="kanto.qpf" />
  <parameter name="sopcBorderPoints" value="true" />
- <parameter name="systemHash" value="-18408878412" />
- <parameter name="timeStamp" value="1368443519938" />
+ <parameter name="systemHash" value="-15557109932" />
+ <parameter name="timeStamp" value="1368463748973" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <module kind="clock_source" version="12.1" enabled="1" name="clk_0">
   <parameter name="clockFrequency" value="50000000" />
@@ -230,7 +246,7 @@
   <parameter name="dcache_numTCDM" value="_0" />
   <parameter name="dcache_lineSize" value="_32" />
   <parameter name="dcache_bursts" value="false" />
-  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='ps2.avalon_slave_0' start='0x0' end='0x8' /><slave name='sram.avalon_slave_0' start='0x80000' end='0x100000' /><slave name='cpu_0.jtag_debug_module' start='0x100800' end='0x101000' /><slave name='sdbuf.avalon_slave_0' start='0x101000' end='0x101200' /><slave name='kanto_ctrl.avalon_slave_0' start='0x101200' end='0x101220' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0x101220' end='0x101228' /></address-map>]]></parameter>
+  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='ps2.avalon_slave_0' start='0x0' end='0x8' /><slave name='de2_vga_text_buffer_0.vga' start='0x4000' end='0x8000' /><slave name='sram.avalon_slave_0' start='0x80000' end='0x100000' /><slave name='cpu_0.jtag_debug_module' start='0x100800' end='0x101000' /><slave name='sdbuf.avalon_slave_0' start='0x101000' end='0x101200' /><slave name='kanto_ctrl.avalon_slave_0' start='0x101200' end='0x101220' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0x101220' end='0x101228' /></address-map>]]></parameter>
   <parameter name="dataAddrWidth" value="21" />
   <parameter name="customInstSlavesSystemInfo" value="&lt;info/&gt;" />
   <parameter name="cpuReset" value="false" />
@@ -264,7 +280,14 @@
  <module kind="de2_kanto_ctrl" version="1.0" enabled="1" name="kanto_ctrl">
   <parameter name="AUTO_CLOCK_CLOCK_RATE" value="50000000" />
  </module>
- <module kind="de2_ps2" version="1.0" enabled="1" name="ps2" />
+ <module kind="de2_ps2" version="1.0" enabled="1" name="ps2">
+  <parameter name="AUTO_CLOCK_SINK_CLOCK_RATE" value="50000000" />
+ </module>
+ <module
+   kind="de2_vga_text_buffer"
+   version="1.0"
+   enabled="1"
+   name="de2_vga_text_buffer_0" />
  <connection kind="clock" version="12.1" start="clk_0.clk" end="cpu_0.clk" />
  <connection
    kind="avalon"
@@ -341,4 +364,17 @@
   <parameter name="baseAddress" value="0x0000" />
  </connection>
  <connection kind="clock" version="12.1" start="clk_0.clk" end="ps2.clock_sink" />
+ <connection
+   kind="avalon"
+   version="12.1"
+   start="cpu_0.data_master"
+   end="de2_vga_text_buffer_0.vga">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x4000" />
+ </connection>
+ <connection
+   kind="clock"
+   version="12.1"
+   start="clk_0.clk"
+   end="de2_vga_text_buffer_0.clock_sink" />
 </system>
