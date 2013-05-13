@@ -74,6 +74,7 @@ architecture rtl of visualizer is
   
   signal current_sum : ram_type := ((others=>(others =>'0')));
   signal next_sum : ram_type := ((others=>(others =>'0')));
+  signal last_sum : ram_type := ((others=>(others=>'0')));
   
   signal address_r      : integer := 512;
   signal index 	        : integer := 0;
@@ -116,33 +117,24 @@ begin
                 reset<='0';
 			end if;
 		    when reading_data =>
+            -- 4 downto 1 - we're grouping the 32 frequency bins into sets of
+            -- two. so when summing, we can ignore the LSB and this happens 
+            -- on its own
+            if last_fdom_data(15) = '1' then
+                     next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
+                            + unsigned(not last_fdom_data(14 downto 0));
+            else 
+                next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
+                            + unsigned(last_fdom_data(14 downto 0));
+            end if;
             if sum_counter = x"1F" then -- count up to 31
                 addr_counter <= x"00";
                 sum_counter <= "00000";
                 state := initializing;
-                --sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
-
-                if last_fdom_data(15) = '1' then
-                         next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
-                                + unsigned(not last_fdom_data(14 downto 0));
-
-                else 
-                    next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
-                                + unsigned(last_fdom_data(14 downto 0));
-                end if;
                 ledr15 <= '0';
                 ledr16 <= '1';
                 ledr17 <= '0';
-            else
-                --sum(to_integer(sum_counter(7 downto 4))) <= sum(to_integer(sum_counter(7 downto 4))) + test_ones;
-                if last_fdom_data(15) = '1' then
-                         next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
-                                + unsigned(not last_fdom_data(14 downto 0));
-
-                else 
-                    next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
-                                + unsigned(last_fdom_data(14 downto 0));
-                end if;
+            else -- if we haven't yet reached 31
                 ledr15 <= '1';
                 ledr16 <= '0';
                 ledr17 <= '1';
