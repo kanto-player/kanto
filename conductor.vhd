@@ -54,7 +54,11 @@ begin
                         blockaddr <= nios_addr;
                     elsif nios_play = '1' then
                         state <= resume;
-                        blockaddr <= blockaddr + 1;
+                        if sd_ccs = '1' then
+                            blockaddr <= blockaddr + 1;
+                        else
+                            blockaddr <= blockaddr + 512;
+                        end if;
                     end if;
                 when trigger_write =>
                     state <= wait_write;
