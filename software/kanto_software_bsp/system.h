@@ -4,7 +4,7 @@
  * Machine generated for CPU 'cpu_0' in SOPC Builder design 'nios_system'
  * SOPC Builder design path: ../../nios_system.sopcinfo
  *
- * Generated: Mon May 13 07:17:31 EDT 2013
+ * Generated: Mon May 13 13:01:38 EDT 2013
  */
 
 /*
@@ -129,6 +129,7 @@
 #define __DE2_PS2
 #define __DE2_SD_BUFFER
 #define __DE2_SRAM_CONTROLLER
+#define __DE2_VGA_TEXT_BUFFER
 
 
 /*
@@ -165,6 +166,20 @@
 #define ALT_STDOUT_PRESENT
 #define ALT_STDOUT_TYPE "altera_avalon_jtag_uart"
 #define ALT_SYSTEM_NAME "nios_system"
+
+
+/*
+ * de2_vga_text_buffer_0 configuration
+ *
+ */
+
+#define ALT_MODULE_CLASS_de2_vga_text_buffer_0 de2_vga_text_buffer
+#define DE2_VGA_TEXT_BUFFER_0_BASE 0x4000
+#define DE2_VGA_TEXT_BUFFER_0_IRQ -1
+#define DE2_VGA_TEXT_BUFFER_0_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define DE2_VGA_TEXT_BUFFER_0_NAME "/dev/de2_vga_text_buffer_0"
+#define DE2_VGA_TEXT_BUFFER_0_SPAN 16384
+#define DE2_VGA_TEXT_BUFFER_0_TYPE "de2_vga_text_buffer"
 
 
 /*

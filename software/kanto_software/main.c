@@ -2,6 +2,7 @@
 #include <system.h>
 #include <io.h>
 #include <stdint.h>
+#include "vga.h"
 
 #define KANTO_BLOCKADDR 0
 #define KANTO_READBLOCK 4
@@ -18,6 +19,9 @@ int track_count = 0;
 unsigned char curtrack;
 uint32_t track_start;
 uint32_t track_end;
+
+unsigned char selected_track;
+unsigned char selected_row;
 
 #define NEXT_TRACK 0x1
 #define LAST_TRACK 0x2
