@@ -105,6 +105,21 @@ static inline void seek_to_track(int track)
 	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_TRACK, curtrack);
 }
 
+void selection_up()
+{
+	puts("moving selection up");
+}
+
+void selection_down()
+{
+	puts("moving selection down");
+}
+
+void selection_play()
+{
+	puts("playing selection");
+}
+
 int ignore_next_key = 0;
 
 void key_receive(uint32_t blockaddr)
@@ -181,8 +196,11 @@ void key_receive(uint32_t blockaddr)
 		break;
 
 	case 0x3b: // 'j' move down
+		selection_down();
 	case 0x42: // 'k' move up
+		selection_up();
 	case 0x5a: // 'enter' select
+		selection_play();
 		break;
 
 	}
