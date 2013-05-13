@@ -74,7 +74,6 @@ architecture rtl of visualizer is
   
   signal current_sum : ram_type := ((others=>(others =>'0')));
   signal next_sum : ram_type := ((others=>(others =>'0')));
-  signal last_sum : ram_type := ((others=>(others=>'0')));
   
   signal address_r      : integer := 512;
   signal index 	        : integer := 0;
@@ -120,6 +119,8 @@ begin
             -- 4 downto 1 - we're grouping the 32 frequency bins into sets of
             -- two. so when summing, we can ignore the LSB and this happens 
             -- on its own
+            
+            -- also ensure that we're only only adding positive number (absolute value)
             if last_fdom_data(15) = '1' then
                      next_sum(to_integer(sum_counter(4 downto 1))) <= oldsum 
                             + unsigned(not last_fdom_data(14 downto 0));
@@ -299,7 +300,23 @@ begin
 		end if;
         
         if vga_hblank = '1' and vga_vblank = '1' then
-            current_sum <= next_sum;
+            -- do a weighted average of current and previous levels to reduce flickering
+            current_sum(0) <= unsigned('0' & current_sum(0)(19 downto 1)) + unsigned('0' & next_sum(0)(19 downto 1));
+            current_sum(1) <= unsigned('0' & current_sum(1)(19 downto 1)) + unsigned('0' & next_sum(1)(19 downto 1));
+            current_sum(2) <= unsigned('0' & current_sum(2)(19 downto 1)) + unsigned('0' & next_sum(2)(19 downto 1));
+            current_sum(3) <= unsigned('0' & current_sum(3)(19 downto 1)) + unsigned('0' & next_sum(3)(19 downto 1));
+            current_sum(4) <= unsigned('0' & current_sum(4)(19 downto 1)) + unsigned('0' & next_sum(4)(19 downto 1));
+            current_sum(5) <= unsigned('0' & current_sum(5)(19 downto 1)) + unsigned('0' & next_sum(5)(19 downto 1));
+            current_sum(6) <= unsigned('0' & current_sum(6)(19 downto 1)) + unsigned('0' & next_sum(6)(19 downto 1));
+            current_sum(7) <= unsigned('0' & current_sum(7)(19 downto 1)) + unsigned('0' & next_sum(7)(19 downto 1));
+            current_sum(8) <= unsigned('0' & current_sum(8)(19 downto 1)) + unsigned('0' & next_sum(8)(19 downto 1));
+            current_sum(9) <= unsigned('0' & current_sum(9)(19 downto 1)) + unsigned('0' & next_sum(9)(19 downto 1));
+            current_sum(10) <= unsigned('0' & current_sum(10)(19 downto 1)) + unsigned('0' & next_sum(10)(19 downto 1));
+            current_sum(11) <= unsigned('0' & current_sum(11)(19 downto 1)) + unsigned('0' & next_sum(11)(19 downto 1));
+            current_sum(12) <= unsigned('0' & current_sum(12)(19 downto 1)) + unsigned('0' & next_sum(12)(19 downto 1));
+            current_sum(13) <= unsigned('0' & current_sum(13)(19 downto 1)) + unsigned('0' & next_sum(13)(19 downto 1));
+            current_sum(14) <= unsigned('0' & current_sum(14)(19 downto 1)) + unsigned('0' & next_sum(14)(19 downto 1));
+            current_sum(15) <= unsigned('0' & current_sum(15)(19 downto 1)) + unsigned('0' & next_sum(15)(19 downto 1));
         end if;
 	end if;
 end process RectangleGen;
