@@ -382,7 +382,11 @@ begin
 		ledr15				=> LEDR(15),
         sw_r            => SW(2),
         sw_g            => SW(1),
-        sw_b            => SW(0)
+        sw_b            => SW(0),
+        
+        vga_text_buffer_x => vga_display_x,
+        vga_text_buffer_y => vga_display_y,
+        vga_text_buffer_pixel => vga_display_pixel_on
 	 );
 
     SDBUF_RAM : entity work.tdom_full_ram port map (

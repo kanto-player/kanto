@@ -35,7 +35,11 @@ entity visualizer is
     VGA_SYNC : out std_logic;        -- SYNC
     VGA_R,                           -- Red[9:0]
     VGA_G,                           -- Green[9:0]
-    VGA_B : out std_logic_vector(9 downto 0) -- Blue[9:0]
+    VGA_B : out std_logic_vector(9 downto 0); -- Blue[9:0]
+    
+    vga_text_buffer_x : out std_logic_vector(9 downto 0);
+    vga_text_buffer_y : out std_logic_vector(6 downto 0);
+    vga_text_buffer_pixel : in std_logic
     );
 
 end visualizer;
