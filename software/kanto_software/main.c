@@ -86,13 +86,94 @@ static inline void seek_to_track(int track)
 	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_TRACK, curtrack);
 }
 
+int ignore_next_key = 0;
+
+void key_receive(uint32_t blockaddr)
+{
+	unsigned short key;
+	key = IORD_8DIRECT(PS2_BASE, 4);
+
+	if (ignore_next_key) {
+		ignore_next_key = 0;
+		return;
+	}
+
+	if (key == 0xf0) {
+		ignore_next_key = 1;
+		return;
+	}
+
+//	if (key == 0x31) { // 'n' -- next track
+//		stop_playback();
+//		seek_to_track(curtrack + 1);
+//		start_playback();
+//	} else if (key == 0x4d) { // 'p' -- previous track
+//		stop_playback();
+//		if ((blockaddr - track_start) < BLOCK_SECOND)
+//			seek_to_track(curtrack - 1);
+//		else
+//			seek_to_track(curtrack);
+//		start_playback();
+//	} else if (key == 0x2b) { // 'f' -- fast forward
+//		if (track_end - blockaddr < 5 * BLOCK_SECOND)
+//			seek_to_track(curtrack + 1);
+//		else
+//			read_block(blockaddr + 5 * BLOCK_SECOND);
+//	} else if (key == 0x32) { // 'b' -- rewind
+//		if (blockaddr - track_start < 5 * BLOCK_SECOND)
+//			seek_to_track(curtrack);
+//		else
+//			read_block(blockaddr - 5 * BLOCK_SECOND);
+//	}
+
+	switch (key) {
+
+	case 0x31: // 'n' next track
+		stop_playback();
+		seek_to_track(curtrack + 1);
+		start_playback();
+		break;
+
+	case 0x4d: // 'p' previous track
+		stop_playback();
+		if ((blockaddr - track_start) < BLOCK_SECOND)
+			seek_to_track(curtrack - 1);
+		else
+			seek_to_track(curtrack);
+		start_playback();
+		break;
+
+	case 0x2b: // 'f' fast forward
+		stop_playback();
+		if (track_end - blockaddr < 5 * BLOCK_SECOND)
+			seek_to_track(curtrack + 1);
+		else
+			read_block(blockaddr + 5 * BLOCK_SECOND);
+		start_playback();
+		break;
+
+	case 0x32: // 'b' rewind
+		stop_playback();
+		if (blockaddr - track_start < 5 * BLOCK_SECOND)
+			seek_to_track(curtrack);
+		else
+			read_block(blockaddr - 5 * BLOCK_SECOND);
+		start_playback();
+		break;
+
+	case 0x3b: // 'j' move down
+	case 0x42: // 'k' move up
+	case 0x5a: // 'enter' select
+		break;
+
+	}
+}
+
 int main()
 {
-    uint32_t blockaddr;
-    unsigned char keys;
-    unsigned char last_keys;
+	uint32_t blockaddr;
 
-    printf("Hello, Kanto\n");
+	printf("Hello, Kanto\n");
 
     // stop playback
     stop_playback();
@@ -113,30 +194,9 @@ int main()
 
     for (;;) {
     	blockaddr = IORD_32DIRECT(KANTO_CTRL_BASE, KANTO_BLOCKADDR);
-    	last_keys = keys;
-    	keys = IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_KEYS);
 
-    	if (keys && !last_keys) {
-    		stop_playback();
-    		if (keys & NEXT_TRACK)
-    			seek_to_track(curtrack + 1);
-    		else if (keys & LAST_TRACK) {
-    			if ((blockaddr - track_start) < BLOCK_SECOND)
-    				seek_to_track(curtrack - 1);
-    			else
-    				seek_to_track(curtrack);
-    		} else if (keys & FAST_FORWARD) {
-    			if (track_end - blockaddr < 5 * BLOCK_SECOND)
-    				seek_to_track(curtrack + 1);
-    			else
-    				read_block(blockaddr + 5 * BLOCK_SECOND);
-    		} else if (keys & REWIND) {
-    			if (blockaddr - track_start < 5 * BLOCK_SECOND)
-    				seek_to_track(curtrack);
-    			else
-    				read_block(blockaddr - 5 * BLOCK_SECOND);
-    		}
-    		start_playback();
+    	if (IORD_8DIRECT(PS2_BASE, 0)) {
+    		key_receive(blockaddr);
     	} else if (blockaddr >= track_end) {
     		curtrack++;
     		check_curtrack();
