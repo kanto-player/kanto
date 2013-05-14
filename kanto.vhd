@@ -264,11 +264,12 @@ begin
         sdbuf_rden_from_the_sdbuf => sdbuf_rden,
         
         PS2_Clk_to_the_ps2 => PS2_CLK,
-        PS2_Data_to_the_ps2 => PS2_DAT
+        PS2_Data_to_the_ps2 => PS2_DAT,
 
---        display_x_to_the_vga => vga_display_x,
---        display_y_to_the_vga => vga_display_y,
---        display_pixel_on_from_the_vga => vga_display_pixel_on
+        display_x_to_the_vga => vga_display_x,
+        display_y_to_the_vga => vga_display_y,
+        display_pixel_on_from_the_vga => vga_display_pixel_on,
+        display_clk_to_the_vga => clk25
     );
 
     PLL : entity work.audpll port map (
