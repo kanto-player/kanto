@@ -111,10 +111,10 @@ void selection_up()
 	if (selected_track == 0)
 		return;
 	if (selected_row == 0) {
-		int x, i;;
+		int x, i;
 		for (x = 1, i = --selected_track; i < track_count && x < 5; x++, i++) {
-	    	snprintf(buffer, sizeof(buffer), "%c  %u. %s", (i == selected_track) ? '*' : ' ', i, track_titles[i]);
-	    	vga_write_string(buffer, 0, x);
+			snprintf(buffer, sizeof(buffer), "%c  %u. %s", (i == selected_track) ? '*' : ' ', i, track_titles[i]);
+			vga_write_string(buffer, 0, x);
 		}
 		return;
 	}
@@ -125,12 +125,26 @@ void selection_up()
 
 void selection_down()
 {
-	puts("moving selection down");
+	if (selected_track == track_count - 1)
+		return 0;
+	if (selected_row == 3) {
+		int x, i;
+		for (x = 4, i = ++selected_track, i >= 0 && x >= 1; x--, i--) {
+			snprintf(buffer, sizeof(buffer), "%c  %u. %s", (i == selected_track) ? '*' : ' ', i, track_titles[i]);
+			vga_write_string(buffer, 0, x);
+		}
+		return;
+	}
+	vga_write_character(' ', 0, selected_row + 1);
+	vga_write_character('*', 0, ++selected_row + 1);
+	selected_track++;
 }
 
 void selection_play()
 {
-	puts("playing selection");
+	stop_playback();
+	seek_to_track(selected_track);
+	start_playback();
 }
 
 int ignore_next_key = 0;
