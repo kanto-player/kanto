@@ -27,7 +27,8 @@ port(
     -- each 16 pixels high
     display_pixel_on : out std_logic;
     display_x : in std_logic_vector(9 downto 0);
-    display_y : in std_logic_vector(6 downto 0)
+    display_y : in std_logic_vector(6 downto 0);
+    display_clk : in std_logic
 );
 end de2_vga_text_buffer;
 
@@ -36,60 +37,79 @@ architecture rtl of de2_vga_text_buffer is
     -- there are 16 lines in each character font.
     -- first line of ever character goes in one array, second line in
     -- another array, etc. -- this lets us write and read in parallel
-
-    -- this also keeps us within the 4kbit size of a block ram
-    type font_line_ram_type is array(0 to 399) of unsigned(7 downto 0);
-    type font_ram_type is array(0 to 15) of font_line_ram_type;
-    signal font_ram : font_ram_type := (others => (others => (others => '0')));
     
-    signal addr : integer;
-    signal x : integer;
-    signal y : integer;
+    type addr_array is array(0 to 15) of std_logic_vector(8 downto 0);
+    type data_array is array(0 to 15) of std_logic_vector(7 downto 0);
+    
+    signal row_writeaddr : addr_array;
+    signal row_writedata : data_array;
+    signal row_write_en : std_logic_vector(0 to 15);
+    
+    signal row_readaddr : addr_array;
+    signal row_readdata : data_array;
+    
+    signal x : integer range 0 to 399;
+    signal y : integer range 0 to 15;
     signal inner_x : integer;
 
 begin
 
-    addr <= to_integer(unsigned(vga_address(10 downto 2)));
-
-    process(vga_clk)
-    begin
-    if rising_edge(vga_clk) then
+    RAM_GENERATE : for i in 0 to 15 generate
+        RAM : entity work.vga_row_ram port map (
+            rdaddress => row_readaddr(i),
+            rdclock => display_clk,
+            q => row_readdata(i),
+            
+            -- the top 9 bits tell us what character we are in
+            -- the bottom 2 bits tell us which rows of the character
+            -- we are in (since we have split each character into
+            -- 4 groups of 4 rows)
+            wraddress => vga_address(10 downto 2),
+            -- so the bottom two bits tell us whether to enable the write
+            -- for this row
+            wren => row_write_en(i),
+            wrclock => vga_clk,
+            data => row_writedata(i)
+        );
+    end generate RAM_GENERATE;
     
     -- if the processor tries to write a character part, we split
     -- it up and do it in parallel (using multiple block rams
     -- comes in handy)
-    
+    MAPPING1_GENERATE : for i in 0 to 15 generate
+        row_writeaddr(i) <= vga_address(10 downto 2);
+    end generate MAPPING1_GENERATE;
+
     -- since we can only write one character part at a time, and
     -- each character is composed of four character parts, we look at the
     -- bottom two bits of the address to determine which lines this
     -- character part belongs on
-    if vga_write = '1' then
-        case vga_address(1 downto 0) is
-            when "00" =>
-                font_ram(0)(addr) <= unsigned(vga_writedata(31 downto 24));
-                font_ram(1)(addr) <= unsigned(vga_writedata(23 downto 16));
-                font_ram(2)(addr) <= unsigned(vga_writedata(15 downto 8));
-                font_ram(3)(addr) <= unsigned(vga_writedata(7 downto 0));
-            when "01" =>
-                font_ram(4)(addr) <= unsigned(vga_writedata(31 downto 24));
-                font_ram(5)(addr) <= unsigned(vga_writedata(23 downto 16));
-                font_ram(6)(addr) <= unsigned(vga_writedata(15 downto 8));
-                font_ram(7)(addr) <= unsigned(vga_writedata(7 downto 0));
-            when "10" =>
-                font_ram(8)(addr) <= unsigned(vga_writedata(31 downto 24));
-                font_ram(9)(addr) <= unsigned(vga_writedata(23 downto 16));
-                font_ram(10)(addr) <= unsigned(vga_writedata(15 downto 8));
-                font_ram(11)(addr) <= unsigned(vga_writedata(7 downto 0));
-            when others =>
-                font_ram(12)(addr) <= unsigned(vga_writedata(31 downto 24));
-                font_ram(13)(addr) <= unsigned(vga_writedata(23 downto 16));
-                font_ram(14)(addr) <= unsigned(vga_writedata(15 downto 8));
-                font_ram(15)(addr) <= unsigned(vga_writedata(7 downto 0));
-        end case;
-    end if; -- vga_write = '1'
+    row_write_en(0) <= vga_write when vga_address(1 downto 0) = "00" else '0';
+    row_write_en(1) <= vga_write when vga_address(1 downto 0) = "00" else '0';
+    row_write_en(2) <= vga_write when vga_address(1 downto 0) = "00" else '0';
+    row_write_en(3) <= vga_write when vga_address(1 downto 0) = "00" else '0';
+    row_write_en(4) <= vga_write when vga_address(1 downto 0) = "01" else '0';
+    row_write_en(5) <= vga_write when vga_address(1 downto 0) = "01" else '0';
+    row_write_en(6) <= vga_write when vga_address(1 downto 0) = "01" else '0';
+    row_write_en(7) <= vga_write when vga_address(1 downto 0) = "01" else '0';
+    row_write_en(8) <= vga_write when vga_address(1 downto 0) = "10" else '0';
+    row_write_en(9) <= vga_write when vga_address(1 downto 0) = "10" else '0';
+    row_write_en(10) <= vga_write when vga_address(1 downto 0) = "10" else '0';
+    row_write_en(11) <= vga_write when vga_address(1 downto 0) = "10" else '0';
+    row_write_en(12) <= vga_write when vga_address(1 downto 0) = "11" else '0';
+    row_write_en(13) <= vga_write when vga_address(1 downto 0) = "11" else '0';
+    row_write_en(14) <= vga_write when vga_address(1 downto 0) = "11" else '0';
+    row_write_en(15) <= vga_write when vga_address(1 downto 0) = "11" else '0';
     
-    end if; -- rising_edge(vga_clk)
-    end process; -- process(vga_clk)
+    -- we have 8 bit wide data ports, so we split it into 4 parallel
+    -- writes. we use the write enables to determine which actually
+    -- get written to
+    MAPPING2_GENERATE : for i in 0 to 3 generate
+        row_writedata(i * 4 + 0) <= vga_writedata(31 downto 24);
+        row_writedata(i * 4 + 1) <= vga_writedata(23 downto 16);
+        row_writedata(i * 4 + 2) <= vga_writedata(15 downto 8);
+        row_writedata(i * 4 + 3) <= vga_writedata(7 downto 0);
+    end generate MAPPING2_GENERATE;
     
         
     -- there are 16 lines in each font character, so we can
@@ -103,12 +123,16 @@ begin
 
     -- we can implement this as y * 80 == y << 6 + y << 4
     x <= to_integer(unsigned(display_x(9 downto 3))
-    	+ unsigned(display_y(6 downto 4) & "000000")
-    	+ unsigned(display_y(6 downto 4) & "0000"));
+    	+ unsigned(display_y(6 downto 4)) & "000000"
+    	+ unsigned(display_y(6 downto 4)) & "0000");
     	
     -- we still need to find the x position within that particular char.
     inner_x <= to_integer(unsigned(display_x(2 downto 0)));
     
-    display_pixel_on <= font_ram(y)(x)(inner_x);
+    MAPPING3_GENERATE : for i in 0 to 15 generate
+        row_readaddr(i) <= std_logic_vector(to_unsigned(x, 9));
+    end generate;
+    
+    display_pixel_on <= row_readdata(y)(inner_x);
 
 end rtl;

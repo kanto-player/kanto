@@ -2564,6 +2564,7 @@ entity nios_system is
                  signal SRAM_WE_N_from_the_sram : OUT STD_LOGIC;
 
               -- the_vga
+                 signal display_clk_to_the_vga : IN STD_LOGIC;
                  signal display_pixel_on_from_the_vga : OUT STD_LOGIC;
                  signal display_x_to_the_vga : IN STD_LOGIC_VECTOR (9 DOWNTO 0);
                  signal display_y_to_the_vga : IN STD_LOGIC_VECTOR (6 DOWNTO 0)
@@ -3020,6 +3021,7 @@ end component vga_vga_arbitrator;
 component vga is 
            port (
                  -- inputs:
+                    signal display_clk : IN STD_LOGIC;
                     signal display_x : IN STD_LOGIC_VECTOR (9 DOWNTO 0);
                     signal display_y : IN STD_LOGIC_VECTOR (6 DOWNTO 0);
                     signal vga_address : IN STD_LOGIC_VECTOR (10 DOWNTO 0);
@@ -3614,6 +3616,7 @@ begin
     port map(
       display_pixel_on => internal_display_pixel_on_from_the_vga,
       vga_readdata => vga_vga_readdata,
+      display_clk => display_clk_to_the_vga,
       display_x => display_x_to_the_vga,
       display_y => display_y_to_the_vga,
       vga_address => vga_vga_address,
@@ -3727,6 +3730,7 @@ component nios_system is
                     signal SRAM_WE_N_from_the_sram : OUT STD_LOGIC;
 
                  -- the_vga
+                    signal display_clk_to_the_vga : IN STD_LOGIC;
                     signal display_pixel_on_from_the_vga : OUT STD_LOGIC;
                     signal display_x_to_the_vga : IN STD_LOGIC_VECTOR (9 DOWNTO 0);
                     signal display_y_to_the_vga : IN STD_LOGIC_VECTOR (6 DOWNTO 0)
@@ -3745,6 +3749,7 @@ end component nios_system;
                 signal audio_track_from_the_kanto_ctrl :  STD_LOGIC_VECTOR (7 DOWNTO 0);
                 signal clk :  STD_LOGIC;
                 signal clk_0 :  STD_LOGIC;
+                signal display_clk_to_the_vga :  STD_LOGIC;
                 signal display_pixel_on_from_the_vga :  STD_LOGIC;
                 signal display_x_to_the_vga :  STD_LOGIC_VECTOR (9 DOWNTO 0);
                 signal display_y_to_the_vga :  STD_LOGIC_VECTOR (6 DOWNTO 0);
@@ -3789,6 +3794,7 @@ begin
       PS2_Clk_to_the_ps2 => PS2_Clk_to_the_ps2,
       PS2_Data_to_the_ps2 => PS2_Data_to_the_ps2,
       clk_0 => clk_0,
+      display_clk_to_the_vga => display_clk_to_the_vga,
       display_x_to_the_vga => display_x_to_the_vga,
       display_y_to_the_vga => display_y_to_the_vga,
       keys_to_the_kanto_ctrl => keys_to_the_kanto_ctrl,

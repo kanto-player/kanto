@@ -188,6 +188,8 @@ void key_receive(uint32_t blockaddr)
 int main()
 {
 	uint32_t blockaddr;
+	int i, j;
+	char buffer[80];
 
 	printf("Hello, Kanto\n");
 	vga_write_string("Hello, Kanto", 0, 0);
@@ -200,6 +202,11 @@ int main()
     read_block(0);
     setup_track_table();
     printf("Track table read\n");
+
+    for (i = 0; i < track_count && i < 4; i++) {
+    	snprintf(buffer, sizeof(buffer), "   %u. %s", i, track_titles[i]);
+    	vga_write_string(buffer, 0, i + 1);
+    }
 
     seek_to_track(0);
 

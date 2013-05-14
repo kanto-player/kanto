@@ -10,19 +10,19 @@
          type = "String";
       }
    }
-   element sdbuf.avalon_slave_0
-   {
-      datum baseAddress
-      {
-         value = "1052672";
-         type = "String";
-      }
-   }
    element sram.avalon_slave_0
    {
       datum baseAddress
       {
          value = "524288";
+         type = "String";
+      }
+   }
+   element sdbuf.avalon_slave_0
+   {
+      datum baseAddress
+      {
+         value = "1052672";
          type = "String";
       }
    }
@@ -114,20 +114,20 @@
          type = "int";
       }
    }
-   element vga.vga
-   {
-      datum baseAddress
-      {
-         value = "8192";
-         type = "String";
-      }
-   }
    element vga
    {
       datum _sortIndex
       {
          value = "7";
          type = "int";
+      }
+   }
+   element vga.vga
+   {
+      datum baseAddress
+      {
+         value = "8192";
+         type = "String";
       }
    }
 }
@@ -145,7 +145,7 @@
  <parameter name="projectName" value="kanto.qpf" />
  <parameter name="sopcBorderPoints" value="true" />
  <parameter name="systemHash" value="-21242591764" />
- <parameter name="timeStamp" value="1368472665069" />
+ <parameter name="timeStamp" value="1368559493735" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <module kind="clock_source" version="12.1" enabled="1" name="clk_0">
   <parameter name="clockFrequency" value="50000000" />

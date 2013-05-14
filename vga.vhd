@@ -19,7 +19,8 @@ entity vga is
 		vga_reset        : in  std_logic                     := '0';             --  reset_sink.reset
 		display_pixel_on : out std_logic;                                        -- conduit_end.export
 		display_x        : in  std_logic_vector(9 downto 0)  := (others => '0'); --            .export
-		display_y        : in  std_logic_vector(6 downto 0)  := (others => '0')  --            .export
+		display_y        : in  std_logic_vector(6 downto 0)  := (others => '0'); --            .export
+		display_clk      : in  std_logic                     := '0'              --            .export
 	);
 end entity vga;
 
@@ -36,7 +37,8 @@ architecture rtl of vga is
 			vga_reset        : in  std_logic                     := 'X';             -- reset
 			display_pixel_on : out std_logic;                                        -- export
 			display_x        : in  std_logic_vector(9 downto 0)  := (others => 'X'); -- export
-			display_y        : in  std_logic_vector(6 downto 0)  := (others => 'X')  -- export
+			display_y        : in  std_logic_vector(6 downto 0)  := (others => 'X'); -- export
+			display_clk      : in  std_logic                     := 'X'              -- export
 		);
 	end component de2_vga_text_buffer;
 
@@ -54,7 +56,8 @@ begin
 			vga_reset        => vga_reset,        --  reset_sink.reset
 			display_pixel_on => display_pixel_on, -- conduit_end.export
 			display_x        => display_x,        --            .export
-			display_y        => display_y         --            .export
+			display_y        => display_y,        --            .export
+			display_clk      => display_clk       --            .export
 		);
 
 end architecture rtl; -- of vga

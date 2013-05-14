@@ -2260,6 +2260,13 @@ SYSTEM nios_system
             direction = "input";
             Is_Enabled = "1";
          }
+         PORT display_clk
+         {
+            type = "export";
+            width = "1";
+            direction = "input";
+            Is_Enabled = "1";
+         }
       }
       class = "no_legacy_module";
       class_version = "7.08121";
@@ -2282,7 +2289,7 @@ SYSTEM nios_system
       }
       HDL_INFO 
       {
-         Simulation_HDL_Files = "__PROJECT_DIRECTORY__/de2_vga_text_buffer.vhd,__PROJECT_DIRECTORY__/vga.vhd";
+         Simulation_HDL_Files = "__PROJECT_DIRECTORY__/de2_vga_text_buffer.vhd,__PROJECT_DIRECTORY__/vga_row_ram.vhd,__PROJECT_DIRECTORY__/vga.vhd";
       }
       WIZARD_SCRIPT_ARGUMENTS 
       {
