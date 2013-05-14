@@ -26,7 +26,7 @@ entity conductor is
 end conductor;
 
 architecture rtl of conductor is
-    type conductor_state is (initial, cpuctrl, trigger_write, wait_write, 
+    type conductor_state is (initial, cpuctrl, trigger_sd, wait_sd, 
                              resume, playing, fft_end, block_end);
     signal state : conductor_state := initial; 
     signal fft_done_last : std_logic;
@@ -50,7 +50,7 @@ begin
                     end if;
                 when cpuctrl =>
                     if nios_readblock = '1' then
-                        state <= trigger_write;
+                        state <= trigger_sd;
                         blockaddr <= nios_addr;
                     elsif nios_play = '1' then
                         state <= resume;
@@ -60,9 +60,9 @@ begin
                             blockaddr <= blockaddr + 512;
                         end if;
                     end if;
-                when trigger_write =>
-                    state <= wait_write;
-                when wait_write =>
+                when trigger_sd =>
+                    state <= wait_sd;
+                when wait_sd =>
                     if sd_ready = '1' then
                         -- once block is read, return control to CPU
                         state <= cpuctrl;
@@ -108,7 +108,7 @@ begin
     ab_audio_ok <= '1' when state = playing or state = block_end or 
                             state = fft_end else '0';
     ab_force_swap <= '1' when state = resume else '0';
-    sd_start <= '1' when state = trigger_write or state = block_end or
+    sd_start <= '1' when state = trigger_sd or state = block_end or
                          state = resume else '0';
     -- only compute fft and refresh visualizer every fourth block
     fft_start <= '1' when state = block_end and fft_counter = 0 else '0';
