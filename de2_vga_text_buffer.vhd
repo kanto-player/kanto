@@ -9,10 +9,12 @@ port(
     vga_read : in std_logic;
     vga_write : in std_logic;
     vga_chipselect : in std_logic;
+
     -- there are 80 x 5 = 400 characters
     -- 400 * 4 parts per character = 1600 parts
     -- so 11 bit addressing
     vga_address : in std_logic_vector(10 downto 0);
+
     -- each character part is 32 bits
     vga_readdata : out std_logic_vector(31 downto 0);
     vga_writedata : in std_logic_vector(31 downto 0);
@@ -20,7 +22,7 @@ port(
     -- the following are accessed by a vga driver
     -- give me a pixel coordinate (on a 640x80 plane)
     -- and I'll tell you if it's on or off
-    --
+
     -- it's 40 pixels high because we have 5 lines,
     -- each 16 pixels high
     display_pixel_on : out std_logic;
@@ -34,7 +36,7 @@ architecture rtl of de2_vga_text_buffer is
     -- there are 16 lines in each character font.
     -- first line of ever character goes in one array, second line in
     -- another array, etc. -- this lets us write and read in parallel
-    --
+
     -- this also keeps us within the 4kbit size of a block ram
     type font_line_ram_type is array(0 to 399) of unsigned(7 downto 0);
     type font_ram_type is array(0 to 15) of font_line_ram_type;
@@ -98,7 +100,7 @@ begin
     -- we're in, ignore the bottom 3 bits. But there's a catch - we
     -- store all the rows end to end, so we have to add y * row_length
     -- where row_length = 80
-    --
+
     -- we can implement this as y * 80 == y << 6 + y << 4
     x <= to_integer(unsigned(display_x(9 downto 3))
     	+ unsigned(display_y(6 downto 4) & "000000")
