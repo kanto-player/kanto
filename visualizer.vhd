@@ -13,7 +13,7 @@ use ieee.numeric_std.all;
 
 entity visualizer is
   
-  port (
+port (
     clk25   : in std_logic;                    -- Should be 25.125 MHz
     clk50 : in std_logic;
     reset_data: in std_logic;
@@ -40,7 +40,7 @@ entity visualizer is
     vga_text_buffer_x : out std_logic_vector(9 downto 0);
     vga_text_buffer_y : out std_logic_vector(6 downto 0);
     vga_text_buffer_pixel : in std_logic
-    );
+);
 
 end visualizer;
 
@@ -90,6 +90,9 @@ architecture rtl of visualizer is
   signal test_half      : std_logic_vector (15 downto 0) := "0111111111111111";
   signal oldsum : unsigned(19 downto 0);
   signal last_fdom_data : signed(15 downto 0);
+
+  signal hpos : integer range -144 to 800;
+  signal vpos : integer range -10 to 525;
   
   -- reset stuff
   signal reset          : std_logic := '0'; -- resets the screen
@@ -244,18 +247,26 @@ end process GetData;
       end if;
     end if;
   end process VBlankGen;
+
+-- continuously get the pixel from the vga text buffer
+-- doesn't matter if we're out of range - we only use the
+-- vga_text_buffer_pixel value when we're in range, anyway
+hpos <= to_integer(Hcount) - (HSYNC + HBACK_PORCH);
+vpos <= VTOTAL - VFRONT_PORCH - to_integer(Vcount);
+vga_text_buffer_x <= to_unsigned(hpos, 10);
+vga_text_buffer_y <= to_unsigned(vpos, 7);
   
 RectangleGen: process (clk25)
-    variable hpos : integer range -144 to 800;
-    variable vpos : integer range -10 to 525;
     variable height : unsigned(7 downto 0);
     variable sum_index : integer range 0 to 15;
 begin
 	if rising_edge(clk25) then
-        hpos := to_integer(Hcount) - (HSYNC + HBACK_PORCH);
-        vpos := VTOTAL - VFRONT_PORCH - to_integer(Vcount);
 		if reset='1' then
 			rectangle<='0';
+        -- if we're inside the top 5 lines, allow the
+        -- vga text buffer to handle output
+        elsif vpos >= 0 and vpos < 80 then
+            rectangle <= vga_text_buffer_pixel;
         -- is it inside the drawable region
         elsif hpos >= 0 and hpos <= 16 * bar_w then
             if hpos <= bar_w then
@@ -331,7 +342,7 @@ end process RectangleGen;
             
         if sw_b = '1' then
            VGA_B <= "0000000000";
-        else VGA_B <= "1111111111";
+        elseVGA_B <= "1111111111";
         end if;
     elsif vga_hblank = '0' and vga_vblank ='0' then
         VGA_R <= "0000000000";
