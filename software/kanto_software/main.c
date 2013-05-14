@@ -126,10 +126,10 @@ void selection_up()
 void selection_down()
 {
 	if (selected_track == track_count - 1)
-		return 0;
+		return;
 	if (selected_row == 3) {
 		int x, i;
-		for (x = 4, i = ++selected_track, i >= 0 && x >= 1; x--, i--) {
+		for (x = 4, i = ++selected_track; i >= 0 && x >= 1; x--, i--) {
 			snprintf(buffer, sizeof(buffer), "%c  %u. %s", (i == selected_track) ? '*' : ' ', i, track_titles[i]);
 			vga_write_string(buffer, 0, x);
 		}
