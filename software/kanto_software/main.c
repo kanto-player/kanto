@@ -190,6 +190,7 @@ int main()
 	uint32_t blockaddr;
 
 	printf("Hello, Kanto\n");
+	vga_write_string("Hello, Kanto", 0, 0);
 
     // stop playback
     stop_playback();
