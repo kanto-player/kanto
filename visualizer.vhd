@@ -253,8 +253,8 @@ end process GetData;
 -- vga_text_buffer_pixel value when we're in range, anyway
 hpos <= to_integer(Hcount) - (HSYNC + HBACK_PORCH);
 vpos <= VTOTAL - VFRONT_PORCH - to_integer(Vcount);
-vga_text_buffer_x <= to_unsigned(hpos, 10);
-vga_text_buffer_y <= to_unsigned(vpos, 7);
+vga_text_buffer_x <= std_logic_vector(to_unsigned(hpos, 10));
+vga_text_buffer_y <= std_logic_vector(to_unsigned(vpos, 7));
   
 RectangleGen: process (clk25)
     variable height : unsigned(7 downto 0);
@@ -342,7 +342,8 @@ end process RectangleGen;
             
         if sw_b = '1' then
            VGA_B <= "0000000000";
-        elseVGA_B <= "1111111111";
+        else
+           VGA_B <= "1111111111";
         end if;
     elsif vga_hblank = '0' and vga_vblank ='0' then
         VGA_R <= "0000000000";

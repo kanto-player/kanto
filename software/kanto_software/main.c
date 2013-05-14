@@ -174,8 +174,10 @@ void key_receive(uint32_t blockaddr)
 
 	case 0x3b: // 'j' move down
 		selection_down();
+		break;
 	case 0x42: // 'k' move up
 		selection_up();
+		break;
 	case 0x5a: // 'enter' select
 		selection_play();
 		break;
