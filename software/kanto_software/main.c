@@ -32,7 +32,7 @@ int playing = 0;
 #define REWIND 0x8
 
 /* number of blocks in a second */
-#define BLOCK_SECOND (172 * 512)
+#define BLOCK_SECOND 172
 
 #define wait_for_done() while (!IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_DONE))
 
@@ -80,7 +80,7 @@ static inline void read_block(uint32_t addr)
 	wait_for_done();
 }
 
-static inline void setup_track_table(void)
+static void setup_track_table(void)
 {
 	int i, j;
 	uint32_t word;
@@ -104,7 +104,7 @@ static inline void setup_track_table(void)
 
 static inline void check_curtrack(void)
 {
-	if (track_table[curtrack] == 0 || track_table[curtrack + 1] == 0)
+	if (curtrack >= track_count)
 		curtrack = 0;
 }
 
@@ -120,7 +120,7 @@ static inline void seek_to_track(int track)
 	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_TRACK, curtrack);
 }
 
-void selection_up()
+static void selection_up()
 {
 	if (selected_track == 0)
 		return;
@@ -138,7 +138,7 @@ void selection_up()
 	selected_track--;
 }
 
-void selection_down()
+static void selection_down()
 {
 	if (selected_track == track_count - 1)
 		return;
@@ -156,7 +156,7 @@ void selection_down()
 	selected_track++;
 }
 
-void selection_play()
+static inline void selection_play()
 {
 	stop_playback();
 	seek_to_track(selected_track);
@@ -165,7 +165,7 @@ void selection_play()
 
 int ignore_next_key = 0;
 
-void key_receive(uint32_t blockaddr)
+static void key_receive(uint32_t blockaddr)
 {
 	unsigned short key;
 	key = IORD_8DIRECT(PS2_BASE, 4);
@@ -268,21 +268,17 @@ int main()
 
     printf("First block read\n");
 
-    //start_playback();
+    start_playback();
 
     printf("Playing audio\n");
 
     for (;;) {
     	blockaddr = IORD_32DIRECT(KANTO_CTRL_BASE, KANTO_BLOCKADDR);
 
-    	if (IORD_8DIRECT(PS2_BASE, 0)) {
+    	if (IORD_8DIRECT(PS2_BASE, 0))
     		key_receive(blockaddr);
-    	} else if (blockaddr >= track_end) {
-    		curtrack++;
-    		check_curtrack();
-    		track_end = track_table[curtrack + 1];
-    		IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_TRACK, curtrack);
-    	}
+    	else if (blockaddr >= track_end)
+    		seek_to_track(curtrack + 1);
     }
 
 	return 0;
