@@ -41,11 +41,8 @@ architecture rtl of de2_vga_text_buffer is
     type addr_array is array(0 to 15) of std_logic_vector(8 downto 0);
     type data_array is array(0 to 15) of std_logic_vector(7 downto 0);
     
-    signal row_writeaddr : addr_array;
     signal row_writedata : data_array;
     signal row_write_en : std_logic_vector(0 to 15);
-    
-    signal row_readaddr : addr_array;
     signal row_readdata : data_array;
     
     signal x : integer range 0 to 399;
@@ -56,7 +53,7 @@ begin
 
     RAM_GENERATE : for i in 0 to 15 generate
         RAM : entity work.vga_row_ram port map (
-            rdaddress => row_readaddr(i),
+            rdaddress => std_logic_vector(to_unsigned(x, 9)),
             rdclock => display_clk,
             q => row_readdata(i),
             
@@ -72,13 +69,6 @@ begin
             data => row_writedata(i)
         );
     end generate RAM_GENERATE;
-    
-    -- if the processor tries to write a character part, we split
-    -- it up and do it in parallel (using multiple block rams
-    -- comes in handy)
-    MAPPING1_GENERATE : for i in 0 to 15 generate
-        row_writeaddr(i) <= vga_address(10 downto 2);
-    end generate MAPPING1_GENERATE;
 
     -- since we can only write one character part at a time, and
     -- each character is composed of four character parts, we look at the
@@ -123,15 +113,12 @@ begin
 
     -- we can implement this as y * 80 == y << 6 + y << 4
     x <= to_integer(unsigned(display_x(9 downto 3))
-    	+ unsigned(display_y(6 downto 4)) & "000000"
-    	+ unsigned(display_y(6 downto 4)) & "0000");
+    	+ unsigned(unsigned(display_y(6 downto 4)) & "000000")
+    	+ unsigned(unsigned(display_y(6 downto 4)) & "0000"));
+--    x <= 0;
     	
     -- we still need to find the x position within that particular char.
     inner_x <= to_integer(unsigned(display_x(2 downto 0)));
-    
-    MAPPING3_GENERATE : for i in 0 to 15 generate
-        row_readaddr(i) <= std_logic_vector(to_unsigned(x, 9));
-    end generate;
     
     display_pixel_on <= row_readdata(y)(inner_x);
 
