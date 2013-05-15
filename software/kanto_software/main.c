@@ -55,7 +55,7 @@ static inline void stop_playback(void)
 	wait_for_done();
 	if (curtrack >= list_top_track && curtrack <= list_top_track + 3) {
 		int listnum = curtrack - list_top_track;
-		snprintf(buffer, sizeof(buffer), "%c %c%u. %s", (curtrack == selected_track) ? '*' : ' ', ' ', curtrack, track_titles[curtrack]);
+		snprintf(buffer, sizeof(buffer), "%c  %c%u. %s", (curtrack == selected_track) ? '*' : ' ', ' ', curtrack, track_titles[curtrack]);
 		vga_write_string(buffer, listnum + 1);
 	}
 }
@@ -66,7 +66,7 @@ static inline void start_playback(void)
 	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_PLAY, 1);
 	if (curtrack >= list_top_track && curtrack <= list_top_track + 3) {
 		int listnum = curtrack - list_top_track;
-		snprintf(buffer, sizeof(buffer), "%c %c%u. %s", (curtrack == selected_track) ? '*' : ' ', '>', curtrack, track_titles[curtrack]);
+		snprintf(buffer, sizeof(buffer), "%c  %c%u. %s", (curtrack == selected_track) ? '*' : ' ', '>', curtrack, track_titles[curtrack]);
 		vga_write_string(buffer, listnum + 1);
 	}
 }
@@ -262,7 +262,7 @@ int main()
     list_top_track = 0;
 
     for (i = 0; i < track_count && i < 4; i++) {
-    	snprintf(buffer, sizeof(buffer), "%c  %u. %s", (i == selected_row) ? '*' : ' ', i, track_titles[i]);
+    	snprintf(buffer, sizeof(buffer), "%c   %u. %s", (i == selected_row) ? '*' : ' ', i, track_titles[i]);
     	vga_write_string(buffer, i + 1);
     }
 
