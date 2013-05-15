@@ -10,6 +10,7 @@
 #define KANTO_DONE 12
 #define KANTO_TRACK 16
 #define KANTO_KEYS 20
+#define KANTO_CCS 24
 
 #define MAX_TRACKS 8
 
@@ -32,7 +33,8 @@ int playing = 0;
 #define REWIND 0x8
 
 /* number of blocks in a second */
-#define BLOCK_SECOND 172
+static int BLOCK_SECOND;
+static int SD_CCS;
 
 #define wait_for_done() while (!IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_DONE))
 
@@ -238,13 +240,11 @@ int main()
 	uint32_t blockaddr;
 	int i;
 
+	SD_CCS = IORD_8DIRECT(KANTO_CTRL_BASE, KANTO_CCS);
+	BLOCK_SECOND = (SD_CCS) ? 172 : 172 * 512;
+
 	printf("Hello, Kanto\n");
-//	IOWR_32DIRECT(VGA_BASE, 2576, 0x00000000);
-//	IOWR_32DIRECT(VGA_BASE, 2580, 0x00e103e3);
-//	IOWR_32DIRECT(VGA_BASE, 2584, 0x333333e6);
-//	IOWR_32DIRECT(VGA_BASE, 2588, 0x00000000);
 	vga_write_string("                            == [ Hello, Kanto ] ==       ", 0);
-//	vga_write_string("                    f           ", 0, 1);
 
     // stop playback
     stop_playback();
