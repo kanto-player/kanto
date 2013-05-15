@@ -25,6 +25,7 @@
       nios_done_to_the_kanto_ctrl => nios_done_to_the_kanto_ctrl,
       reset_n => reset_n,
       sd_blockaddr_to_the_kanto_ctrl => sd_blockaddr_to_the_kanto_ctrl,
+      sd_ccs_to_the_kanto_ctrl => sd_ccs_to_the_kanto_ctrl,
       sdbuf_data_to_the_sdbuf => sdbuf_data_to_the_sdbuf
     );
 

@@ -258,6 +258,7 @@ begin
         sd_blockaddr_to_the_kanto_ctrl => std_logic_vector(sd_blockaddr),
         audio_track_from_the_kanto_ctrl => audio_track,
         keys_to_the_kanto_ctrl => not KEY,
+        sd_ccs_to_the_kanto_ctrl => sd_ccs,
 
         sdbuf_addr_from_the_sdbuf => sdbuf_addr,
         sdbuf_data_to_the_sdbuf => sdbuf_data,

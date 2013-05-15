@@ -18,6 +18,7 @@ entity de2_kanto_ctrl is
 
           keys : in std_logic_vector(3 downto 0);
 
+          sd_ccs : in std_logic;
           audio_track : out std_logic_vector(7 downto 0);
           sd_blockaddr : in std_logic_vector(31 downto 0));
 end de2_kanto_ctrl;
@@ -64,6 +65,10 @@ begin
                     when "101" =>
                         if read = '1' then
                             readdata <= (31 downto 4 => '0') & keys;
+                        end if;
+                    when "110" =>
+                        if read = '1' then
+                            readdata <= (31 downto 1 => '0') & sd_ccs;
                         end if;
                     when others =>
                         if read = '1' then

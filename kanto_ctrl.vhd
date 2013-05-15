@@ -23,7 +23,8 @@ entity kanto_ctrl is
 		nios_done      : in  std_logic                     := '0';             --               .export
 		sd_blockaddr   : in  std_logic_vector(31 downto 0) := (others => '0'); --               .export
 		audio_track    : out std_logic_vector(7 downto 0);                     --               .export
-		keys           : in  std_logic_vector(3 downto 0)  := (others => '0')  --               .export
+		keys           : in  std_logic_vector(3 downto 0)  := (others => '0'); --               .export
+		sd_ccs         : in  std_logic                     := '0'              --               .export
 	);
 end entity kanto_ctrl;
 
@@ -44,7 +45,8 @@ architecture rtl of kanto_ctrl is
 			nios_done      : in  std_logic                     := 'X';             -- export
 			sd_blockaddr   : in  std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			audio_track    : out std_logic_vector(7 downto 0);                     -- export
-			keys           : in  std_logic_vector(3 downto 0)  := (others => 'X')  -- export
+			keys           : in  std_logic_vector(3 downto 0)  := (others => 'X'); -- export
+			sd_ccs         : in  std_logic                     := 'X'              -- export
 		);
 	end component de2_kanto_ctrl;
 
@@ -66,7 +68,8 @@ begin
 			nios_done      => nios_done,      --               .export
 			sd_blockaddr   => sd_blockaddr,   --               .export
 			audio_track    => audio_track,    --               .export
-			keys           => keys            --               .export
+			keys           => keys,           --               .export
+			sd_ccs         => sd_ccs          --               .export
 		);
 
 end architecture rtl; -- of kanto_ctrl

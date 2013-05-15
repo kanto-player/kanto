@@ -1215,7 +1215,7 @@ begin
   kanto_ctrl_avalon_slave_0_begins_xfer <= NOT d1_reasons_to_wait AND (internal_cpu_0_data_master_qualified_request_kanto_ctrl_avalon_slave_0);
   --assign kanto_ctrl_avalon_slave_0_readdata_from_sa = kanto_ctrl_avalon_slave_0_readdata so that symbol knows where to group signals which may go to master only, which is an e_assign
   kanto_ctrl_avalon_slave_0_readdata_from_sa <= kanto_ctrl_avalon_slave_0_readdata;
-  internal_cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0 <= to_std_logic(((Std_Logic_Vector'(cpu_0_data_master_address_to_slave(20 DOWNTO 5) & std_logic_vector'("00000")) = std_logic_vector'("100000001001000000000")))) AND ((cpu_0_data_master_read OR cpu_0_data_master_write));
+  internal_cpu_0_data_master_requests_kanto_ctrl_avalon_slave_0 <= to_std_logic(((Std_Logic_Vector'(cpu_0_data_master_address_to_slave(20 DOWNTO 5) & std_logic_vector'("00000")) = std_logic_vector'("000000000000000100000")))) AND ((cpu_0_data_master_read OR cpu_0_data_master_write));
   --kanto_ctrl_avalon_slave_0_arb_share_counter set values, which is an e_mux
   kanto_ctrl_avalon_slave_0_arb_share_set_values <= std_logic_vector'("001");
   --kanto_ctrl_avalon_slave_0_non_bursting_master_requests mux, which is an e_mux
@@ -2544,6 +2544,7 @@ entity nios_system is
                  signal nios_play_from_the_kanto_ctrl : OUT STD_LOGIC;
                  signal nios_readblock_from_the_kanto_ctrl : OUT STD_LOGIC;
                  signal sd_blockaddr_to_the_kanto_ctrl : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+                 signal sd_ccs_to_the_kanto_ctrl : IN STD_LOGIC;
 
               -- the_ps2
                  signal PS2_Clk_to_the_ps2 : IN STD_LOGIC;
@@ -2834,6 +2835,7 @@ component kanto_ctrl is
                     signal read : IN STD_LOGIC;
                     signal reset_n : IN STD_LOGIC;
                     signal sd_blockaddr : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+                    signal sd_ccs : IN STD_LOGIC;
                     signal write : IN STD_LOGIC;
                     signal writedata : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
 
@@ -3448,6 +3450,7 @@ begin
       read => kanto_ctrl_avalon_slave_0_read,
       reset_n => kanto_ctrl_avalon_slave_0_reset_n,
       sd_blockaddr => sd_blockaddr_to_the_kanto_ctrl,
+      sd_ccs => sd_ccs_to_the_kanto_ctrl,
       write => kanto_ctrl_avalon_slave_0_write,
       writedata => kanto_ctrl_avalon_slave_0_writedata
     );
@@ -3710,6 +3713,7 @@ component nios_system is
                     signal nios_play_from_the_kanto_ctrl : OUT STD_LOGIC;
                     signal nios_readblock_from_the_kanto_ctrl : OUT STD_LOGIC;
                     signal sd_blockaddr_to_the_kanto_ctrl : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+                    signal sd_ccs_to_the_kanto_ctrl : IN STD_LOGIC;
 
                  -- the_ps2
                     signal PS2_Clk_to_the_ps2 : IN STD_LOGIC;
@@ -3762,6 +3766,7 @@ end component nios_system;
                 signal nios_readblock_from_the_kanto_ctrl :  STD_LOGIC;
                 signal reset_n :  STD_LOGIC;
                 signal sd_blockaddr_to_the_kanto_ctrl :  STD_LOGIC_VECTOR (31 DOWNTO 0);
+                signal sd_ccs_to_the_kanto_ctrl :  STD_LOGIC;
                 signal sdbuf_addr_from_the_sdbuf :  STD_LOGIC_VECTOR (7 DOWNTO 0);
                 signal sdbuf_data_to_the_sdbuf :  STD_LOGIC_VECTOR (15 DOWNTO 0);
                 signal sdbuf_rden_from_the_sdbuf :  STD_LOGIC;
@@ -3801,6 +3806,7 @@ begin
       nios_done_to_the_kanto_ctrl => nios_done_to_the_kanto_ctrl,
       reset_n => reset_n,
       sd_blockaddr_to_the_kanto_ctrl => sd_blockaddr_to_the_kanto_ctrl,
+      sd_ccs_to_the_kanto_ctrl => sd_ccs_to_the_kanto_ctrl,
       sdbuf_data_to_the_sdbuf => sdbuf_data_to_the_sdbuf
     );
 
