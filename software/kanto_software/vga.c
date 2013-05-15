@@ -1,9 +1,17 @@
 #include <system.h>
 #include <io.h>
+#include <stdint.h>
 #include "vga.h"
 
+struct part {
+	char part1;
+	char part2;
+	char part3;
+	char part4;
+};
+
 struct character {
-	char parts[4][4];
+	struct part parts[4];
 };
 
 struct character font[] = {
@@ -145,7 +153,7 @@ void vga_write_character(char c, unsigned int x, unsigned int y)
 	// look up the font character and send the entire 128 bits to the VGA text buffer
 	int i;
 	for (i = 0; i < 4; i++)
-		IOWR_32DIRECT(VGA_BASE, y * 80 * 4 + x * 4 + i, font[c].parts[i]);
+		IOWR_32DIRECT(VGA_BASE, y * 80 * 4 + x * 4 + i, *((uint32_t *) &font[c].parts[i]));
 }
 
 void vga_write_string(char *s, unsigned int x, unsigned int y)
