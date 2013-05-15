@@ -22,7 +22,9 @@ uint32_t track_end;
 
 unsigned char selected_track;
 unsigned char selected_row;
+unsigned char list_top_track;
 char buffer[81];
+int playing = 0;
 
 #define NEXT_TRACK 0x1
 #define LAST_TRACK 0x2
@@ -48,13 +50,25 @@ static inline uint32_t sdbuf_read_word(unsigned char offset)
 
 static inline void stop_playback(void)
 {
+	playing = 0;
 	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_PLAY, 0);
 	wait_for_done();
+	if (curtrack >= list_top_track && curtrack <= list_top_track + 3) {
+		int listnum = curtrack - list_top_track;
+		snprintf(buffer, sizeof(buffer), "%c %c%u. %s", (curtrack == selected_track) ? '*' : ' ', ' ', curtrack, track_titles[curtrack]);
+		vga_write_string(buffer, 0, listnum + 1);
+	}
 }
 
 static inline void start_playback(void)
 {
+	playing = 1;
 	IOWR_8DIRECT(KANTO_CTRL_BASE, KANTO_PLAY, 1);
+	if (curtrack >= list_top_track && curtrack <= list_top_track + 3) {
+		int listnum = curtrack - list_top_track;
+		snprintf(buffer, sizeof(buffer), "%c %c%u. %s", (curtrack == selected_track) ? '*' : ' ', '>', curtrack, track_titles[curtrack]);
+		vga_write_string(buffer, 0, listnum + 1);
+	}
 }
 
 static inline void read_block(uint32_t addr)
@@ -112,8 +126,9 @@ void selection_up()
 		return;
 	if (selected_row == 0) {
 		int x, i;
+		list_top_track--;
 		for (x = 1, i = --selected_track; i < track_count && x < 5; x++, i++) {
-			snprintf(buffer, sizeof(buffer), "%c  %u. %s", (i == selected_track) ? '*' : ' ', i, track_titles[i]);
+			snprintf(buffer, sizeof(buffer), "%c  %c%u. %s", (i == selected_track) ? '*' : ' ', (i == curtrack && playing) ? '>' : ' ', i, track_titles[i]);
 			vga_write_string(buffer, 0, x);
 		}
 		return;
@@ -129,8 +144,9 @@ void selection_down()
 		return;
 	if (selected_row == 3) {
 		int x, i;
+		list_top_track++;
 		for (x = 4, i = ++selected_track; i >= 0 && x >= 1; x--, i--) {
-			snprintf(buffer, sizeof(buffer), "%c  %u. %s", (i == selected_track) ? '*' : ' ', i, track_titles[i]);
+			snprintf(buffer, sizeof(buffer), "%c  %c%u. %s", (i == selected_track) ? '*' : ' ', (i == curtrack && playing) ? '>' : ' ', i, track_titles[i]);
 			vga_write_string(buffer, 0, x);
 		}
 		return;
@@ -200,15 +216,20 @@ void key_receive(uint32_t blockaddr)
 		break;
 
 	case 0x3b: // 'j' move down
-		//selection_down();
+		selection_down();
 		break;
 	case 0x42: // 'k' move up
-		//selection_up();
+		selection_up();
 		break;
 	case 0x5a: // 'enter' select
-		//selection_play();
+		selection_play();
 		break;
-
+	case 0x29: // 'space' play/pause
+		if (playing)
+			stop_playback();
+		else
+			start_playback();
+		break;
 	}
 }
 
@@ -218,7 +239,12 @@ int main()
 	int i, j;
 
 	printf("Hello, Kanto\n");
-	vga_write_string("Hello, Kanto", 0, 4);
+//	IOWR_32DIRECT(VGA_BASE, 2576, 0x00000000);
+//	IOWR_32DIRECT(VGA_BASE, 2580, 0x00e103e3);
+//	IOWR_32DIRECT(VGA_BASE, 2584, 0x333333e6);
+//	IOWR_32DIRECT(VGA_BASE, 2588, 0x00000000);
+	vga_write_string("                            == [ Hello, Kanto ] ==       ", 0, 0);
+//	vga_write_string("                    f           ", 0, 1);
 
     // stop playback
     stop_playback();
@@ -229,19 +255,20 @@ int main()
     setup_track_table();
     printf("Track table read\n");
 
-//    for (i = 0; i < track_count && i < 4; i++) {
-//    	snprintf(buffer, sizeof(buffer), "   %u. %s", i, track_titles[i]);
-//    	vga_write_string(buffer, 0, i + 1);
-//    }
-
     seek_to_track(0);
 
     selected_track = 0;
     selected_row = 0;
+    list_top_track = 0;
+
+    for (i = 0; i < track_count && i < 4; i++) {
+    	snprintf(buffer, sizeof(buffer), "%c  %u. %s", (i == selected_row) ? '*' : ' ', i, track_titles[i]);
+    	vga_write_string(buffer, 0, i + 1);
+    }
 
     printf("First block read\n");
 
-    start_playback();
+    //start_playback();
 
     printf("Playing audio\n");
 

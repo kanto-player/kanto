@@ -40,14 +40,15 @@ architecture rtl of de2_vga_text_buffer is
     
     type addr_array is array(0 to 15) of std_logic_vector(8 downto 0);
     type data_array is array(0 to 15) of std_logic_vector(7 downto 0);
+    type backwards_data_array is array(0 to 15) of std_logic_vector(0 to 7);
     
     signal row_writedata : data_array;
     signal row_write_en : std_logic_vector(0 to 15);
-    signal row_readdata : data_array;
+    signal row_readdata : backwards_data_array;
     
     signal x : integer range 0 to 399;
     signal y : integer range 0 to 15;
-    signal inner_x : integer;
+    signal inner_x : integer range 0 to 7;
 
 begin
 
@@ -118,7 +119,9 @@ begin
 --    x <= 0;
     	
     -- we still need to find the x position within that particular char.
-    inner_x <= to_integer(unsigned(display_x(2 downto 0)));
+    -- this -2 is a horrible horrible hack and I have no idea why it works
+    -- probably related to timing
+    inner_x <= to_integer(unsigned(display_x(2 downto 0))) - 2;
     
     display_pixel_on <= row_readdata(y)(inner_x);
 

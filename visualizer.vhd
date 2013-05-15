@@ -254,7 +254,7 @@ end process GetData;
 hpos <= to_integer(Hcount) - (HSYNC + HBACK_PORCH);
 vpos <= VTOTAL - VFRONT_PORCH - to_integer(Vcount);
 vga_text_buffer_x <= std_logic_vector(to_unsigned(hpos, 10));
-vga_text_buffer_y <= std_logic_vector(to_unsigned(640 - vpos, 7));
+vga_text_buffer_y <= std_logic_vector(to_unsigned(to_integer(Vcount) - (VSYNC + VBACK_PORCH), 7));
   
 RectangleGen: process (clk25)
     variable height : unsigned(7 downto 0);
@@ -265,7 +265,7 @@ begin
 			rectangle<='0';
         -- if we're inside the top 5 lines, allow the
         -- vga text buffer to handle output
-        elsif vpos < 640 and vpos >= 360 then
+        elsif vpos < 480 and vpos >= 400 then
             rectangle <= vga_text_buffer_pixel;
         -- is it inside the drawable region
         elsif hpos >= 0 and hpos <= 16 * bar_w then
