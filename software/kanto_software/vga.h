@@ -10,7 +10,7 @@
 
 void vga_write_character(char c, unsigned int x, unsigned int y);
 
-void vga_write_string(char *s, unsigned int x, unsigned int y);
+void vga_write_string(char *s, unsigned int y);
 
 
 #endif /* VGA_H_ */

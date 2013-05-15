@@ -56,7 +56,7 @@ static inline void stop_playback(void)
 	if (curtrack >= list_top_track && curtrack <= list_top_track + 3) {
 		int listnum = curtrack - list_top_track;
 		snprintf(buffer, sizeof(buffer), "%c %c%u. %s", (curtrack == selected_track) ? '*' : ' ', ' ', curtrack, track_titles[curtrack]);
-		vga_write_string(buffer, 0, listnum + 1);
+		vga_write_string(buffer, listnum + 1);
 	}
 }
 
@@ -67,7 +67,7 @@ static inline void start_playback(void)
 	if (curtrack >= list_top_track && curtrack <= list_top_track + 3) {
 		int listnum = curtrack - list_top_track;
 		snprintf(buffer, sizeof(buffer), "%c %c%u. %s", (curtrack == selected_track) ? '*' : ' ', '>', curtrack, track_titles[curtrack]);
-		vga_write_string(buffer, 0, listnum + 1);
+		vga_write_string(buffer, listnum + 1);
 	}
 }
 
@@ -129,7 +129,7 @@ void selection_up()
 		list_top_track--;
 		for (x = 1, i = --selected_track; i < track_count && x < 5; x++, i++) {
 			snprintf(buffer, sizeof(buffer), "%c  %c%u. %s", (i == selected_track) ? '*' : ' ', (i == curtrack && playing) ? '>' : ' ', i, track_titles[i]);
-			vga_write_string(buffer, 0, x);
+			vga_write_string(buffer, x);
 		}
 		return;
 	}
@@ -147,7 +147,7 @@ void selection_down()
 		list_top_track++;
 		for (x = 4, i = ++selected_track; i >= 0 && x >= 1; x--, i--) {
 			snprintf(buffer, sizeof(buffer), "%c  %c%u. %s", (i == selected_track) ? '*' : ' ', (i == curtrack && playing) ? '>' : ' ', i, track_titles[i]);
-			vga_write_string(buffer, 0, x);
+			vga_write_string(buffer, x);
 		}
 		return;
 	}
@@ -236,14 +236,14 @@ void key_receive(uint32_t blockaddr)
 int main()
 {
 	uint32_t blockaddr;
-	int i, j;
+	int i;
 
 	printf("Hello, Kanto\n");
 //	IOWR_32DIRECT(VGA_BASE, 2576, 0x00000000);
 //	IOWR_32DIRECT(VGA_BASE, 2580, 0x00e103e3);
 //	IOWR_32DIRECT(VGA_BASE, 2584, 0x333333e6);
 //	IOWR_32DIRECT(VGA_BASE, 2588, 0x00000000);
-	vga_write_string("                            == [ Hello, Kanto ] ==       ", 0, 0);
+	vga_write_string("                            == [ Hello, Kanto ] ==       ", 0);
 //	vga_write_string("                    f           ", 0, 1);
 
     // stop playback
@@ -263,7 +263,7 @@ int main()
 
     for (i = 0; i < track_count && i < 4; i++) {
     	snprintf(buffer, sizeof(buffer), "%c  %u. %s", (i == selected_row) ? '*' : ' ', i, track_titles[i]);
-    	vga_write_string(buffer, 0, i + 1);
+    	vga_write_string(buffer, i + 1);
     }
 
     printf("First block read\n");
