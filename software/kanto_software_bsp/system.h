@@ -4,7 +4,7 @@
  * Machine generated for CPU 'cpu_0' in SOPC Builder design 'nios_system'
  * SOPC Builder design path: ../../nios_system.sopcinfo
  *
- * Generated: Mon May 13 15:24:10 EDT 2013
+ * Generated: Wed May 15 13:49:54 EDT 2013
  */
 
 /*
@@ -202,7 +202,7 @@
  */
 
 #define ALT_MODULE_CLASS_kanto_ctrl de2_kanto_ctrl
-#define KANTO_CTRL_BASE 0x101200
+#define KANTO_CTRL_BASE 0x20
 #define KANTO_CTRL_IRQ -1
 #define KANTO_CTRL_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define KANTO_CTRL_NAME "/dev/kanto_ctrl"
