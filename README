@@ -1,7 +1,23 @@
-Hardware description files for the Kanto audio player.
+Hardware description files and NIOS II code for the Kanto audio player.
 
 Quartus Project File - kanto.qpf
 Quartus Assignments File - kanto.qsf
 Quartus Top-Level Entity - kanto.vhd
+NIOS II Code - software/kanto_software
+NIOS II BSP - software/kanto_software_bsp
 
+To run the project, perform the following steps
+ 
+ 1. Open up kanto.qpf in quartus. 
+ 2. Compile the HDL and program the kanto.sof file onto the DE2 board.
+ 3. Open NIOS II IDE
+ 4. Import the software/kanto_software and software/kanto_software_bsp projects
+ 5. Build All, then Run
 
+Kanto Project Team Members
+
+ * Kavita Jain-Cocks - kj2264
+ * Zhehao Mao - zm2169
+ * Amrita Mazumdar - am3210
+ * Darien Nurse - don2102
+ * Jonathan Yu - jy2432
