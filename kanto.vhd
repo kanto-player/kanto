@@ -215,6 +215,7 @@ architecture datapath of kanto is
     signal nios_readblock : std_logic;
     signal nios_play : std_logic;
     signal nios_done : std_logic;
+    signal nios_keys : std_logic_vector(3 downto 0);
     
     signal sdbuf_rden : std_logic;
     signal sdbuf_addr : std_logic_vector(7 downto 0);
@@ -238,6 +239,7 @@ begin
     LEDR(0) <= sd_err;
     LEDR(1) <= cond_err;
     ab_play <= SW(17) and ab_audio_ok;
+    nios_keys <= not KEY;
     
     NIOS : entity work.nios_system port map (
         clk_0 => main_clk,
@@ -257,8 +259,8 @@ begin
         nios_readblock_from_the_kanto_ctrl => nios_readblock,
         sd_blockaddr_to_the_kanto_ctrl => std_logic_vector(sd_blockaddr),
         audio_track_from_the_kanto_ctrl => audio_track,
-        keys_to_the_kanto_ctrl => not KEY,
         sd_ccs_to_the_kanto_ctrl => sd_ccs,
+        keys_to_the_kanto_ctrl => nios_keys,
 
         sdbuf_addr_from_the_sdbuf => sdbuf_addr,
         sdbuf_data_to_the_sdbuf => sdbuf_data,
